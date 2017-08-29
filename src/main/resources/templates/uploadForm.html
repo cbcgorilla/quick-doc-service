@@ -1,0 +1,45 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+
+<div>
+    <form method="POST" enctype="multipart/form-data" action="/files/">
+        <table>
+            <tr>
+                <td>需要上传的文件:</td>
+                <td><input type="file" name="file"/></td>
+            </tr>
+            <tr>
+                <td>文件分类:</td>
+                <td>
+                    <select>
+                        <option th:each="category : ${allCategories}"
+                                th:value="${category}" th:text="${category.type}">Credit card</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" value="上传"/></td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div th:if="${countoffiles}">
+    <h2 th:text="${countoffiles}"/>
+</div>
+
+<div>
+    <ul>
+        <li th:each="file : ${files}">
+            <a th:href="${file}" th:text="${file}"/>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>
