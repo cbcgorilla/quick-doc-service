@@ -1,14 +1,19 @@
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"></title>
+    <link href="css/bootstrap.css" rel="stylesheet"/>
+    <link href="css/app.css" rel="stylesheet"/>
+</head>
 <body>
 
-<div th:if="${message}">
-    <h2 th:text="${message}"/>
+<div th:if="${title}">
+    <h2 th:text="${title}"/>
 </div>
 
-<div th:if="${directoryId}">
+<div th:if="${currentdirectory}">
     <div>
         <form method="POST" enctype="multipart/form-data" action=".">
-            <table>
+            <table class="table table-hover">
                 <tr>
                     <td>需要上传的文件:</td>
                     <td><input type="file" name="file"/></td>
@@ -16,15 +21,16 @@
                 <tr>
                     <td>文件分类:</td>
                     <td>
-                        <select>
+                        <select id="categoryId" name="categoryId">
                             <option th:each="category : ${allCategories}"
-                                    th:value="${category}" th:text="${category.type}">文件分类
+                                    th:value="${category.id}" th:text="${category.type}">文件分类
                             </option>
                         </select>
                     </td>
                 </tr>
                 <tr>
-                    <td><input id="directoryId" name="directoryId" type="hidden" th:value="${directoryId}"/></td>
+                    <td><input id="directoryId" name="directoryId" type="hidden" th:value="${currentdirectory.id}"/>
+                    </td>
                     <td><input type="submit" value="上传"/></td>
                 </tr>
             </table>
@@ -32,21 +38,54 @@
     </div>
 </div>
 
-<div>
-    <ul>
-        <li th:each="directory : ${directories}">
-            <a th:href="${directory.id}" th:text="${directory.path}"/>
-        </li>
-    </ul>
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
 </div>
 
-<div>
-    <ul>
-        <li th:each="file : ${files}">
-            <a th:href="@{'view/'+${file.storedId}}" th:text="${file.filename}"/>
-        </li>
-    </ul>
+<div class="panel-body">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>文件夹</th>
+                <th>上级文件夹</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="directory : ${directories}">
+                <td><a th:href="${directory.id}" th:text="${directory.path}"/></td>
+                <td><a th:href="${directory.parentId}" th:text="${directory.parentId}"/></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
+<div class="panel-body">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>文件名</th>
+                <th>文件长度</th>
+                <th>上传日期</th>
+                <th>文件分类ID</th>
+                <th>文件目录ID</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="file : ${files}">
+                <td><a th:href="@{'view/'+${file.storedId}}" th:text="${file.filename}"/></td>
+                <td th:text="${file.contentLength}">ID</td>
+                <td th:text="${file.uploadDate}">ID</td>
+                <td th:text="${file.categoryId}">ID</td>
+                <td th:text="${file.directoryId}">ID</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </body>
 </html>

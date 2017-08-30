@@ -2,6 +2,7 @@ package com.neofinance.quickdoc.web.mvc;
 
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.neofinance.quickdoc.common.entities.FsCategory;
+import com.neofinance.quickdoc.common.entities.FsDirectory;
 import com.neofinance.quickdoc.common.entities.FsEntity;
 import com.neofinance.quickdoc.common.utils.KeyUtil;
 import com.neofinance.quickdoc.service.ReactiveCategoryService;
@@ -9,7 +10,6 @@ import com.neofinance.quickdoc.service.ReactiveDirectoryService;
 import com.neofinance.quickdoc.service.ReactiveFileService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/")
 public class IndexController {
+
+    private static final String HOME_TITLE = "极速云存储（强大源自共享）";
 
     private final ReactiveCategoryService reactiveCategoryService;
     private final ReactiveDirectoryService reactiveDirectoryFsService;
@@ -49,29 +51,18 @@ public class IndexController {
 
     @GetMapping()
     public String index(Model model) throws IOException {
-        model.addAttribute("message", "文件服务器：强大源自共享");
-
-        model.addAttribute("directories",
-                reactiveDirectoryFsService.allRootDirectories()
-                        .toStream()
-                        .collect(Collectors.toList()));
+        model.addAttribute("title", HOME_TITLE);
+        refreshDirList(model, 0L);
         return "index";
     }
 
     @GetMapping("/{directoryId}")
     public String index(@PathVariable Long directoryId, Model model) throws IOException {
-        model.addAttribute("message", "文件服务器：强大源自共享：");
+        model.addAttribute("title", HOME_TITLE);
 
-        model.addAttribute("directories",
-                reactiveDirectoryFsService.findAllByParentId(directoryId)
-                        .toStream()
-                        .collect(Collectors.toList()));
-        model.addAttribute("files",
-                reactiveFileService.getStoredFiles(directoryId)
-                        .toStream()
-                        .collect(Collectors.toList()));
-
-        model.addAttribute("directoryId", directoryId);
+        FsDirectory directoryMono = reactiveDirectoryFsService.findById(directoryId).block();
+        model.addAttribute("currentdirectory", directoryMono);
+        refreshDirList(model, directoryId);
 
         return "index";
     }
@@ -100,9 +91,9 @@ public class IndexController {
         FsEntity fsEntity = new FsEntity(KeyUtil.getSHA256UUID(),
                 file.getOriginalFilename(),
                 file.getSize(),
-                "PDF",
+                "PDF", //@TODO 修改为实际文件类型
                 new Date(),
-                1503903557505L,
+                categoryId,
                 directoryId,
                 null,
                 null);
@@ -110,9 +101,20 @@ public class IndexController {
                 fsEntity,
                 file.getInputStream())
                 .subscribe();
+        refreshDirList(model, directoryId);
         redirectAttributes.addFlashAttribute("message", "成功上传文件： " + file.getOriginalFilename());
+        return "redirect:/" + directoryId;
+    }
 
-        return "redirect:/"+directoryId;
+    private void refreshDirList(Model model, Long directoryId) {
+        model.addAttribute("directories",
+                reactiveDirectoryFsService.findAllByParentId(directoryId)
+                        .toStream()
+                        .collect(Collectors.toList()));
+        model.addAttribute("files",
+                reactiveFileService.getStoredFiles(directoryId)
+                        .toStream()
+                        .collect(Collectors.toList()));
     }
 
 }
