@@ -42,11 +42,14 @@ public class GridFsAssistant {
         return Query.query(GridFsCriteria.where(id));
     }
 
+    public static Query keyQuery(ObjectId id) {
+        return keyQuery(id.toString());
+    }
 
     public GridFSDownloadStream getResource(ObjectId storedId) {
         GridFSBucket gridFSBucket = GridFSBuckets.create(getDefaultMongoDB());
         MongoCollection<Document> coll = getDefaultMongoDB().getCollection("fs.files");
-        FindIterable<Document> file = coll.find(eq("_id",storedId));
+        FindIterable<Document> file = coll.find(eq("_id", storedId));
         return file.first() != null ? gridFSBucket.openDownloadStream(storedId) : null;
     }
 }

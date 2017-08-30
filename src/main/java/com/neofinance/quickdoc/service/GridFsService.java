@@ -17,11 +17,9 @@ import java.util.stream.StreamSupport;
 public class GridFsService {
 
     private final GridFsTemplate gridFsTemplate;
-    private final ReactiveFileEntityRepository reactiveFileEntityRepository;
 
-    public GridFsService(GridFsTemplate gridFsTemplate, ReactiveFileEntityRepository reactiveFileEntityRepository) {
+    public GridFsService(GridFsTemplate gridFsTemplate) {
         this.gridFsTemplate = gridFsTemplate;
-        this.reactiveFileEntityRepository = reactiveFileEntityRepository;
     }
 
     /**

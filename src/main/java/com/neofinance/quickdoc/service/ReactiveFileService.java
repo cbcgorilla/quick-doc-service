@@ -15,10 +15,12 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.NoSuchElementException;
 
+import static com.neofinance.quickdoc.common.utils.GridFsAssistant.keyQuery;
+
 @Service
 public class ReactiveFileService {
 
-    private static final String MSG_NO_FILE = "[Exception from ReactiveFileService] 在目录（{1}）找不到文件：{0}";
+    private static final String MSG_NO_FILE = "[Exception from ReactiveFileService] 在目录（{0}）找不到文件：{1}";
 
     private final GridFsAssistant gridFsAssistant;
     private final GridFsTemplate gridFsTemplate;
@@ -79,18 +81,14 @@ public class ReactiveFileService {
                         Mono.error(
                                 new NoSuchElementException(
                                         MessageFormat.format(MSG_NO_FILE,
-                                                fileEntity.getFilename(),
-                                                fileEntity.getDirectoryId()
+                                                fileEntity.getDirectoryId(),
+                                                fileEntity.getFilename()
                                         )
                                 )
                         )
                 )
                 .flatMap(entity -> {
-                    gridFsTemplate.delete(
-                            GridFsAssistant.keyQuery(
-                                    entity.getStoredId().toString()
-                            )
-                    );
+                    gridFsTemplate.delete(keyQuery(entity.getStoredId()));
                     return reactiveFileEntityRepository.delete(entity);
                 });
     }
