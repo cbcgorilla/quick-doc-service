@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import java.util.NoSuchElementException;
 
 @Service
-public class CategoryService {
+public class ReactiveCategoryService {
 
     private static final String MSG_NO_CATEGORY = "[Exception from CategoryService] 找不到文件分类：";
     private static final String MSG_CATEGORY_CONFLICT = "[Exception from CategoryService] 与已有文件分类冲突：";
@@ -20,7 +20,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ReactiveCategoryRepository reactiveCategoryRepository;
 
-    CategoryService(CategoryRepository categoryRepository, ReactiveCategoryRepository reactiveCategoryRepository) {
+    ReactiveCategoryService(CategoryRepository categoryRepository, ReactiveCategoryRepository reactiveCategoryRepository) {
         this.categoryRepository = categoryRepository;
         this.reactiveCategoryRepository = reactiveCategoryRepository;
     }
@@ -82,10 +82,6 @@ public class CategoryService {
         return reactiveCategoryRepository.findById(id);
     }
 
-    public Flux<FsCategory> findAll() {
-        return reactiveCategoryRepository.findAll();
-    }
-
     /**
      * 根据分类名获取FsCategory
      *
@@ -94,6 +90,14 @@ public class CategoryService {
      */
     public Mono<FsCategory> findByType(String type) {
         return reactiveCategoryRepository.findByType(type);
+    }
+
+    /**
+     * 获取所有文件分类信息
+     * @return
+     */
+    public Flux<FsCategory> findAll() {
+        return reactiveCategoryRepository.findAll();
     }
 
 }

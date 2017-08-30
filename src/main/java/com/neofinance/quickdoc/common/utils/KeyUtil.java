@@ -31,9 +31,18 @@ public class KeyUtil {
      *
      * @return
      */
-    public static String getSHA256UUID() throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        MessageDigest salt = MessageDigest.getInstance("SHA-256");
-        salt.update(randomUUID().toString().getBytes("UTF-8"));
+    public static String getSHA256UUID() {
+        MessageDigest salt = null;
+        try {
+            salt = MessageDigest.getInstance("SHA-256");
+            salt.update(randomUUID().toString().getBytes("UTF-8"));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
         return bytesToHex(salt.digest());
     }
 

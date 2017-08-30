@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 data class FsDirectory(@Id val id: Long,
                        var path: String,
-                       var parent: Long,
+                       var parentId: Long,
                        var owners: Array<FsOwner>? = null)

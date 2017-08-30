@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface DirectoryRepository extends MongoRepository<FsDirectory, Long> {
 
-    FsDirectory findByPathAndParent(String path, Long parent);
+    FsDirectory findByPathAndParentId(String path, Long parentId);
 
-    List<FsDirectory> findAllByParent(Long parent);
+    List<FsDirectory> findAllByParentId(Long parentId);
 }

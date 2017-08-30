@@ -2,7 +2,7 @@ package com.neofinance.quickdoc.web.rest;
 
 import com.neofinance.quickdoc.common.entities.ApiResponseEntity;
 import com.neofinance.quickdoc.common.entities.FsCategory;
-import com.neofinance.quickdoc.service.CategoryService;
+import com.neofinance.quickdoc.service.ReactiveCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -17,21 +17,21 @@ public class ConfigRestController {
     private static final String ACTION_ADD_CATEGORY = "新增文件分类目录名";
     private static final String ACTION_RENAME_CATEGORY = "修改文件分类目录名";
 
-    private final CategoryService categoryService;
+    private final ReactiveCategoryService reactiveCategoryService;
 
     @Autowired
-    ConfigRestController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    ConfigRestController(ReactiveCategoryService reactiveCategoryService) {
+        this.reactiveCategoryService = reactiveCategoryService;
     }
 
     @RequestMapping()
     public Flux<FsCategory> getCategories() {
-        return categoryService.findAll();
+        return reactiveCategoryService.findAll();
     }
 
     @RequestMapping("/{type}")
     public Mono<ApiResponseEntity<FsCategory>> addCategory(@PathVariable String type) {
-        return categoryService.addCategory(type)
+        return reactiveCategoryService.addCategory(type)
                 .map(fsCategory -> new ApiResponseEntity<FsCategory>(
                         ACTION_ADD_CATEGORY,
                         ApiResponseEntity.Code.SUCCESS,
@@ -42,7 +42,7 @@ public class ConfigRestController {
     public Mono<ApiResponseEntity<FsCategory>> renameCategory(
             @PathVariable String oldtype,
             @PathVariable String newtype) {
-        return categoryService.renameCategory(oldtype, newtype)
+        return reactiveCategoryService.renameCategory(oldtype, newtype)
                 .map(fsCategory -> new ApiResponseEntity<FsCategory>(
                         ACTION_RENAME_CATEGORY,
                         ApiResponseEntity.Code.SUCCESS,

@@ -1,7 +1,7 @@
 package com.neofinance.quickdoc.web.mvc;
 
 import com.neofinance.quickdoc.common.entities.FsCategory;
-import com.neofinance.quickdoc.service.CategoryService;
+import com.neofinance.quickdoc.service.ReactiveCategoryService;
 import com.neofinance.quickdoc.service.GridFsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -16,14 +16,12 @@ import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/files")
@@ -31,18 +29,18 @@ public class FileController {
 
     public static final String LOCAL_TEMP_DIR = "E:\\temp\\";
 
-    private final CategoryService categoryService;
+    private final ReactiveCategoryService reactiveCategoryService;
     private final GridFsService gridFsService;
 
     @Autowired
-    public FileController(CategoryService categoryService, GridFsService gridFsService) {
-        this.categoryService = categoryService;
+    public FileController(ReactiveCategoryService reactiveCategoryService, GridFsService gridFsService) {
+        this.reactiveCategoryService = reactiveCategoryService;
         this.gridFsService = gridFsService;
     }
 
     @ModelAttribute("allCategories")
     public List<FsCategory> allCategories() {
-        return categoryService.findAll().toStream().collect(Collectors.toList());
+        return reactiveCategoryService.findAll().toStream().collect(Collectors.toList());
     }
 
     @GetMapping()

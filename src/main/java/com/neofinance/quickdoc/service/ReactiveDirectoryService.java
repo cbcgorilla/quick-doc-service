@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class DirectoryService {
+public class ReactiveDirectoryService {
 
     private static final String MSG_NO_DIRECTORY = "[Exception from DirectoryService] 找不到文件目录：";
     private static final String MSG_DIRECTORY_CONFLICT = "[Exception from DirectoryService] 与已有文件目录冲突：";
@@ -23,7 +23,7 @@ public class DirectoryService {
     private final DirectoryRepository directoryRepository;
     private final ReactiveDirectoryRepository reactiveDirectoryRepository;
 
-    DirectoryService(DirectoryRepository directoryRepository, ReactiveDirectoryRepository reactiveDirectoryRepository) {
+    ReactiveDirectoryService(DirectoryRepository directoryRepository, ReactiveDirectoryRepository reactiveDirectoryRepository) {
         this.directoryRepository = directoryRepository;
         this.reactiveDirectoryRepository = reactiveDirectoryRepository;
     }
@@ -38,7 +38,7 @@ public class DirectoryService {
      */
     public Mono<FsDirectory> addDirectory(String path, FsDirectory parent, FsOwner[] owners) {
         long parentId = parent != null ? parent.getId() : 0L;
-        return reactiveDirectoryRepository.findByPathAndParent(path, parentId)
+        return reactiveDirectoryRepository.findByPathAndParentId(path, parentId)
                 .defaultIfEmpty(new FsDirectory(KeyUtil.longID(), path, parentId, owners))
                 .flatMap(reactiveDirectoryRepository::save);
     }
@@ -56,7 +56,7 @@ public class DirectoryService {
                 .switchIfEmpty(Mono.error(
                         new NoSuchElementException(MSG_NO_DIRECTORY + directory)))
                 .flatMap(v -> {
-                    if (directoryRepository.findByPathAndParent(newPath, directory.getParent()) != null) {
+                    if (directoryRepository.findByPathAndParentId(newPath, directory.getParentId()) != null) {
                         return Mono.error(new ConflictException(MSG_DIRECTORY_CONFLICT + newPath));
                     }
                     v.setPath(newPath);
@@ -92,7 +92,7 @@ public class DirectoryService {
                     if (directoryRepository.findById(newDirectoryId) != null) {
                         return Mono.error(new NoSuchElementException(MSG_NO_DIRECTORY + newDirectoryId));
                     }
-                    v.setParent(newDirectoryId);
+                    v.setParentId(newDirectoryId);
                     return reactiveDirectoryRepository.save(v);
                 });
     }
@@ -136,7 +136,7 @@ public class DirectoryService {
                 .switchIfEmpty(Mono.error(
                         new NoSuchElementException(MSG_NO_DIRECTORY + directoryId)))
                 .flatMap(v -> {
-                    List<FsDirectory> subList = directoryRepository.findAllByParent(directoryId);
+                    List<FsDirectory> subList = directoryRepository.findAllByParentId(directoryId);
                     if (subList == null || subList.size() == 0) {
                         return reactiveDirectoryRepository.delete(v);
                     } else {
@@ -148,22 +148,22 @@ public class DirectoryService {
     /**
      * 根据上级目录ID信息获取子文件目录
      *
-     * @param parent
+     * @param parentId
      * @return
      */
-    public Flux<FsDirectory> findAllByParent(Long parent) {
-        return reactiveDirectoryRepository.findAllByParent(parent);
+    public Flux<FsDirectory> findAllByParentId(Long parentId) {
+        return reactiveDirectoryRepository.findAllByParentId(parentId);
     }
 
     /**
      * 获取文件目录
      *
      * @param path  文件路径名
-     * @param parent 上级目录ID
+     * @param parentId 上级目录ID
      * @return
      */
-    public Mono<FsDirectory> findByPathAndParent(String path, Long parent) {
-        return reactiveDirectoryRepository.findByPathAndParent(path, parent);
+    public Mono<FsDirectory> findByPathAndParentId(String path, Long parentId) {
+        return reactiveDirectoryRepository.findByPathAndParentId(path, parentId);
     }
 
     /**
@@ -182,7 +182,7 @@ public class DirectoryService {
      * @return
      */
     public Flux<FsDirectory> allRootDirectories() {
-        return reactiveDirectoryRepository.findAllByParent(0L);
+        return reactiveDirectoryRepository.findAllByParentId(0L);
     }
 
 }

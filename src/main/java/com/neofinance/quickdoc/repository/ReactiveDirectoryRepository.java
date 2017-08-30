@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 public interface ReactiveDirectoryRepository extends ReactiveMongoRepository<FsDirectory, Long> {
 
-    Mono<FsDirectory> findByPathAndParent(String path, Long parent);
+    Mono<FsDirectory> findByPathAndParentId(String path, Long parentId);
 
-    Flux<FsDirectory> findAllByParent(Long parent);
+    Flux<FsDirectory> findAllByParentId(Long parentId);
 }

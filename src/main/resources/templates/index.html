@@ -1,0 +1,52 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+
+<div th:if="${directoryId}">
+    <div>
+        <form method="POST" enctype="multipart/form-data" action=".">
+            <table>
+                <tr>
+                    <td>需要上传的文件:</td>
+                    <td><input type="file" name="file"/></td>
+                </tr>
+                <tr>
+                    <td>文件分类:</td>
+                    <td>
+                        <select>
+                            <option th:each="category : ${allCategories}"
+                                    th:value="${category}" th:text="${category.type}">文件分类
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input id="directoryId" name="directoryId" type="hidden" th:value="${directoryId}"/></td>
+                    <td><input type="submit" value="上传"/></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+
+<div>
+    <ul>
+        <li th:each="directory : ${directories}">
+            <a th:href="${directory.id}" th:text="${directory.path}"/>
+        </li>
+    </ul>
+</div>
+
+<div>
+    <ul>
+        <li th:each="file : ${files}">
+            <a th:href="@{'view/'+${file.storedId}}" th:text="${file.filename}"/>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>
