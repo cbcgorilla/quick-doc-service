@@ -38,14 +38,6 @@ public class GridFsAssistant {
         return getMongoDB(database);
     }
 
-    public static Query keyQuery(String id) {
-        return Query.query(GridFsCriteria.where(id));
-    }
-
-    public static Query keyQuery(ObjectId id) {
-        return keyQuery(id.toString());
-    }
-
     public GridFSDownloadStream getResource(ObjectId storedId) {
         GridFSBucket gridFSBucket = GridFSBuckets.create(getDefaultMongoDB());
         MongoCollection<Document> coll = getDefaultMongoDB().getCollection("fs.files");

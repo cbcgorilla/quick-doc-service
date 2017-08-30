@@ -1,6 +1,5 @@
 package com.neofinance.quickdoc.service;
 
-import com.neofinance.quickdoc.common.ConflictException;
 import com.neofinance.quickdoc.common.entities.FsCategory;
 import com.neofinance.quickdoc.common.utils.KeyUtil;
 import com.neofinance.quickdoc.repository.CategoryRepository;
@@ -9,18 +8,17 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.NoSuchElementException;
+import static com.neofinance.quickdoc.common.utils.ReactiveErrorMessage.categoryConflictMsg;
+import static com.neofinance.quickdoc.common.utils.ReactiveErrorMessage.noCategoryMsg;
 
 @Service
 public class ReactiveCategoryService {
 
-    private static final String MSG_NO_CATEGORY = "[Exception from CategoryService] 找不到文件分类：";
-    private static final String MSG_CATEGORY_CONFLICT = "[Exception from CategoryService] 与已有文件分类冲突：";
-
     private final CategoryRepository categoryRepository;
     private final ReactiveCategoryRepository reactiveCategoryRepository;
 
-    ReactiveCategoryService(CategoryRepository categoryRepository, ReactiveCategoryRepository reactiveCategoryRepository) {
+    ReactiveCategoryService(CategoryRepository categoryRepository,
+                            ReactiveCategoryRepository reactiveCategoryRepository) {
         this.categoryRepository = categoryRepository;
         this.reactiveCategoryRepository = reactiveCategoryRepository;
     }
@@ -47,11 +45,10 @@ public class ReactiveCategoryService {
      */
     public Mono<FsCategory> renameCategory(String oldType, String newType) {
         return reactiveCategoryRepository.findByType(oldType)
-                .switchIfEmpty(Mono.error(
-                        new NoSuchElementException(MSG_NO_CATEGORY + oldType)))
+                .switchIfEmpty(noCategoryMsg(oldType))
                 .flatMap(category -> {
                     if (categoryRepository.findByType(newType) != null) {
-                        return Mono.error(new ConflictException(MSG_CATEGORY_CONFLICT + newType));
+                        return categoryConflictMsg(newType);
                     }
                     category.setType(newType);
                     return reactiveCategoryRepository.save(category);
@@ -67,8 +64,7 @@ public class ReactiveCategoryService {
      */
     public Mono<Void> deleteCategory(String type) {
         return reactiveCategoryRepository.findByType(type)
-                .switchIfEmpty(Mono.error(
-                        new NoSuchElementException(MSG_NO_CATEGORY + type)))
+                .switchIfEmpty(noCategoryMsg(type))
                 .flatMap(reactiveCategoryRepository::delete);
     }
 

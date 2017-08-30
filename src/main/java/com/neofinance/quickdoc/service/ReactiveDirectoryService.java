@@ -1,6 +1,5 @@
 package com.neofinance.quickdoc.service;
 
-import com.neofinance.quickdoc.common.ConflictException;
 import com.neofinance.quickdoc.common.entities.FsDirectory;
 import com.neofinance.quickdoc.common.entities.FsOwner;
 import com.neofinance.quickdoc.common.utils.KeyUtil;
@@ -11,19 +10,17 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+
+import static com.neofinance.quickdoc.common.utils.ReactiveErrorMessage.*;
 
 @Service
 public class ReactiveDirectoryService {
 
-    private static final String MSG_NO_DIRECTORY = "[Exception from DirectoryService] 找不到文件目录：";
-    private static final String MSG_DIRECTORY_CONFLICT = "[Exception from DirectoryService] 与已有文件目录冲突：";
-    private static final String MSG_NON_NULL_DIRECTORY = "[Exception from DirectoryService] 文件夹非空：";
-
     private final DirectoryRepository directoryRepository;
     private final ReactiveDirectoryRepository reactiveDirectoryRepository;
 
-    ReactiveDirectoryService(DirectoryRepository directoryRepository, ReactiveDirectoryRepository reactiveDirectoryRepository) {
+    ReactiveDirectoryService(DirectoryRepository directoryRepository,
+                             ReactiveDirectoryRepository reactiveDirectoryRepository) {
         this.directoryRepository = directoryRepository;
         this.reactiveDirectoryRepository = reactiveDirectoryRepository;
     }
@@ -53,11 +50,11 @@ public class ReactiveDirectoryService {
      */
     public Mono<FsDirectory> renameDirectory(FsDirectory directory, String newPath) {
         return reactiveDirectoryRepository.findById(directory.getId())
-                .switchIfEmpty(Mono.error(
-                        new NoSuchElementException(MSG_NO_DIRECTORY + directory)))
+                .switchIfEmpty(noDirectoryMsg(directory.toString()))
                 .flatMap(v -> {
-                    if (directoryRepository.findByPathAndParentId(newPath, directory.getParentId()) != null) {
-                        return Mono.error(new ConflictException(MSG_DIRECTORY_CONFLICT + newPath));
+                    if (directoryRepository.findByPathAndParentId(newPath,
+                            directory.getParentId()) != null) {
+                        return dirConflictMsg(newPath);
                     }
                     v.setPath(newPath);
                     return reactiveDirectoryRepository.save(v);
@@ -86,11 +83,10 @@ public class ReactiveDirectoryService {
      */
     public Mono<FsDirectory> removeDirectory(FsDirectory directory, Long newDirectoryId) {
         return reactiveDirectoryRepository.findById(directory.getId())
-                .switchIfEmpty(Mono.error(
-                        new NoSuchElementException(MSG_NO_DIRECTORY + directory)))
+                .switchIfEmpty(noDirectoryMsg(directory.toString()))
                 .flatMap(v -> {
                     if (directoryRepository.findById(newDirectoryId) != null) {
-                        return Mono.error(new NoSuchElementException(MSG_NO_DIRECTORY + newDirectoryId));
+                        return noDirectoryMsg(newDirectoryId.toString());
                     }
                     v.setParentId(newDirectoryId);
                     return reactiveDirectoryRepository.save(v);
@@ -105,8 +101,7 @@ public class ReactiveDirectoryService {
      */
     public Mono<FsDirectory> updateFsOwners(FsDirectory directory, FsOwner[] owners) {
         return reactiveDirectoryRepository.findById(directory.getId())
-                .switchIfEmpty(Mono.error(
-                        new NoSuchElementException(MSG_NO_DIRECTORY + directory)))
+                .switchIfEmpty(noDirectoryMsg(directory.toString()))
                 .flatMap(v -> {
                     v.setOwners(owners);
                     return reactiveDirectoryRepository.save(v);
@@ -133,14 +128,13 @@ public class ReactiveDirectoryService {
      */
     public Mono<Void> deleteDirectory(Long directoryId) {
         return reactiveDirectoryRepository.findById(directoryId)
-                .switchIfEmpty(Mono.error(
-                        new NoSuchElementException(MSG_NO_DIRECTORY + directoryId)))
+                .switchIfEmpty(noDirectoryMsg(directoryId.toString()))
                 .flatMap(v -> {
                     List<FsDirectory> subList = directoryRepository.findAllByParentId(directoryId);
                     if (subList == null || subList.size() == 0) {
                         return reactiveDirectoryRepository.delete(v);
                     } else {
-                        return Mono.error(new ConflictException(MSG_NON_NULL_DIRECTORY + directoryId));
+                        return notEmptyDirMsg(directoryId.toString());
                     }
                 });
     }

@@ -33,7 +33,7 @@ public class DefaultDataLoader {
         };
     }
 
-    //@Bean
+    @Bean
     CommandLineRunner initCategory(ReactiveCategoryService reactiveCategoryService) {
         return args -> {
             for (int i = 0; i < 10; i++) {

@@ -1,13 +1,13 @@
 package com.neofinance.quickdoc.common;
 
-public class ConflictException extends RuntimeException {
+public class QuickDocException extends RuntimeException {
     private static final long serialVersionUID = 1039829250633451756L;
 
-    public ConflictException() {
+    public QuickDocException() {
         super();
     }
 
-    public ConflictException(String s) {
+    public QuickDocException(String s) {
         super(s);
     }
 }

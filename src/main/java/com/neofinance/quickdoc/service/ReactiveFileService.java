@@ -12,15 +12,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.NoSuchElementException;
 
-import static com.neofinance.quickdoc.common.utils.GridFsAssistant.keyQuery;
+import static com.neofinance.quickdoc.common.query.QueryKit.keyQuery;
+import static com.neofinance.quickdoc.common.utils.ReactiveErrorMessage.fileNotExistMsg;
 
 @Service
 public class ReactiveFileService {
-
-    private static final String MSG_NO_FILE = "[Exception from ReactiveFileService] 在目录（{0}）找不到文件：{1}";
 
     private final GridFsAssistant gridFsAssistant;
     private final GridFsTemplate gridFsTemplate;
@@ -78,14 +75,8 @@ public class ReactiveFileService {
     public Mono<Void> deleteFile(FsEntity fileEntity) {
         return getStoredFile(fileEntity.getFilename(), fileEntity.getDirectoryId())
                 .switchIfEmpty(
-                        Mono.error(
-                                new NoSuchElementException(
-                                        MessageFormat.format(MSG_NO_FILE,
-                                                fileEntity.getDirectoryId(),
-                                                fileEntity.getFilename()
-                                        )
-                                )
-                        )
+                        fileNotExistMsg(new Long(fileEntity.getDirectoryId()).toString(),
+                                fileEntity.getFilename())
                 )
                 .flatMap(entity -> {
                     gridFsTemplate.delete(keyQuery(entity.getStoredId()));
