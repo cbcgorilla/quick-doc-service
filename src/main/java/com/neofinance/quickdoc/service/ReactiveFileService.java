@@ -3,6 +3,8 @@ package com.neofinance.quickdoc.service;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.neofinance.quickdoc.common.entities.FsEntity;
 import com.neofinance.quickdoc.common.utils.GridFsAssistant;
+import com.neofinance.quickdoc.repository.CategoryRepository;
+import com.neofinance.quickdoc.repository.DirectoryRepository;
 import com.neofinance.quickdoc.repository.FileEntityRepository;
 import com.neofinance.quickdoc.repository.ReactiveFileEntityRepository;
 import org.bson.types.ObjectId;
@@ -21,15 +23,21 @@ public class ReactiveFileService {
 
     private final GridFsAssistant gridFsAssistant;
     private final GridFsTemplate gridFsTemplate;
+    private final CategoryRepository categoryRepository;
+    private final DirectoryRepository directoryRepository;
     private final FileEntityRepository fileEntityRepository;
     private final ReactiveFileEntityRepository reactiveFileEntityRepository;
 
     ReactiveFileService(GridFsAssistant gridFsAssistant,
                         GridFsTemplate gridFsTemplate,
+                        CategoryRepository categoryRepository,
+                        DirectoryRepository directoryRepository,
                         FileEntityRepository fileEntityRepository,
                         ReactiveFileEntityRepository reactiveFileEntityRepository) {
         this.gridFsAssistant = gridFsAssistant;
         this.gridFsTemplate = gridFsTemplate;
+        this.categoryRepository = categoryRepository;
+        this.directoryRepository = directoryRepository;
         this.fileEntityRepository = fileEntityRepository;
         this.reactiveFileEntityRepository = reactiveFileEntityRepository;
     }
@@ -39,7 +47,12 @@ public class ReactiveFileService {
     }
 
     public Flux<FsEntity> getStoredFiles(Long directoryId) {
-        return reactiveFileEntityRepository.findAllByDirectoryId(directoryId);
+        return reactiveFileEntityRepository.findAllByDirectoryId(directoryId)
+                .map(v -> {
+                    v.setCategory(categoryRepository.findById(v.getCategoryId()).get().getType());
+                    v.setDirectory((directoryRepository.findById(v.getDirectoryId()).get().getPath()));
+                    return v;
+                });
     }
 
     /**

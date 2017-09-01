@@ -14,4 +14,6 @@ data class FsEntity(@Id val id: String,
                     var categoryId: Long,
                     var directoryId: Long,
                     var storedId: ObjectId?=null,
-                    var owners: Array<FsOwner>? = null)
+                    var owners: Array<FsOwner>? = null,
+                    var category:String?=null,
+                    var directory:String?=null)

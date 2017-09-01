@@ -1,5 +1,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${title}"></title>
     <link href="css/bootstrap.css" rel="stylesheet"/>
     <link href="css/app.css" rel="stylesheet"/>
@@ -31,7 +32,10 @@
                 <tr>
                     <td><input id="directoryId" name="directoryId" type="hidden" th:value="${currentdirectory.id}"/>
                     </td>
-                    <td><input type="submit" value="上传"/></td>
+                    <td>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <input type="submit" value="上传"/>
+                    </td>
                 </tr>
             </table>
         </form>
@@ -70,8 +74,8 @@
                 <th>文件名</th>
                 <th>文件长度</th>
                 <th>上传日期</th>
-                <th>文件分类ID</th>
-                <th>文件目录ID</th>
+                <th>所属文件分类</th>
+                <th>上传用户</th>
             </tr>
             </thead>
 
@@ -79,9 +83,13 @@
             <tr th:each="file : ${files}">
                 <td><a th:href="@{'view/'+${file.storedId}}" th:text="${file.filename}"/></td>
                 <td th:text="${file.contentLength}">ID</td>
-                <td th:text="${file.uploadDate}">ID</td>
-                <td th:text="${file.categoryId}">ID</td>
-                <td th:text="${file.directoryId}">ID</td>
+                <td th:text="${#dates.format(file.uploadDate,'yyyy-MM-dd HH:mm:ss')}">ID</td>
+                <td th:text="${file.category}">ID</td>
+                <td>
+                    <div th:each="owner:${file.owners}">
+                        <div th:text="${owner.username}"/>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>

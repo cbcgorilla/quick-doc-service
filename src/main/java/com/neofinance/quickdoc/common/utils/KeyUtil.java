@@ -25,17 +25,21 @@ public class KeyUtil {
         return longID(1000000L);
     }
 
+    public static String getSHA256UUID() {
+        return SHA256Encrypt(randomUUID().toString());
+    }
+
     /**
      * 生成如下格式UUID
      * SHA256 UUID = 3155DF76F0991F64B10F62FDEA4CEE36E391B95010BD42F50B3C2DD1119072C1
      *
      * @return
      */
-    public static String getSHA256UUID() {
+    public static String SHA256Encrypt(String message) {
         MessageDigest salt = null;
         try {
             salt = MessageDigest.getInstance("SHA-256");
-            salt.update(randomUUID().toString().getBytes("UTF-8"));
+            salt.update(message.getBytes("UTF-8"));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return null;

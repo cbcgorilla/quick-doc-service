@@ -4,7 +4,9 @@ import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.neofinance.quickdoc.common.entities.FsCategory;
 import com.neofinance.quickdoc.common.entities.FsDirectory;
 import com.neofinance.quickdoc.common.entities.FsEntity;
+import com.neofinance.quickdoc.common.entities.FsOwner;
 import com.neofinance.quickdoc.common.utils.KeyUtil;
+import com.neofinance.quickdoc.security.ActiveUser;
 import com.neofinance.quickdoc.service.ReactiveCategoryService;
 import com.neofinance.quickdoc.service.ReactiveDirectoryService;
 import com.neofinance.quickdoc.service.ReactiveFileService;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +32,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/")
 public class IndexController {
 
-    private static final String HOME_TITLE = "极速云存储（强大源自共享）";
+    private static final String HOME_TITLE = "极速云存储（Quick Sharing）";
 
     private final ReactiveCategoryService reactiveCategoryService;
     private final ReactiveDirectoryService reactiveDirectoryFsService;
@@ -49,17 +52,24 @@ public class IndexController {
         return reactiveCategoryService.findAll().toStream().collect(Collectors.toList());
     }
 
+    @ModelAttribute("title")
+    public String pageTitle() {
+        return HOME_TITLE;
+    }
+
     @GetMapping()
-    public String index(Model model) throws IOException {
-        model.addAttribute("title", HOME_TITLE);
+    public String index(Model model) {
         refreshDirList(model, 0L);
         return "index";
     }
 
-    @GetMapping("/{directoryId}")
-    public String index(@PathVariable Long directoryId, Model model) throws IOException {
-        model.addAttribute("title", HOME_TITLE);
+    @RequestMapping("/login")
+    public String login() {
+        return "login";
+    }
 
+    @GetMapping("/{directoryId}")
+    public String index(@PathVariable Long directoryId, Model model) {
         FsDirectory directoryMono = reactiveDirectoryFsService.findById(directoryId).block();
         model.addAttribute("currentdirectory", directoryMono);
         refreshDirList(model, directoryId);
@@ -69,7 +79,7 @@ public class IndexController {
 
     @GetMapping(value = "/view/{storedId}", produces = MediaType.APPLICATION_PDF_VALUE)
     public @ResponseBody
-    HttpEntity<byte[]> openDocumentInBrowser(@PathVariable("storedId") String storedId) throws IOException {
+    HttpEntity<byte[]> openDocumentInBrowser(@PathVariable String storedId) throws IOException {
         GridFSDownloadStream fs = reactiveFileService.getFileStream(new ObjectId(storedId));
         byte[] document = FileCopyUtils.copyToByteArray(fs);
 
@@ -86,7 +96,10 @@ public class IndexController {
                                    @RequestParam("directoryId") Long directoryId,
                                    @RequestParam("categoryId") Long categoryId,
                                    RedirectAttributes redirectAttributes,
-                                   Model model) throws IOException {
+                                   Model model,
+                                   HttpSession session) throws IOException {
+        ActiveUser activeUser = (ActiveUser) session.getAttribute("ActiveUser");
+        FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE);
 
         FsEntity fsEntity = new FsEntity(KeyUtil.getSHA256UUID(),
                 file.getOriginalFilename(),
@@ -95,6 +108,8 @@ public class IndexController {
                 new Date(),
                 categoryId,
                 directoryId,
+                null,
+                new FsOwner[]{owner},
                 null,
                 null);
         reactiveFileService.storeFile(

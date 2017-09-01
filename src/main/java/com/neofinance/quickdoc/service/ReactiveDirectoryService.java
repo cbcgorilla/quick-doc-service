@@ -3,6 +3,7 @@ package com.neofinance.quickdoc.service;
 import com.neofinance.quickdoc.common.entities.FsDirectory;
 import com.neofinance.quickdoc.common.entities.FsOwner;
 import com.neofinance.quickdoc.common.utils.KeyUtil;
+import com.neofinance.quickdoc.repository.CategoryRepository;
 import com.neofinance.quickdoc.repository.DirectoryRepository;
 import com.neofinance.quickdoc.repository.ReactiveDirectoryRepository;
 import org.springframework.stereotype.Service;
@@ -95,6 +96,7 @@ public class ReactiveDirectoryService {
 
     /**
      * 更新文件目录属主信息
+     *
      * @param directory
      * @param owners
      * @return
@@ -152,7 +154,7 @@ public class ReactiveDirectoryService {
     /**
      * 获取文件目录
      *
-     * @param path  文件路径名
+     * @param path     文件路径名
      * @param parentId 上级目录ID
      * @return
      */
