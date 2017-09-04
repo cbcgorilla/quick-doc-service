@@ -1,6 +1,7 @@
-package cn.techfan.quickdoc.security;
+package cn.techfan.quickdoc.security.authprovider;
 
 import cn.techfan.quickdoc.common.entities.WebUser;
+import cn.techfan.quickdoc.security.model.WebAuthority;
 import cn.techfan.quickdoc.service.UserAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;

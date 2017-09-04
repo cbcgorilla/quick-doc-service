@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.security;
+package cn.techfan.quickdoc.security.model;
 
 import java.util.ArrayList;
 import java.util.List;

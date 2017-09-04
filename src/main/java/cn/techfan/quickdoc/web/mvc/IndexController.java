@@ -9,7 +9,7 @@ import cn.techfan.quickdoc.common.utils.StringUtil;
 import cn.techfan.quickdoc.service.ReactiveDirectoryService;
 import cn.techfan.quickdoc.service.ReactiveFileService;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
-import cn.techfan.quickdoc.security.ActiveUser;
+import cn.techfan.quickdoc.security.model.ActiveUser;
 import cn.techfan.quickdoc.service.ReactiveCategoryService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

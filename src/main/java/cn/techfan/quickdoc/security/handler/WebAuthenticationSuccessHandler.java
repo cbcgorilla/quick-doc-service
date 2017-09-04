@@ -1,5 +1,6 @@
-package cn.techfan.quickdoc.security;
+package cn.techfan.quickdoc.security.handler;
 
+import cn.techfan.quickdoc.security.model.ActiveUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;

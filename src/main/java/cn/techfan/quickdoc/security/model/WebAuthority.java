@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.security;
+package cn.techfan.quickdoc.security.model;
 
 import org.springframework.security.core.GrantedAuthority;
 
