@@ -1,8 +1,8 @@
 package cn.techfan.quickdoc.service;
 
 import cn.techfan.quickdoc.common.entities.WebUser;
-import cn.techfan.quickdoc.repository.ReactiveUserRepository;
-import cn.techfan.quickdoc.repository.UserRepository;
+import cn.techfan.quickdoc.data.dao.ReactiveUserRepository;
+import cn.techfan.quickdoc.data.dao.UserRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

@@ -2,8 +2,8 @@ package cn.techfan.quickdoc.service;
 
 import cn.techfan.quickdoc.common.entities.FsCategory;
 import cn.techfan.quickdoc.common.utils.KeyUtil;
-import cn.techfan.quickdoc.repository.CategoryRepository;
-import cn.techfan.quickdoc.repository.ReactiveCategoryRepository;
+import cn.techfan.quickdoc.data.dao.CategoryRepository;
+import cn.techfan.quickdoc.data.dao.ReactiveCategoryRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

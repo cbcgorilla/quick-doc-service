@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.common.data;
+package cn.techfan.quickdoc.common.config;
 
 import cn.techfan.quickdoc.common.entities.FsEntity;
 import cn.techfan.quickdoc.common.entities.FsOwner;

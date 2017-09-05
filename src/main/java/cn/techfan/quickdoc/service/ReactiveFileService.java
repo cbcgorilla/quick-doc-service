@@ -2,11 +2,11 @@ package cn.techfan.quickdoc.service;
 
 import cn.techfan.quickdoc.common.entities.FsDirectory;
 import cn.techfan.quickdoc.common.entities.FsEntity;
-import cn.techfan.quickdoc.repository.GridFsAssistant;
-import cn.techfan.quickdoc.repository.CategoryRepository;
-import cn.techfan.quickdoc.repository.DirectoryRepository;
-import cn.techfan.quickdoc.repository.FileEntityRepository;
-import cn.techfan.quickdoc.repository.ReactiveFileEntityRepository;
+import cn.techfan.quickdoc.data.GridFsAssistant;
+import cn.techfan.quickdoc.data.dao.CategoryRepository;
+import cn.techfan.quickdoc.data.dao.DirectoryRepository;
+import cn.techfan.quickdoc.data.dao.FileEntityRepository;
+import cn.techfan.quickdoc.data.dao.ReactiveFileEntityRepository;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
