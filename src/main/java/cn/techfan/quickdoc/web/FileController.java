@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.web.mvc;
+package cn.techfan.quickdoc.web;
 
 import cn.techfan.quickdoc.common.entities.FsCategory;
 import cn.techfan.quickdoc.service.ReactiveCategoryService;
