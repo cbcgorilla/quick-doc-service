@@ -1,13 +1,13 @@
 package cn.techfan.quickdoc.common.utils;
 
-import cn.techfan.quickdoc.common.QuickDocException;
+import cn.techfan.quickdoc.common.exception.QuickDocException;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.NoSuchElementException;
 
-public class ReactiveErrorMessage {
+public class MessageUtil {
 
     private static final String MSG_NO_CATEGORY = "[Exception class: {0}] 找不到文件分类：{1}";
     private static final String MSG_CATEGORY_CONFLICT = "[Exception class: {0}] 与已有文件分类冲突：{1}";
@@ -18,8 +18,6 @@ public class ReactiveErrorMessage {
     private static final String MSG_NON_NULL_DIRECTORY = "[Exception class: {0}] 文件夹非空：{1}";
 
     private static final String MSG_NO_FILE = "[Exception class: {0}] 在目录（{1}）找不到文件：{2}";
-
-    private static final String MSG_ZIP_ERROR = "[Exception class: {0}] 创建ZIP文件失败（{1}）";
 
     public static <T> Mono<T> noCategoryMsg(Object... args) {
         return error(MSG_NO_CATEGORY, NoSuchElementException.class, getCallerClassName(), args);
@@ -45,10 +43,6 @@ public class ReactiveErrorMessage {
         return error(MSG_NO_FILE, NoSuchElementException.class, getCallerClassName(), args);
     }
 
-    public static <T> Mono<T> zipErrorMsg(Object... args) {
-        return error(MSG_ZIP_ERROR, NoSuchElementException.class, getCallerClassName(), args);
-    }
-
     protected static <T> Mono<T> error(String template, Class clazz, String callerClazz, Object... args) {
         String[] bindArgs = new String[args.length + 1];
         bindArgs[0] = callerClazz;
@@ -70,7 +64,7 @@ public class ReactiveErrorMessage {
         StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
         for (int i = 1; i < stElements.length; i++) {
             StackTraceElement ste = stElements[i];
-            if (!ste.getClassName().equals(ReactiveErrorMessage.class.getName())
+            if (!ste.getClassName().equals(MessageUtil.class.getName())
                     && ste.getClassName().indexOf("java.lang.Thread") != 0) {
                 return ste.getClassName();
             }

@@ -4,12 +4,9 @@ import cn.techfan.quickdoc.common.entities.ApiResponseEntity;
 import cn.techfan.quickdoc.common.entities.FsCategory;
 import cn.techfan.quickdoc.common.entities.WebUser;
 import cn.techfan.quickdoc.common.utils.KeyUtil;
-import cn.techfan.quickdoc.service.UserAuthenticationService;
 import cn.techfan.quickdoc.service.ReactiveCategoryService;
+import cn.techfan.quickdoc.service.UserAuthenticationService;
 import lombok.extern.java.Log;
-
-import java.util.logging.Level;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.logging.Level;
 
 @Log
 @RestController
@@ -75,7 +74,8 @@ public class ConfigRestController {
                                                     @PathVariable String privilege) {
         return userAuthenticationService
                 .saveUser(new WebUser(KeyUtil.stringUUID(), username,
-                        password, new String[]{privilege, "USER"}))
+                                password, new String[]{privilege, "USER"}),
+                        true)
                 .map(user -> new ApiResponseEntity<WebUser>(
                         "新增系统用户",
                         ApiResponseEntity.Code.SUCCESS, user));

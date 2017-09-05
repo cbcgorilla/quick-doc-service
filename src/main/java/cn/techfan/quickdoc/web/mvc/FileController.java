@@ -130,7 +130,7 @@ public class FileController {
 
 /*
 
-    @ReactiveErrorMessage(StorageFileNotFoundException.class)
+    @MessageUtil(StorageFileNotFoundException.class)
     public ApiResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
         return ApiResponseEntity.notFound().build();
     }

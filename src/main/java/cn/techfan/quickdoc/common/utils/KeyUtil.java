@@ -17,10 +17,19 @@ public class KeyUtil {
         return randomUUID().toString();
     }
 
+    /**
+     * ID生成规则： 系统当前时间 + range范围的随机数
+     * @param range
+     * @return
+     */
     public static long longID(long range) {
         return System.currentTimeMillis() * range + (long) (Math.random() * range);
     }
 
+    /**
+     * ID生成规则： 系统当前时间 + 长度为6的随机数
+     * @return
+     */
     public static long longID() {
         return longID(1000000L);
     }

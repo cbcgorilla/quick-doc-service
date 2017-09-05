@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static cn.techfan.quickdoc.common.utils.ReactiveErrorMessage.*;
+import static cn.techfan.quickdoc.common.utils.MessageUtil.*;
 
 @Service
 public class ReactiveDirectoryService {

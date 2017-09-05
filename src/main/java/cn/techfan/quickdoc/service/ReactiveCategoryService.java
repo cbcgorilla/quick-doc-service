@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static cn.techfan.quickdoc.common.utils.ReactiveErrorMessage.categoryConflictMsg;
-import static cn.techfan.quickdoc.common.utils.ReactiveErrorMessage.noCategoryMsg;
+import static cn.techfan.quickdoc.common.utils.MessageUtil.categoryConflictMsg;
+import static cn.techfan.quickdoc.common.utils.MessageUtil.noCategoryMsg;
 
 @Service
 public class ReactiveCategoryService {

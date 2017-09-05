@@ -15,9 +15,9 @@
     <div>
         <table class="table table-hover">
             <tr>
-                <td>当前目录</td>
-                <td>所属用户</td>
-                <td colspan="2">操作</td>
+                <td align="center">当前目录</td>
+                <td align="center">所属用户</td>
+                <td colspan="2" align="center">操作</td>
             </tr>
             <tr>
                 <td><h3 th:text="${currentdirectory.path}"></h3></td>
@@ -39,11 +39,7 @@
         <form method="POST" enctype="multipart/form-data" action=".">
             <table class="table table-hover">
                 <tr>
-                    <td>需要上传的文件:</td>
-                    <td><input type="file" name="file"/></td>
-                </tr>
-                <tr>
-                    <td>文件分类:</td>
+                    <td align="right">文件分类:</td>
                     <td>
                         <select id="categoryId" name="categoryId">
                             <option th:each="category : ${allCategories}"
@@ -51,11 +47,10 @@
                             </option>
                         </select>
                     </td>
-                </tr>
-                <tr>
-                    <td><input id="directoryId" name="directoryId" type="hidden" th:value="${currentdirectory.id}"/>
-                    </td>
+                    <td align="right">需要上传的文件:</td>
+                    <td><input type="file" name="file"/></td>
                     <td>
+                        <input type="hidden" id="directoryId" name="directoryId" th:value="${currentdirectory.id}"/>
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                         <input type="submit" value="上传"/>
                     </td>

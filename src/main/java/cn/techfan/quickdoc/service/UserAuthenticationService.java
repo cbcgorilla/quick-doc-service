@@ -1,8 +1,8 @@
 package cn.techfan.quickdoc.service;
 
+import cn.techfan.quickdoc.common.entities.WebUser;
 import cn.techfan.quickdoc.repository.ReactiveUserRepository;
 import cn.techfan.quickdoc.repository.UserRepository;
-import cn.techfan.quickdoc.common.entities.WebUser;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -19,13 +19,14 @@ public class UserAuthenticationService {
         this.reactiveUserRepository = reactiveUserRepository;
     }
 
-    public Mono<WebUser> saveUser(WebUser webUser) {
+    public Mono<WebUser> saveUser(WebUser webUser, Boolean updateFlag) {
         return reactiveUserRepository.findByUsername(webUser.getUsername())
                 .defaultIfEmpty(webUser)
                 .flatMap(entity -> {
-                    String encryptPassword = SHA256Encrypt(webUser.getPassword());
-                    entity.setPassword(encryptPassword);
-                    entity.setAuthorities(webUser.getAuthorities());
+                    if (updateFlag) {
+                        entity.setPassword(SHA256Encrypt(webUser.getPassword()));
+                        entity.setAuthorities(webUser.getAuthorities());
+                    }
                     return reactiveUserRepository.save(entity);
                 });
     }

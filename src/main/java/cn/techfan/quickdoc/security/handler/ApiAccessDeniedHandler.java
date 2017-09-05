@@ -2,7 +2,6 @@ package cn.techfan.quickdoc.security.handler;
 
 import cn.techfan.quickdoc.common.entities.ApiResponseEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.extern.java.Log;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -23,13 +22,13 @@ public class ApiAccessDeniedHandler implements AccessDeniedHandler {
             HttpServletResponse response,
             AccessDeniedException exc) throws IOException, ServletException {
 
-        Authentication auth
-                = SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             log.warning("用户: " + auth.getName()
                     + " 尝试访问受保护路径 URL: "
                     + request.getRequestURI());
         }
+
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 

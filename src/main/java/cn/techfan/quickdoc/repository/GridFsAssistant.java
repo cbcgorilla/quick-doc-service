@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.common.utils;
+package cn.techfan.quickdoc.repository;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;

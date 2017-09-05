@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.common;
+package cn.techfan.quickdoc.common.exception;
 
 public class QuickDocException extends RuntimeException {
     private static final long serialVersionUID = 1039829250633451756L;

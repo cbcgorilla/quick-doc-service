@@ -1,13 +1,13 @@
 package cn.techfan.quickdoc.service;
 
 import cn.techfan.quickdoc.common.entities.FsDirectory;
-import cn.techfan.quickdoc.common.utils.GridFsAssistant;
+import cn.techfan.quickdoc.common.entities.FsEntity;
+import cn.techfan.quickdoc.repository.GridFsAssistant;
 import cn.techfan.quickdoc.repository.CategoryRepository;
 import cn.techfan.quickdoc.repository.DirectoryRepository;
 import cn.techfan.quickdoc.repository.FileEntityRepository;
 import cn.techfan.quickdoc.repository.ReactiveFileEntityRepository;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
-import cn.techfan.quickdoc.common.entities.FsEntity;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static cn.techfan.quickdoc.common.query.QueryKit.keyQuery;
-import static cn.techfan.quickdoc.common.utils.ReactiveErrorMessage.fileNotExistMsg;
+import static cn.techfan.quickdoc.common.utils.MessageUtil.fileNotExistMsg;
 
 @Service
 public class ReactiveFileService {

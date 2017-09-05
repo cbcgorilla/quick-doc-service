@@ -1,7 +1,6 @@
 package cn.techfan.quickdoc.repository;
 
 import cn.techfan.quickdoc.common.entities.FsDirectory;
-import cn.techfan.quickdoc.common.entities.FsDirectory;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
