@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 
 @Log
 @RestController
-@RequestMapping("/config-api")
+@RequestMapping("/rest/config-api")
 public class ConfigRestController {
 
     private static final String ACTION_ADD_CATEGORY = "新增文件分类目录名";
@@ -66,7 +66,7 @@ public class ConfigRestController {
                 .onErrorReturn(new ApiResponseEntity(
                         ACTION_RENAME_CATEGORY,
                         ApiResponseEntity.Code.FAIL,
-                        "与已有文件分类冲突"));
+                        "文件重命名失败, 请检查已有文件名和新文件名是否有误！"));
     }
 
     @RequestMapping("/adduser/{username}/{password}/{privilege}")

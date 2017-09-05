@@ -50,8 +50,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http.antMatcher("/management/**").authorizeRequests()
-                    .anyRequest().hasAuthority(AUTHORITY_MANAGEMENT)
+            // @TODO 删除.csrf().disable() 可屏蔽 /management 路径下的POST提交，仅支持GET方法交互
+            http.csrf().disable().antMatcher("/management/**").authorizeRequests()
+                    .anyRequest().hasAuthority(AUTHORITY_ADMIN)
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -70,20 +71,38 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             return entryPoint;
         }
     }
-/*
 
     @Configuration
     @Order(2)
-    public static class GuestConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    public static class RestApiConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         protected void configure(HttpSecurity http) throws Exception {
-            http.antMatcher("/files-api/**").authorizeRequests().anyRequest().permitAll();
+            //http.antMatcher("/guest/**").authorizeRequests().anyRequest().permitAll();
+
+            http.antMatcher("/rest/**").authorizeRequests()
+                    .anyRequest().hasAuthority(AUTHORITY_USER)
+                    .and().httpBasic()
+                    .authenticationEntryPoint(authenticationEntryPoint())
+                    .and().exceptionHandling()
+                    .accessDeniedHandler(accessDeniedHandler())
+                    .and().csrf().disable();
+        }
+
+        @Bean
+        public AccessDeniedHandler accessDeniedHandler() {
+            return new ApiAccessDeniedHandler();
+        }
+
+        @Bean
+        public AuthenticationEntryPoint authenticationEntryPoint() {
+            BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
+            entryPoint.setRealmName("Management Realm");
+            return entryPoint;
         }
     }
-*/
 
     @Configuration
-    @Order(2)
+    @Order(3)
     public static class GeneralLoginConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         protected void configure(HttpSecurity http) throws Exception {
@@ -93,7 +112,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //     head段： <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
             //     form段： <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-            http.csrf().disable().authorizeRequests()
+            http.authorizeRequests()
                     .antMatchers("/error/**").permitAll()
                     .antMatchers("/**").hasAuthority(AUTHORITY_USER)
                     .anyRequest().authenticated()

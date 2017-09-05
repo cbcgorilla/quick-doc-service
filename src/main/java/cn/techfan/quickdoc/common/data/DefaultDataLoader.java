@@ -1,16 +1,14 @@
-package cn.techfan.quickdoc.common.utils;
+package cn.techfan.quickdoc.common.data;
 
 import cn.techfan.quickdoc.common.entities.FsEntity;
 import cn.techfan.quickdoc.common.entities.FsOwner;
+import cn.techfan.quickdoc.common.utils.KeyUtil;
 import cn.techfan.quickdoc.service.GridFsService;
 import cn.techfan.quickdoc.service.ReactiveCategoryService;
 import cn.techfan.quickdoc.service.ReactiveDirectoryService;
 import cn.techfan.quickdoc.service.ReactiveFileService;
-import com.mongodb.MongoClient;
 import lombok.extern.java.Log;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.context.annotation.Bean;
 import reactor.core.publisher.Flux;
 
 import java.io.File;
@@ -20,19 +18,10 @@ import java.util.Date;
 import java.util.logging.Level;
 
 @Log
-@SpringBootConfiguration
+//@SpringBootConfiguration
 public class DefaultDataLoader {
 
-    @Bean
-    CommandLineRunner defaultDatabase(MongoClient mongoClient, GridFsAssistant gridFsAssistant) {
-        return args -> {
-            //MongoDatabase database = mongoClient.getDatabase("school");
-            //System.out.println(database.getName());
-            //System.out.println("database from bean GridFsUtil: "+ gridFsAssistant.getMongoDB("school").getName());
-        };
-    }
-
-    @Bean
+    //@Bean
     CommandLineRunner initCategory(ReactiveCategoryService reactiveCategoryService) {
         return args -> {
             for (int i = 0; i < 10; i++) {
@@ -59,7 +48,7 @@ public class DefaultDataLoader {
         };
     }
 
-   // @Bean
+    // @Bean
     CommandLineRunner initGridFs(GridFsService gridFsService, ReactiveFileService reactiveFileService) {
         return args -> {
             File directory = new File("E:\\BaiduYunDownload\\发展路线图");
@@ -94,7 +83,7 @@ public class DefaultDataLoader {
         };
     }
 
-    @Bean
+    // @Bean
     CommandLineRunner initDirectory(ReactiveDirectoryService reactiveDirectoryService) {
         return args -> {
             for (int i = 0; i < 10; i++) {
@@ -153,9 +142,9 @@ public class DefaultDataLoader {
 
     private FsOwner[] getRandomOwners() {
         FsOwner owners[] = new FsOwner[3];
-        owners[0] = new FsOwner("chenbichao", FsOwner.Type.TYPE_PRIVATE,7);
-        owners[1] = new FsOwner("陈毕超", FsOwner.Type.TYPE_PRIVATE,7);
-        owners[2] = new FsOwner("Michael Chen", FsOwner.Type.TYPE_PUBLIC,7);
+        owners[0] = new FsOwner("chenbichao", FsOwner.Type.TYPE_PRIVATE, 7);
+        owners[1] = new FsOwner("陈毕超", FsOwner.Type.TYPE_PRIVATE, 7);
+        owners[2] = new FsOwner("Michael Chen", FsOwner.Type.TYPE_PUBLIC, 7);
         return owners;
     }
 

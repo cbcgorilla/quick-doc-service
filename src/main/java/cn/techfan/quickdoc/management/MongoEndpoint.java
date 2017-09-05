@@ -24,10 +24,15 @@ public class MongoEndpoint {
     }
 
     @ReadOperation
-    public CommandResult getMongo(@Selector String type) {
+    public CommandResult getMongoDetail(@Selector String type) {
         if (type.equalsIgnoreCase("more")) {
             return mongoClient.getDB(database).command("serverStatus");
         }
+        return getMongo();
+    }
+
+    @ReadOperation
+    public CommandResult getMongo() {
         return mongoClient.getDB(database).getStats();
     }
 }

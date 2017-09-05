@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/files-api")
+@RequestMapping("/rest/files-api")
 public class FileRestController {
 
     private static final String ACTION_GET_FILE_LIST = "获取文件清单";
