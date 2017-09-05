@@ -123,7 +123,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     //.failureHandler(getFailureHandler())
                     .permitAll()
                     .and()
-                    .logout()
+                    .logout().logoutUrl("/logout")
                     .permitAll()/*
                     .and()
                     .exceptionHandling()
