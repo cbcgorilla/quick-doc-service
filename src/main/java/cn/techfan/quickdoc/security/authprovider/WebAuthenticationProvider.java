@@ -5,6 +5,7 @@ import cn.techfan.quickdoc.security.model.WebAuthority;
 import cn.techfan.quickdoc.service.UserAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -29,15 +30,12 @@ public class WebAuthenticationProvider
         String password = authentication.getCredentials().toString();
         WebUser webUser = userAuthenticationService.validateUser(name, password).block();
         if (webUser.getAuthorities() != null) {
-
-            // use the credentials
-            // and authenticate against the third-party system
             List<WebAuthority> list = Stream.of(webUser.getAuthorities())
                     .map(v -> new WebAuthority(v))
                     .collect(Collectors.toList());
             return new UsernamePasswordAuthenticationToken(name, password, list);
         } else {
-            return null;
+            throw new BadCredentialsException("用户名密码校验失败!");
         }
     }
 

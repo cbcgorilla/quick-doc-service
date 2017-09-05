@@ -1,5 +1,7 @@
 package cn.techfan.quickdoc.security.config;
 
+import cn.techfan.quickdoc.security.handler.ApiAccessDeniedHandler;
+import cn.techfan.quickdoc.security.handler.WebAuthenticationFailureHandler;
 import cn.techfan.quickdoc.security.handler.WebAuthenticationSuccessHandler;
 import cn.techfan.quickdoc.security.authprovider.WebAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +15,17 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final String AUTHORITY_USER = "USER";
+    private static final String AUTHORITY_ADMIN = "ADMIN";
+    private static final String AUTHORITY_MANAGEMENT = "MANAGEMENT";
 
     @Autowired
     private WebAuthenticationProvider authProvider;
@@ -45,9 +50,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http.antMatcher("/management/**/*").authorizeRequests().anyRequest().hasAuthority("ADMIN")
-                    .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint())
-                    .and().exceptionHandling().accessDeniedPage("/403");
+            http.antMatcher("/management/**").authorizeRequests()
+                    .anyRequest().hasAuthority(AUTHORITY_MANAGEMENT)
+                    .and().httpBasic()
+                    .authenticationEntryPoint(authenticationEntryPoint())
+                    .and().exceptionHandling()
+                    .accessDeniedHandler(accessDeniedHandler());
+        }
+
+        @Bean
+        public AccessDeniedHandler accessDeniedHandler() {
+            return new ApiAccessDeniedHandler();
         }
 
         @Bean
@@ -56,13 +69,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             entryPoint.setRealmName("Management Realm");
             return entryPoint;
         }
-
-        @Bean
-        public WebAuthenticationSuccessHandler getSuccessHandler() {
-            return new WebAuthenticationSuccessHandler();
-        }
-
     }
+/*
 
     @Configuration
     @Order(2)
@@ -72,9 +80,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             http.antMatcher("/files-api/**").authorizeRequests().anyRequest().permitAll();
         }
     }
+*/
 
     @Configuration
-    @Order(3)
+    @Order(2)
     public static class GeneralLoginConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         protected void configure(HttpSecurity http) throws Exception {
@@ -85,12 +94,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //     form段： <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
             http.csrf().disable().authorizeRequests()
-                    .antMatchers("/**").hasAuthority("USER")
+                    .antMatchers("/error/**").permitAll()
+                    .antMatchers("/**").hasAuthority(AUTHORITY_USER)
                     .anyRequest().authenticated()
                     .and()
                     .formLogin()
                     .loginPage("/login")
                     .successHandler(getSuccessHandler())
+                    //.failureHandler(getFailureHandler())
                     .permitAll()
                     .and()
                     .logout()
@@ -118,6 +129,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         @Bean
         public WebAuthenticationSuccessHandler getSuccessHandler() {
             return new WebAuthenticationSuccessHandler();
+        }
+
+        @Bean
+        public WebAuthenticationFailureHandler getFailureHandler() {
+            return new WebAuthenticationFailureHandler();
         }
 
     }

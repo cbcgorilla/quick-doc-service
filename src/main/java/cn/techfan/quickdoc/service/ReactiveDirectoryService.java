@@ -135,7 +135,7 @@ public class ReactiveDirectoryService {
                     if (subList == null || subList.size() == 0) {
                         return reactiveDirectoryRepository.delete(v);
                     } else {
-                        return notEmptyDirMsg(directoryId.toString());
+                        return notEmptyDirMsg("[" + directoryId.toString() + "] " + v.getPath());
                     }
                 });
     }

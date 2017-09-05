@@ -1,18 +1,33 @@
 package cn.techfan.quickdoc.management;
 
+import com.mongodb.CommandResult;
+import com.mongodb.MongoClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.endpoint.Endpoint;
 import org.springframework.boot.endpoint.ReadOperation;
+import org.springframework.boot.endpoint.Selector;
 import org.springframework.stereotype.Component;
 
-import javax.websocket.server.ServerEndpoint;
-
-@Endpoint(id="mongo")
-@ServerEndpoint("mongo")
+@Endpoint(id = "mongo")
 @Component
 public class MongoEndpoint {
 
+    @Value("${spring.data.mongodb.database}")
+    private String database;
+
+    private final MongoClient mongoClient;
+
+    @Autowired
+    public MongoEndpoint(MongoClient mongoClient) {
+        this.mongoClient = mongoClient;
+    }
+
     @ReadOperation
-    public String getMongo(){
-        return "mongo";
+    public CommandResult getMongo(@Selector String type) {
+        if (type.equalsIgnoreCase("more")) {
+            return mongoClient.getDB(database).command("serverStatus");
+        }
+        return mongoClient.getDB(database).getStats();
     }
 }
