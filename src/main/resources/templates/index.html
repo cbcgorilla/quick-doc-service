@@ -103,6 +103,8 @@
                                        th:value="${currentdirectory.id}"/>
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                                 <input type="submit" value="删除" class="btn btn-danger"/>
+                                <a th:href="@{'/download/'+${file.storedId}}" th:text="@{'下载'}"
+                                   class="btn btn-success"></a>
                             </td>
                         </form>
                     </tr>

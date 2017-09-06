@@ -30,7 +30,7 @@ public class DefaultDataLoader {
                                     "admin",
                                     "chenbichao",
                                     new String[]{"ADMIN", "USER"}),
-                            true)
+                            false)
                     .subscribe(v->log.info(v.toString()));
         };
     }

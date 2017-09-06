@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
 @Document
-data class FsEntity(@Id var id: String,
+data class FsEntity(@Id val id: String,
                     var filename: String,
                     var contentLength: Long,
                     var contentType: String,

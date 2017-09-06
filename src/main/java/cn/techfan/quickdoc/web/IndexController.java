@@ -11,8 +11,10 @@ import cn.techfan.quickdoc.service.ReactiveFileService;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import cn.techfan.quickdoc.security.model.ActiveUser;
 import cn.techfan.quickdoc.service.ReactiveCategoryService;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,27 +53,55 @@ public class IndexController {
         this.reactiveFileService = reactiveFileService;
     }
 
+    /**
+     * 获取所有文件分类清单
+     *
+     * @return
+     */
     @ModelAttribute("allCategories")
     public List<FsCategory> allCategories() {
         return reactiveCategoryService.findAll().toStream().collect(Collectors.toList());
     }
 
+    /**
+     * 获取系统标题
+     *
+     * @return
+     */
     @ModelAttribute("title")
     public String pageTitle() {
         return HOME_TITLE;
     }
 
+    /**
+     * 登录后的首页
+     *
+     * @param model
+     * @return
+     */
     @GetMapping()
     public String index(Model model) {
         refreshDirList(model, 0L);
         return "index";
     }
 
+    /**
+     * 登录页面
+     *
+     * @return
+     */
     @RequestMapping("/login")
     public String login() {
         return "login";
     }
 
+    /**
+     * 刷新显示指定文件夹内的所有内容
+     *
+     * @param directoryId
+     * @param model
+     * @return
+     */
     @GetMapping("/dir/{directoryId}")
     public String index(@PathVariable Long directoryId, Model model) {
         FsDirectory directoryMono = reactiveDirectoryFsService.findById(directoryId).block();
@@ -80,6 +111,13 @@ public class IndexController {
         return "index";
     }
 
+    /**
+     * 打包下载指定文件夹内的所有内容
+     *
+     * @param response
+     * @param directoryId
+     * @throws IOException
+     */
     @GetMapping(value = "/zip/{directoryId}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public @ResponseBody
     void downloadDocument(HttpServletResponse response,
@@ -92,6 +130,35 @@ public class IndexController {
         reactiveFileService.createZip(directoryId, response.getOutputStream(), 0L);
     }
 
+    /**
+     * 文件下载： 提供文件ID , 下载文件名默认编码为GB2312.
+     *
+     * @param response
+     * @param storedId 文件存储ID号
+     * @throws IOException
+     */
+    @GetMapping(value = "/download/{storedId}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public @ResponseBody
+    void downloadDocument(HttpServletResponse response,
+                          @PathVariable String storedId) throws IOException {
+        GridFSDownloadStream fs = reactiveFileService.getFileStream(new ObjectId(storedId));
+        GridFSFile gridFSFile = fs.getGridFSFile();
+
+        response.setContentType(MediaType.MULTIPART_FORM_DATA_VALUE);
+        response.setHeader("Content-Disposition",
+                "attachment; filename=" + new String(gridFSFile.getFilename()
+                        .getBytes("gb2312"), "ISO8859-1"));
+        response.setHeader("Content-Length", String.valueOf(gridFSFile.getLength()));
+        FileCopyUtils.copy(fs, response.getOutputStream());
+    }
+
+    /**
+     * PDF格式文件预览功能
+     *
+     * @param storedId
+     * @return
+     * @throws IOException
+     */
     @GetMapping(value = "/view/{storedId}", produces = MediaType.APPLICATION_PDF_VALUE)
     public @ResponseBody
     HttpEntity<byte[]> openDocumentInBrowser(@PathVariable String storedId) throws IOException {
@@ -106,6 +173,18 @@ public class IndexController {
         return new HttpEntity<byte[]>(document, header);
     }
 
+    /**
+     * 上传文件到指定目录和文件分类
+     *
+     * @param file
+     * @param directoryId
+     * @param categoryId
+     * @param redirectAttributes
+     * @param model
+     * @param session
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/uploadFile")
     public String uploadFile(@RequestParam("file") MultipartFile file,
                              @RequestParam("directoryId") Long directoryId,
@@ -137,6 +216,13 @@ public class IndexController {
         return "redirect:/dir/" + directoryId;
     }
 
+    /**
+     * 删除文件
+     *
+     * @param directoryId
+     * @param fsEntityId
+     * @return
+     */
     @DeleteMapping("/deleteFile")
     public String deleteFile(@RequestParam("directoryId") Long directoryId,
                              @RequestParam String fsEntityId) {
@@ -145,6 +231,12 @@ public class IndexController {
     }
 
 
+    /**
+     * 刷新文件夹目录内容
+     *
+     * @param model
+     * @param directoryId
+     */
     private void refreshDirList(Model model, Long directoryId) {
         model.addAttribute("directories",
                 reactiveDirectoryFsService.findAllByParentId(directoryId)
