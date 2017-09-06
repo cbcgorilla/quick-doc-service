@@ -2,115 +2,114 @@
 <head>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${title}"></title>
-    <link href="css/bootstrap.css" rel="stylesheet"/>
-    <link href="css/app.css" rel="stylesheet"/>
+    <link href="/css/app.css" rel="stylesheet"/>
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/font-awesome.min.css" rel="stylesheet"/>
 </head>
 <body>
 
-<div th:if="${title}">
-    <h2 th:text="${title}"/>
+<div class="template-bg-gray" th:if="${title}">
+    <table class="table table-dark">
+        <tr>
+            <td>
+                <h2 th:text="${title}"/>
+            </td>
+            <td align="right" width="500">
+                <a class="btn btn-dark" th:href="@{'/logout'}" th:text="@{'退出系统'}"></a>
+            </td>
+        </tr>
+    </table>
 </div>
-
-<div th:if="${currentdirectory}">
-    <div>
-        <table class="table table-hover">
-            <tr>
-                <td align="center">当前目录</td>
-                <td align="center">所属用户</td>
-                <td colspan="2" align="center">操作</td>
-            </tr>
-            <tr>
-                <td><h3 th:text="${currentdirectory.path}"></h3></td>
-                <td>
-                    <div th:each="owner:${currentdirectory.owners}">
-                        <div th:text="${owner.username}"/>
-                    </div>
-                </td>
-                <td>
-                    <a th:href="@{'zip/'+${currentdirectory.id}}" th:text="@{'批量下载文件夹内容'}"></a>
-                </td>
-                <td>
-                    <a th:href="${currentdirectory.parentId}" th:text="@{'返回上级目录'}"></a>
-                </td>
-            </tr>
-        </table>
+<div class="generic-container">
+    <div class="panel panel-default" th:if="${currentdirectory}">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><span class="lead">文件上传</span></div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <form method="POST" enctype="multipart/form-data" th:action="@{'/uploadFile'}">
+                    <table class="table table-hover">
+                        <tr>
+                            <td align="right">文件分类:</td>
+                            <td>
+                                <select id="categoryId" name="categoryId" class="select custome-select">
+                                    <option th:each="category : ${allCategories}"
+                                            th:value="${category.id}" th:text="${category.type}">文件分类
+                                    </option>
+                                </select>
+                            </td>
+                            <td align="right">需要上传的文件:</td>
+                            <td><input type="file" name="file" class="input custom-file"/></td>
+                            <td>
+                                <input type="hidden" id="directoryId" name="directoryId"
+                                       th:value="${currentdirectory.id}"/>
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <input type="submit" value="上传文件" class="btn btn-success"/>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
     </div>
-    <div>
-        <form method="POST" enctype="multipart/form-data" action=".">
-            <table class="table table-hover">
-                <tr>
-                    <td align="right">文件分类:</td>
-                    <td>
-                        <select id="categoryId" name="categoryId">
-                            <option th:each="category : ${allCategories}"
-                                    th:value="${category.id}" th:text="${category.type}">文件分类
-                            </option>
-                        </select>
-                    </td>
-                    <td align="right">需要上传的文件:</td>
-                    <td><input type="file" name="file"/></td>
-                    <td>
-                        <input type="hidden" id="directoryId" name="directoryId" th:value="${currentdirectory.id}"/>
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                        <input type="submit" value="上传"/>
-                    </td>
-                </tr>
-            </table>
-        </form>
+
+    <div class="alert alert-success" th:if="${message}">
+        <h2 th:text="${message}"/>
     </div>
-</div>
 
-<div th:if="${message}">
-    <h2 th:text="${message}"/>
-</div>
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><span class="lead">文件清单</span></div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>文件名</th>
+                        <th>文件长度</th>
+                        <th>上传日期</th>
+                        <th>文件分类</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
 
-<div class="panel-body">
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th>文件夹</th>
-                <th>上级文件夹</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr th:each="directory : ${directories}">
-                <td><a th:href="${directory.id}" th:text="${directory.path}"/></td>
-                <td><a th:href="${directory.parentId}" th:text="${directory.parentId}"/></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="panel-body">
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th>文件名</th>
-                <th>文件长度</th>
-                <th>上传日期</th>
-                <th>所属文件分类</th>
-                <th>上传用户</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr th:each="file : ${files}">
-                <td><a th:href="@{'view/'+${file.storedId}}" th:text="${file.filename}"/></td>
-                <td th:text="${file.contentLength}">ID</td>
-                <td th:text="${#dates.format(file.uploadDate,'yyyy-MM-dd HH:mm:ss')}">ID</td>
-                <td th:text="${file.category}">ID</td>
-                <td>
-                    <div th:each="owner:${file.owners}">
-                        <div th:text="${owner.username}"/>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    <tbody>
+                    <tr th:if="${currentdirectory}">
+                        <td colspan="5">
+                            <a th:href="@{'/dir/'+${currentdirectory.parentId}}" th:text="@{'返回上级目录'}"></a>
+                        </td>
+                    </tr>
+                    <tr th:each="directory : ${directories}">
+                        <td>
+                            <i class="fa fa-folder-o"></i>
+                            <a th:href="@{'/dir/'+${directory.id}}" th:text="${directory.path}"/>
+                        </td>
+                        <td th:text="@{'文件夹'}" colspan="3"></td>
+                        <td>
+                            <a th:href="@{'/zip/'+${directory.id}}" th:text="@{'批量下载文件夹'}" class="btn btn-success"></a>
+                        </td>
+                    </tr>
+                    <tr th:each="file : ${files}">
+                        <form th:action="@{/deleteFile}" th:method="DELETE">
+                            <td>
+                                <i class="fa fa-file-pdf-o"></i>
+                                <a th:href="@{'/view/'+${file.storedId}}" th:text="${file.filename}"/>
+                            </td>
+                            <td th:text="${file.contentLength}">ID</td>
+                            <td th:text="${#dates.format(file.uploadDate,'yyyy-MM-dd HH:mm:ss')}">ID</td>
+                            <td th:text="${file.category}">ID</td>
+                            <td>
+                                <input type="hidden" id="fsEntityId" name="fsEntityId" th:value="${file.id}"/>
+                                <input type="hidden" id="directoryId" name="directoryId"
+                                       th:value="${currentdirectory.id}"/>
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <input type="submit" value="删除" class="btn btn-danger"/>
+                            </td>
+                        </form>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 </body>

@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.data.dao;
+package cn.techfan.quickdoc.persistent.dao;
 
 import cn.techfan.quickdoc.common.entities.FsCategory;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;

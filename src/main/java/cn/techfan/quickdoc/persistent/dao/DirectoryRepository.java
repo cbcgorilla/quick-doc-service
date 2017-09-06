@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.data.dao;
+package cn.techfan.quickdoc.persistent.dao;
 
 import cn.techfan.quickdoc.common.entities.FsDirectory;
 import org.springframework.data.mongodb.repository.MongoRepository;

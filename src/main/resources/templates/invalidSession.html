@@ -1,0 +1,15 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title th:text="${title}"></title>
+    <link href="/css/bootstrap.css" rel="stylesheet"/>
+    <link href="/css/app.css" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="alert alert-warning" th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+
+</body>
+</html>

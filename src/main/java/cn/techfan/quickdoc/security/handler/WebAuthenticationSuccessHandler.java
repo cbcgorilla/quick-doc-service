@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Collection;
 
-@Component("myAuthenticationSuccessHandler")
+@Component("webAuthenticationSuccessHandler")
 public class WebAuthenticationSuccessHandler implements
         AuthenticationSuccessHandler {
 

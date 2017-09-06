@@ -1,6 +1,8 @@
 package cn.techfan.quickdoc.common.utils;
 
+import cn.techfan.quickdoc.common.exception.InvalidPasswordException;
 import cn.techfan.quickdoc.common.exception.QuickDocException;
+import cn.techfan.quickdoc.common.exception.UserNotFoundException;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Constructor;
@@ -18,6 +20,10 @@ public class MessageUtil {
     private static final String MSG_NON_NULL_DIRECTORY = "[Exception class: {0}] 文件夹非空：{1}";
 
     private static final String MSG_NO_FILE = "[Exception class: {0}] 在目录（{1}）找不到文件：{2}";
+
+    private static final String USER_NOT_FOUND = "[Exception class: {0}] 用户名（{1}）不存在";
+
+    private static final String INVALID_PASSWORD = "[Exception class: {0}] 密码无效";
 
     public static <T> Mono<T> noCategoryMsg(Object... args) {
         return error(MSG_NO_CATEGORY, NoSuchElementException.class, getCallerClassName(), args);
@@ -41,6 +47,14 @@ public class MessageUtil {
 
     public static <T> Mono<T> fileNotExistMsg(Object... args) {
         return error(MSG_NO_FILE, NoSuchElementException.class, getCallerClassName(), args);
+    }
+
+    public static <T> Mono<T> userNotFoundMsg(Object... args) {
+        return error(USER_NOT_FOUND, UserNotFoundException.class, getCallerClassName(), args);
+    }
+
+    public static <T> Mono<T> invalidPasswordMsg() {
+        return error(INVALID_PASSWORD, InvalidPasswordException.class, getCallerClassName(), "");
     }
 
     protected static <T> Mono<T> error(String template, Class clazz, String callerClazz, Object... args) {

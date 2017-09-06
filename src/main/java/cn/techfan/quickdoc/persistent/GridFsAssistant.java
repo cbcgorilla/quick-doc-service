@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.data;
+package cn.techfan.quickdoc.persistent;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
@@ -11,8 +11,6 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsCriteria;
 import org.springframework.stereotype.Component;
 
 import static com.mongodb.client.model.Filters.eq;

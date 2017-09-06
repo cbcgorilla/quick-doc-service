@@ -14,10 +14,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -41,7 +47,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 针对 css 和 images 资源忽略认证
         web.ignoring()
                 .antMatchers(HttpMethod.GET, "/css/**/*")
-                .antMatchers(HttpMethod.GET, "/images/**/*");
+                .antMatchers(HttpMethod.GET, "/fonts/**/*")
+                .antMatchers(HttpMethod.GET, "/images/**/*")
+                .antMatchers(HttpMethod.GET, "/js/**/*")
+                .antMatchers(HttpMethod.GET, "/less/**/*")
+                .antMatchers(HttpMethod.GET, "/scss/**/*");
     }
 
     @Configuration
@@ -105,6 +115,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Order(3)
     public static class GeneralLoginConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
+        @Autowired
+        private AuthenticationSuccessHandler webAuthenticationSuccessHandler;
+
+        @Autowired
+        private AuthenticationFailureHandler webAuthenticationFailureHandler;
+
+        @Autowired
+        private LogoutSuccessHandler webLogoutSuccessHandler;
+
         protected void configure(HttpSecurity http) throws Exception {
             // @TODO 启用用csrf特性
             //  1. 删除 .csrf().disable() ,
@@ -112,27 +131,46 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //     head段： <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
             //     form段： <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-            http.authorizeRequests()
-                    .antMatchers("/error/**").permitAll()
-                    .antMatchers("/**").hasAuthority(AUTHORITY_USER)
-                    .anyRequest().authenticated()
+            // @formatter:off
+            http
+                    .authorizeRequests()
+                    .antMatchers("/login*", "/login*", "/signin/**", "/signup/**", "/customLogin",
+                            "/user/registration*", "/registrationConfirm*", "/expiredAccount*", "/registration*",
+                            "/badUser*", "/user/resendRegistrationToken*", "/forgetPassword*", "/user/resetPassword*",
+                            "/user/changePassword*", "/emailError*", "/resources/**", "/old/user/registration*", "/successRegister*", "/qrcode*").permitAll()
+                    //.antMatchers("/invalidSession*").anonymous()
+                    //.antMatchers("/user/updatePassword*","/user/savePassword*","/updatePassword*").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
+                    .anyRequest().hasAuthority(AUTHORITY_USER)
                     .and()
                     .formLogin()
                     .loginPage("/login")
-                    .successHandler(getSuccessHandler())
-                    //.failureHandler(getFailureHandler())
+                    .defaultSuccessUrl("/homepage.html")
+                    .failureUrl("/login?error=true")
+                    .successHandler(webAuthenticationSuccessHandler)
+                    .failureHandler(webAuthenticationFailureHandler)
+                    //.authenticationDetailsSource(authenticationDetailsSource)
                     .permitAll()
                     .and()
-                    .logout().logoutUrl("/logout")
-                    .permitAll()/*
+                    .sessionManagement()
+                    .invalidSessionUrl("/invalidSession.html")
+                    .maximumSessions(1).sessionRegistry(sessionRegistry())
                     .and()
-                    .exceptionHandling()
-                    .defaultAuthenticationEntryPointFor(
-                            loginUrlauthenticationEntryPointWithWarning(),
-                            new AntPathRequestMatcher("/user/private/**"))
-                    .defaultAuthenticationEntryPointFor(
-                            loginUrlauthenticationEntryPoint(),
-                            new AntPathRequestMatcher("/user/general/**"))*/;
+                    .sessionFixation().none()
+                    .and()
+                    .logout()
+                    //.logoutUrl("/perform_logout")
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                    .deleteCookies("JSESSIONID")
+                    .logoutSuccessHandler(webLogoutSuccessHandler)
+                    .invalidateHttpSession(false)
+                    .logoutSuccessUrl("/login.html?logout=true")
+                    .permitAll();
+            // @formatter:on
+        }
+
+        @Bean
+        public SessionRegistry sessionRegistry() {
+            return new SessionRegistryImpl();
         }
 
         @Bean
@@ -143,16 +181,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         @Bean
         public AuthenticationEntryPoint loginUrlauthenticationEntryPointWithWarning() {
             return new LoginUrlAuthenticationEntryPoint("/userLoginWithWarning");
-        }
-
-        @Bean
-        public WebAuthenticationSuccessHandler getSuccessHandler() {
-            return new WebAuthenticationSuccessHandler();
-        }
-
-        @Bean
-        public WebAuthenticationFailureHandler getFailureHandler() {
-            return new WebAuthenticationFailureHandler();
         }
 
     }

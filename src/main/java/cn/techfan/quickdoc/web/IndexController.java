@@ -71,7 +71,7 @@ public class IndexController {
         return "login";
     }
 
-    @GetMapping("/{directoryId}")
+    @GetMapping("/dir/{directoryId}")
     public String index(@PathVariable Long directoryId, Model model) {
         FsDirectory directoryMono = reactiveDirectoryFsService.findById(directoryId).block();
         model.addAttribute("currentdirectory", directoryMono);
@@ -89,7 +89,7 @@ public class IndexController {
                 "attachment; filename=" + directoryId + ".zip");
         //response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
 
-        reactiveFileService.createZip(directoryId, response.getOutputStream(),0L);
+        reactiveFileService.createZip(directoryId, response.getOutputStream(), 0L);
     }
 
     @GetMapping(value = "/view/{storedId}", produces = MediaType.APPLICATION_PDF_VALUE)
@@ -106,15 +106,15 @@ public class IndexController {
         return new HttpEntity<byte[]>(document, header);
     }
 
-    @PostMapping()
-    public String handleFileUpload(@RequestParam("file") MultipartFile file,
-                                   @RequestParam("directoryId") Long directoryId,
-                                   @RequestParam("categoryId") Long categoryId,
-                                   RedirectAttributes redirectAttributes,
-                                   Model model,
-                                   HttpSession session) throws IOException {
+    @PostMapping("/uploadFile")
+    public String uploadFile(@RequestParam("file") MultipartFile file,
+                             @RequestParam("directoryId") Long directoryId,
+                             @RequestParam("categoryId") Long categoryId,
+                             RedirectAttributes redirectAttributes,
+                             Model model,
+                             HttpSession session) throws IOException {
         ActiveUser activeUser = (ActiveUser) session.getAttribute("ActiveUser");
-        FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE,5);
+        FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 5);
         String filename = StringUtil.getFilename(file.getOriginalFilename());
 
         FsEntity fsEntity = new FsEntity(KeyUtil.getSHA256UUID(),
@@ -134,8 +134,16 @@ public class IndexController {
                 .subscribe();
         refreshDirList(model, directoryId);
         redirectAttributes.addFlashAttribute("message", "成功上传文件： " + filename);
-        return "redirect:/" + directoryId;
+        return "redirect:/dir/" + directoryId;
     }
+
+    @DeleteMapping("/deleteFile")
+    public String deleteFile(@RequestParam("directoryId") Long directoryId,
+                             @RequestParam String fsEntityId) {
+        reactiveFileService.deleteFile(fsEntityId).subscribe();
+        return "redirect:/dir/" + directoryId;
+    }
+
 
     private void refreshDirList(Model model, Long directoryId) {
         model.addAttribute("directories",

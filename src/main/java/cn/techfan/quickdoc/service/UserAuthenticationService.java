@@ -1,12 +1,14 @@
 package cn.techfan.quickdoc.service;
 
 import cn.techfan.quickdoc.common.entities.WebUser;
-import cn.techfan.quickdoc.data.dao.ReactiveUserRepository;
-import cn.techfan.quickdoc.data.dao.UserRepository;
+import cn.techfan.quickdoc.persistent.dao.ReactiveUserRepository;
+import cn.techfan.quickdoc.persistent.dao.UserRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import static cn.techfan.quickdoc.common.utils.KeyUtil.SHA256Encrypt;
+import static cn.techfan.quickdoc.common.utils.MessageUtil.invalidPasswordMsg;
+import static cn.techfan.quickdoc.common.utils.MessageUtil.userNotFoundMsg;
 
 @Service
 public class UserAuthenticationService {
@@ -41,12 +43,10 @@ public class UserAuthenticationService {
                 .defaultIfEmpty(new WebUser("", "", "", null))
                 .map(user -> {
                     if (!user.getUsername().equalsIgnoreCase(username)) {
-                        user.setAuthorities(null);
-                        return user;
+                        userNotFoundMsg(username);
                     }
                     if (!user.getPassword().equalsIgnoreCase(encyptPassword)) {
-                        user.setAuthorities(null);
-                        return user;
+                        invalidPasswordMsg();
                     }
                     return user;
                 });

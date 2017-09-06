@@ -2,11 +2,11 @@ package cn.techfan.quickdoc.service;
 
 import cn.techfan.quickdoc.common.entities.FsDirectory;
 import cn.techfan.quickdoc.common.entities.FsEntity;
-import cn.techfan.quickdoc.data.GridFsAssistant;
-import cn.techfan.quickdoc.data.dao.CategoryRepository;
-import cn.techfan.quickdoc.data.dao.DirectoryRepository;
-import cn.techfan.quickdoc.data.dao.FileEntityRepository;
-import cn.techfan.quickdoc.data.dao.ReactiveFileEntityRepository;
+import cn.techfan.quickdoc.persistent.GridFsAssistant;
+import cn.techfan.quickdoc.persistent.dao.CategoryRepository;
+import cn.techfan.quickdoc.persistent.dao.DirectoryRepository;
+import cn.techfan.quickdoc.persistent.dao.FileEntityRepository;
+import cn.techfan.quickdoc.persistent.dao.ReactiveFileEntityRepository;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -114,6 +114,23 @@ public class ReactiveFileService {
                 .switchIfEmpty(
                         fileNotExistMsg(new Long(fileEntity.getDirectoryId()).toString(),
                                 fileEntity.getFilename())
+                )
+                .flatMap(entity -> {
+                    gridFsTemplate.delete(keyQuery(entity.getStoredId()));
+                    return reactiveFileEntityRepository.delete(entity);
+                });
+    }
+
+    /**
+     * 删除Mongo库内文件
+     *
+     * @param fsEntityId 文件ID信息
+     * @return
+     */
+    public Mono<Void> deleteFile(String fsEntityId) {
+        return reactiveFileEntityRepository.findById(fsEntityId)
+                .switchIfEmpty(
+                        fileNotExistMsg(fsEntityId)
                 )
                 .flatMap(entity -> {
                     gridFsTemplate.delete(keyQuery(entity.getStoredId()));
