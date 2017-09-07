@@ -80,7 +80,8 @@
                     </tr>
                     <tr th:each="directory : ${directories}">
                         <td>
-                            <i class="fa fa-folder-o"></i>
+                            <i th:if="${directory.childrenCount>0}" class="fa fa-folder"></i>
+                            <i th:if="${directory.childrenCount==0}" class="fa fa-folder-o"></i>
                             <a th:href="@{'/dir/'+${directory.id}}" th:text="${directory.path}"/>
                         </td>
                         <td th:text="@{'文件夹'}" colspan="3"></td>

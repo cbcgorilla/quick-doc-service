@@ -23,7 +23,6 @@ public class WebLogoutSuccessHandler implements LogoutSuccessHandler {
         if (session != null) {
             session.removeAttribute(SESSION_USER);
         }
-
         response.sendRedirect("/login.html?logout=true");
     }
 }

@@ -4,7 +4,10 @@ import cn.techfan.quickdoc.common.entities.FsDirectory;
 import cn.techfan.quickdoc.common.entities.FsOwner;
 import cn.techfan.quickdoc.common.utils.KeyUtil;
 import cn.techfan.quickdoc.persistent.dao.DirectoryRepository;
+import cn.techfan.quickdoc.persistent.dao.FileEntityRepository;
 import cn.techfan.quickdoc.persistent.dao.ReactiveDirectoryRepository;
+import cn.techfan.quickdoc.web.dto.WebDirectory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,11 +20,14 @@ import static cn.techfan.quickdoc.common.utils.MessageUtil.*;
 public class ReactiveDirectoryService {
 
     private final DirectoryRepository directoryRepository;
+    private final FileEntityRepository fileEntityRepository;
     private final ReactiveDirectoryRepository reactiveDirectoryRepository;
 
     ReactiveDirectoryService(DirectoryRepository directoryRepository,
+                             FileEntityRepository fileEntityRepository,
                              ReactiveDirectoryRepository reactiveDirectoryRepository) {
         this.directoryRepository = directoryRepository;
+        this.fileEntityRepository = fileEntityRepository;
         this.reactiveDirectoryRepository = reactiveDirectoryRepository;
     }
 
@@ -146,8 +152,16 @@ public class ReactiveDirectoryService {
      * @param parentId
      * @return
      */
-    public Flux<FsDirectory> findAllByParentId(Long parentId) {
-        return reactiveDirectoryRepository.findAllByParentId(parentId);
+    public Flux<WebDirectory> findAllByParentId(Long parentId) {
+        return reactiveDirectoryRepository.findAllByParentId(parentId)
+                .map(directory -> {
+                    WebDirectory webDirectory = new WebDirectory();
+                    BeanUtils.copyProperties(directory, webDirectory);
+                    Long dirCount = directoryRepository.countFsDirectoriesByParentIdIs(directory.getId());
+                    Long filesCount = fileEntityRepository.countFsEntitiesByDirectoryIdIs(directory.getId());
+                    webDirectory.setChildrenCount(dirCount + filesCount);
+                    return webDirectory;
+                });
     }
 
     /**

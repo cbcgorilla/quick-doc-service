@@ -134,10 +134,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // @formatter:off
             http
                     .authorizeRequests()
-                    .antMatchers("/login*", "/login*", "/signin/**", "/signup/**", "/customLogin",
+                    .antMatchers("/login*", "/login*", "/signin/**", "/signup/**", "/invalidSession*",
                             "/user/registration*", "/registrationConfirm*", "/expiredAccount*", "/registration*",
-                            "/badUser*", "/user/resendRegistrationToken*", "/forgetPassword*", "/user/resetPassword*",
-                            "/user/changePassword*", "/emailError*", "/resources/**", "/old/user/registration*", "/successRegister*", "/qrcode*").permitAll()
+                            "/forgetPassword*", "/user/resetPassword*", "/user/changePassword*").permitAll()
                     //.antMatchers("/invalidSession*").anonymous()
                     //.antMatchers("/user/updatePassword*","/user/savePassword*","/updatePassword*").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
                     .anyRequest().hasAuthority(AUTHORITY_USER)
@@ -152,7 +151,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                     .and()
                     .sessionManagement()
-                    .invalidSessionUrl("/invalidSession.html")
+                    .invalidSessionUrl("/login")
                     .maximumSessions(1).sessionRegistry(sessionRegistry())
                     .and()
                     .sessionFixation().none()

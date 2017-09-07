@@ -3,6 +3,7 @@ package cn.techfan.quickdoc.web.dto;
 import cn.techfan.quickdoc.common.entities.FsOwner;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -12,6 +13,7 @@ import java.util.Date;
 
 @Document
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @Data
 public class WebEntity {

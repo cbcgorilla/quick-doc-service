@@ -76,6 +76,10 @@ public class ReactiveFileService {
                 });
     }
 
+    public Mono<Long> countFsEntitiesByDirectoryId(Long directoryId){
+        return  reactiveFileEntityRepository.countFsEntitiesByDirectoryIdIs(directoryId);
+    }
+
     /**
      * 存储文件， 如同名文件已存在则更新文件内容
      *

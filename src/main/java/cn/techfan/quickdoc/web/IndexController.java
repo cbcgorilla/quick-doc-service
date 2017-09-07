@@ -27,7 +27,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -245,6 +248,43 @@ public class IndexController {
                 reactiveFileService.getStoredFiles(directoryId)
                         .toStream()
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * 同名文件多并发请求时有冲突可能, 占用服务端本地缓存目录，需要定期清理Web服务器缓存目录
+     *
+     * @param response
+     * @param filename
+     * @return
+     * @throws IOException
+     *//*
+    @GetMapping(value = "/resource/{filename:.+}", produces = MediaType.APPLICATION_PDF_VALUE)
+    public @ResponseBody
+    Resource resourceDownload(HttpServletResponse response,
+                              @PathVariable("filename") String filename) throws IOException {
+        GridFsResource fsResource = reactiveFileService.getFileStream(new ObjectId(filename));
+        InputStream in = fsResource.getInputStream();
+
+        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        response.setHeader("Content-Disposition", "inline; filename=" + filename);
+        response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
+        return new FileSystemResource(getTempResourceFile(in, LOCAL_TEMP_DIR + filename));
+    }
+    */
+    private File getTempResourceFile(InputStream in, String tempFilename) {
+        try {
+            File f = new File(tempFilename);
+            FileOutputStream out = new FileOutputStream(f);
+            byte buf[] = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0)
+                out.write(buf, 0, len);
+            out.close();
+            in.close();
+            return f;
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }

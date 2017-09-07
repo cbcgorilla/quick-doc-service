@@ -31,7 +31,7 @@ public class DefaultDataLoader {
                                     "chenbichao",
                                     new String[]{"ADMIN", "USER"}),
                             false)
-                    .subscribe(v->log.info(v.toString()));
+                    .subscribe(v -> log.info(v.toString()));
         };
     }
 
@@ -56,7 +56,7 @@ public class DefaultDataLoader {
                         log.log(Level.WARNING, v.getMessage());
                         return v;
                     })
-                    .subscribe(v->log.info(v.toString()));
+                    .subscribe(v -> log.info(v.toString()));
 
         };
     }
@@ -89,7 +89,7 @@ public class DefaultDataLoader {
     }
 
     // @Bean
-    CommandLineRunner initGridFs(GridFsService gridFsService, ReactiveFileService reactiveFileService) {
+    CommandLineRunner uploadLocalFiles(ReactiveFileService reactiveFileService) {
         return args -> {
             File directory = new File("E:\\BaiduYunDownload\\发展路线图");
             if (directory.exists() && directory.isDirectory()) {
@@ -118,7 +118,7 @@ public class DefaultDataLoader {
                                     }
                                     return file;
                                 }
-                        ).subscribe(v->log.info(v.toString()));
+                        ).subscribe(v -> log.info(v.toString()));
             }
         };
     }
@@ -140,7 +140,7 @@ public class DefaultDataLoader {
                         log.log(Level.WARNING, v.getMessage());
                         return v;
                     })
-                    .subscribe(v->log.info(v.toString()));
+                    .subscribe(v -> log.info(v.toString()));
 
             // 删除 chenbichao/sub子目录
             reactiveDirectoryService.findByPathAndParentId("sub", 1503973850289331809L)
@@ -149,7 +149,7 @@ public class DefaultDataLoader {
                         log.log(Level.WARNING, v.getMessage());
                         return v;
                     })
-                    .subscribe(v->log.info(v.toString()));
+                    .subscribe(v -> log.info(v.toString()));
 
             // 删除 chenbichao子目录
             reactiveDirectoryService.findByPathAndParentId("chenbichao", 0L)
@@ -158,7 +158,7 @@ public class DefaultDataLoader {
                         log.log(Level.WARNING, v.getMessage());
                         return v;
                     })
-                    .subscribe(v->log.info(v.toString()));
+                    .subscribe(v -> log.info(v.toString()));
         };
     }
 

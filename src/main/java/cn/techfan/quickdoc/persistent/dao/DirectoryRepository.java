@@ -10,4 +10,6 @@ public interface DirectoryRepository extends MongoRepository<FsDirectory, Long> 
     FsDirectory findByPathAndParentId(String path, Long parentId);
 
     List<FsDirectory> findAllByParentId(Long parentId);
+
+    Long countFsDirectoriesByParentIdIs(Long parentId);
 }

@@ -10,4 +10,6 @@ public interface ReactiveFileEntityRepository extends ReactiveMongoRepository<Fs
     Mono<FsEntity> findByFilenameAndDirectoryId(String filename, Long directoryId);
 
     Flux<FsEntity> findAllByDirectoryId(Long directoryId);
+
+    Mono<Long> countFsEntitiesByDirectoryIdIs(Long directoryId);
 }
