@@ -85,13 +85,31 @@
                         </td>
                         <td th:text="@{'文件夹'}" colspan="3"></td>
                         <td>
-                            <a th:href="@{'/zip/'+${directory.id}}" th:text="@{'批量下载文件夹'}" class="btn btn-success"></a>
+                            <a th:href="@{'/zip/'+${directory.id}}" th:text="@{'下载此文件夹'}" class="btn btn-success"></a>
                         </td>
                     </tr>
                     <tr th:each="file : ${files}">
                         <form th:action="@{/deleteFile}" th:method="DELETE">
                             <td>
-                                <i class="fa fa-file-pdf-o"></i>
+                                <span th:switch="${file.contentType}">
+                                    <i th:case="pdf" class="fa fa-file-pdf-o"></i>
+                                    <i th:case="xls" class="fa fa-file-excel-o"></i>
+                                    <i th:case="xlsx" class="fa fa-file-excel-o"></i>
+                                    <i th:case="doc" class="fa fa-file-word-o"></i>
+                                    <i th:case="docx" class="fa fa-file-word-o"></i>
+                                    <i th:case="ppt" class="fa fa-file-powerpoint-o"></i>
+                                    <i th:case="pptx" class="fa fa-file-powerpoint-o"></i>
+                                    <i th:case="gif" class="fa fa-file-image-o"></i>
+                                    <i th:case="jpg" class="fa fa-file-image-o"></i>
+                                    <i th:case="jpeg" class="fa fa-file-image-o"></i>
+                                    <i th:case="png" class="fa fa-file-image-o"></i>
+                                    <i th:case="bmp" class="fa fa-file-image-o"></i>
+                                    <i th:case="tif" class="fa fa-file-image-o"></i>
+                                    <i th:case="tiff" class="fa fa-file-image-o"></i>
+                                    <i th:case="txt" class="fa fa-file-text-o"></i>
+                                    <i th:case="zip" class="fa fa-file-zip-o"></i>
+                                    <i th:case="rar" class="fa fa-file-zip-o"></i>
+                                </span>
                                 <a th:href="@{'/view/'+${file.storedId}}" th:text="${file.filename}"/>
                             </td>
                             <td th:text="${file.contentLength}">ID</td>

@@ -21,4 +21,8 @@ Web层： BootStrap 4.0 Beta， + font-awesome.css + jquery
 
 2. csrf() 在Spring Security 内默认启用CSRF，会屏蔽POST提交任务, 通过csrf().disable()关闭CSRF。
 
-3. 
+3. 后台管理功能：文件夹管理，用户管理，分类管理
+
+4. 前端显示优化：文件夹图标，下载用图标替换按钮
+
+5. Android客户端： 自动同步本地图片文件

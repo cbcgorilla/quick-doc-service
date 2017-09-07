@@ -6,21 +6,21 @@ import cn.techfan.quickdoc.common.entities.FsEntity;
 import cn.techfan.quickdoc.common.entities.FsOwner;
 import cn.techfan.quickdoc.common.utils.KeyUtil;
 import cn.techfan.quickdoc.common.utils.StringUtil;
+import cn.techfan.quickdoc.security.model.ActiveUser;
+import cn.techfan.quickdoc.service.ReactiveCategoryService;
 import cn.techfan.quickdoc.service.ReactiveDirectoryService;
 import cn.techfan.quickdoc.service.ReactiveFileService;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
-import cn.techfan.quickdoc.security.model.ActiveUser;
-import cn.techfan.quickdoc.service.ReactiveCategoryService;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -28,7 +28,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +38,7 @@ import java.util.stream.Collectors;
 public class IndexController {
 
     private static final String HOME_TITLE = "极速云存储（Quick Sharing）";
+    private static final String SESSION_USER = "ActiveUser";
 
     private final ReactiveCategoryService reactiveCategoryService;
     private final ReactiveDirectoryService reactiveDirectoryFsService;
@@ -192,14 +192,13 @@ public class IndexController {
                              RedirectAttributes redirectAttributes,
                              Model model,
                              HttpSession session) throws IOException {
-        ActiveUser activeUser = (ActiveUser) session.getAttribute("ActiveUser");
+        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 5);
         String filename = StringUtil.getFilename(file.getOriginalFilename());
-
         FsEntity fsEntity = new FsEntity(KeyUtil.getSHA256UUID(),
                 filename,
                 file.getSize(),
-                "PDF", //@TODO 修改为实际文件类型
+                StringUtils.getFilenameExtension(filename).toLowerCase(),
                 new Date(),
                 categoryId,
                 directoryId,
