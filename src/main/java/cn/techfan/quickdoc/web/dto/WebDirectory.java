@@ -1,6 +1,6 @@
 package cn.techfan.quickdoc.web.dto;
 
-import cn.techfan.quickdoc.common.entities.FsOwner;
+import cn.techfan.quickdoc.entities.FsOwner;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

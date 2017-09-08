@@ -1,6 +1,6 @@
 package cn.techfan.quickdoc.security.authprovider;
 
-import cn.techfan.quickdoc.common.entities.WebUser;
+import cn.techfan.quickdoc.entities.UserEntity;
 import cn.techfan.quickdoc.security.model.WebAuthority;
 import cn.techfan.quickdoc.service.UserAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +28,9 @@ public class WebAuthenticationProvider
 
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
-        WebUser webUser = userAuthenticationService.validateUser(name, password).block();
-        if (webUser.getAuthorities() != null) {
-            List<WebAuthority> list = Stream.of(webUser.getAuthorities())
+        UserEntity userEntity = userAuthenticationService.validateUser(name, password).block();
+        if (userEntity.getAuthorities() != null) {
+            List<WebAuthority> list = Stream.of(userEntity.getAuthorities())
                     .map(v -> new WebAuthority(v))
                     .collect(Collectors.toList());
             return new UsernamePasswordAuthenticationToken(name, password, list);

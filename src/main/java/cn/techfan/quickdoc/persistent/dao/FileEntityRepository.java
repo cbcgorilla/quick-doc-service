@@ -1,8 +1,7 @@
 package cn.techfan.quickdoc.persistent.dao;
 
-import cn.techfan.quickdoc.common.entities.FsEntity;
+import cn.techfan.quickdoc.entities.FsEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 

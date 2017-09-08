@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.common.entities;
+package cn.techfan.quickdoc.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @ToString
 @Data
-public class WebUser {
+public class UserEntity {
     @Id
     private final String id;
     private String username;

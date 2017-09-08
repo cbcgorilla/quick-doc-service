@@ -1,8 +1,8 @@
 package cn.techfan.quickdoc.common.config;
 
-import cn.techfan.quickdoc.common.entities.FsEntity;
-import cn.techfan.quickdoc.common.entities.FsOwner;
-import cn.techfan.quickdoc.common.entities.WebUser;
+import cn.techfan.quickdoc.entities.FsEntity;
+import cn.techfan.quickdoc.entities.FsOwner;
+import cn.techfan.quickdoc.entities.UserEntity;
 import cn.techfan.quickdoc.common.utils.KeyUtil;
 import cn.techfan.quickdoc.service.*;
 import lombok.extern.java.Log;
@@ -26,11 +26,11 @@ public class DefaultDataLoader {
         return args -> {
             // 初始化Admin用户
             userAuthenticationService
-                    .saveUser(new WebUser(KeyUtil.stringUUID(),
+                    .saveUser(new UserEntity(KeyUtil.stringUUID(),
                                     "admin",
                                     "chenbichao",
                                     new String[]{"ADMIN", "USER"}),
-                            false)
+                            true)
                     .subscribe(v -> log.info(v.toString()));
         };
     }
@@ -38,14 +38,14 @@ public class DefaultDataLoader {
     @Bean
     CommandLineRunner initDirectory(ReactiveDirectoryService reactiveDirectoryService) {
         return args -> {
-            reactiveDirectoryService.addDirectory("root", null, null).subscribe();
+            reactiveDirectoryService.addDirectory("root", null, null, false).subscribe();
             // 对所有跟目录新增子目录, 并修改子目录属主
             reactiveDirectoryService.allRootDirectories()
                     .flatMap(v -> {
                                 return reactiveDirectoryService.updateFsOwners(v, getRandomOwners());
                             }
                     )
-                    .flatMap(parent -> reactiveDirectoryService.addDirectory("service-desk", parent, null)
+                    .flatMap(parent -> reactiveDirectoryService.addDirectory("service-desk", parent.getId(), null, false)
                             .flatMap(
                                     v -> {
                                         return reactiveDirectoryService.updateFsOwners(v, getRandomOwners());
@@ -128,9 +128,9 @@ public class DefaultDataLoader {
         return args -> {
             for (int i = 0; i < 10; i++) {
                 Thread.sleep(280);
-                reactiveDirectoryService.addDirectory("root", null, null).subscribe();
-                reactiveDirectoryService.addDirectory("michael", null, null).subscribe();
-                reactiveDirectoryService.addDirectory("chenbichao", null, null).subscribe();
+                reactiveDirectoryService.addDirectory("root", null, null,false).subscribe();
+                reactiveDirectoryService.addDirectory("michael", null, null,false).subscribe();
+                reactiveDirectoryService.addDirectory("chenbichao", null, null,false).subscribe();
             }
 
             // 重命名 michael 目录

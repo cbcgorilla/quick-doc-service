@@ -1,7 +1,7 @@
 package cn.techfan.quickdoc.service;
 
-import cn.techfan.quickdoc.common.entities.FsDirectory;
-import cn.techfan.quickdoc.common.entities.FsEntity;
+import cn.techfan.quickdoc.entities.FsDirectory;
+import cn.techfan.quickdoc.entities.FsEntity;
 import cn.techfan.quickdoc.persistent.GridFsAssistant;
 import cn.techfan.quickdoc.persistent.dao.CategoryRepository;
 import cn.techfan.quickdoc.persistent.dao.DirectoryRepository;

@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.common.entities;
+package cn.techfan.quickdoc.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,8 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @ToString
 @Data
-public class FsCategory {
+public class FsDirectory {
     @Id
     private final Long id;
-    private String type;
+    private String path;
+    private Long parentId;
+    private FsOwner[] owners = null;
 }

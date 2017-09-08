@@ -1,4 +1,4 @@
-package cn.techfan.quickdoc.common.entities;
+package cn.techfan.quickdoc.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

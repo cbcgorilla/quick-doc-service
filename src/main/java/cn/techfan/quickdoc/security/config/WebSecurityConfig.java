@@ -31,7 +31,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String AUTHORITY_USER = "USER";
     private static final String AUTHORITY_ADMIN = "ADMIN";
-    private static final String AUTHORITY_MANAGEMENT = "MANAGEMENT";
 
     @Autowired
     private WebAuthenticationProvider authProvider;

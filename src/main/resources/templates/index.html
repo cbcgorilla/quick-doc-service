@@ -7,18 +7,15 @@
     <link href="/css/font-awesome.min.css" rel="stylesheet"/>
 </head>
 <body>
-
-<div class="template-bg-gray" th:if="${title}">
-    <table class="table table-dark">
-        <tr>
-            <td>
-                <h2 th:text="${title}"/>
-            </td>
-            <td align="right" width="500">
-                <a class="btn btn-dark" th:href="@{'/logout'}" th:text="@{'退出系统'}"></a>
-            </td>
-        </tr>
-    </table>
+<div class="generic-container">
+    <div class="navbar-brand">
+        <h2 th:text="${title}"/>
+    </div>
+    <div class="navbar-brand">
+        <div class="text-right">
+            <a class="btn btn-dark" th:href="@{'/logout'}" th:text="@{'退出系统'}"></a>
+        </div>
+    </div>
 </div>
 <div class="generic-container">
     <div class="panel panel-default" th:if="${currentdirectory}">

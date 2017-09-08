@@ -1,6 +1,6 @@
 package cn.techfan.quickdoc.service;
 
-import cn.techfan.quickdoc.common.entities.FsCategory;
+import cn.techfan.quickdoc.entities.FsCategory;
 import cn.techfan.quickdoc.common.utils.KeyUtil;
 import cn.techfan.quickdoc.persistent.dao.CategoryRepository;
 import cn.techfan.quickdoc.persistent.dao.ReactiveCategoryRepository;

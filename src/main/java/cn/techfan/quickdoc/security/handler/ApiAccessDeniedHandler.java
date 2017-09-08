@@ -1,6 +1,6 @@
 package cn.techfan.quickdoc.security.handler;
 
-import cn.techfan.quickdoc.common.entities.ApiResponseEntity;
+import cn.techfan.quickdoc.entities.ApiResponseEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.java.Log;
 import org.springframework.security.access.AccessDeniedException;

@@ -1,10 +1,10 @@
 package cn.techfan.quickdoc.persistent.dao;
 
-import cn.techfan.quickdoc.common.entities.WebUser;
+import cn.techfan.quickdoc.entities.UserEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface UserRepository extends MongoRepository<WebUser, String> {
+public interface UserRepository extends MongoRepository<UserEntity, String> {
 
-    WebUser findByUsername(String type);
+    UserEntity findByUsername(String type);
 
 }

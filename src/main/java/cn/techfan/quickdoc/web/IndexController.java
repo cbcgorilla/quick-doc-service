@@ -1,9 +1,9 @@
 package cn.techfan.quickdoc.web;
 
-import cn.techfan.quickdoc.common.entities.FsCategory;
-import cn.techfan.quickdoc.common.entities.FsDirectory;
-import cn.techfan.quickdoc.common.entities.FsEntity;
-import cn.techfan.quickdoc.common.entities.FsOwner;
+import cn.techfan.quickdoc.entities.FsCategory;
+import cn.techfan.quickdoc.entities.FsDirectory;
+import cn.techfan.quickdoc.entities.FsEntity;
+import cn.techfan.quickdoc.entities.FsOwner;
 import cn.techfan.quickdoc.common.utils.KeyUtil;
 import cn.techfan.quickdoc.common.utils.StringUtil;
 import cn.techfan.quickdoc.security.model.ActiveUser;

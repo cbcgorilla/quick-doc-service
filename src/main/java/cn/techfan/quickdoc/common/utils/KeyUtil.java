@@ -7,7 +7,9 @@ import java.util.UUID;
 
 public class KeyUtil {
 
-    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
+    private static final String SHA256 = "SHA-256";
+    private static final String MD5 = "MD5";
 
     public static UUID randomUUID() {
         return UUID.randomUUID();
@@ -19,6 +21,7 @@ public class KeyUtil {
 
     /**
      * ID生成规则： 系统当前时间 + range范围的随机数
+     *
      * @param range
      * @return
      */
@@ -28,14 +31,11 @@ public class KeyUtil {
 
     /**
      * ID生成规则： 系统当前时间 + 长度为6的随机数
+     *
      * @return
      */
     public static long longID() {
         return longID(1000000L);
-    }
-
-    public static String getSHA256UUID() {
-        return SHA256Encrypt(randomUUID().toString());
     }
 
     /**
@@ -44,10 +44,35 @@ public class KeyUtil {
      *
      * @return
      */
+    public static String getSHA256UUID() {
+        return SHA256Encrypt(randomUUID().toString());
+    }
+
+    /**
+     * SHA256编码
+     *
+     * @param message
+     * @return
+     */
     public static String SHA256Encrypt(String message) {
+        return digestMessage(message, SHA256);
+    }
+
+    /**
+     * MD5编码
+     *
+     * @param message
+     * @return
+     */
+    public static String MD5Encrypt(String message) {
+        return digestMessage(message, MD5);
+    }
+
+
+    private static String digestMessage(String message, String method) {
         MessageDigest salt = null;
         try {
-            salt = MessageDigest.getInstance("SHA-256");
+            salt = MessageDigest.getInstance(method);
             salt.update(message.getBytes("UTF-8"));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

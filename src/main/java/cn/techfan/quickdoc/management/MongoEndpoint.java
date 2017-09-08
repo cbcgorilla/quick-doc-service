@@ -25,7 +25,7 @@ public class MongoEndpoint {
 
     @ReadOperation
     public CommandResult getMongoDetail(@Selector String type) {
-        if (type.equalsIgnoreCase("more")) {
+        if (type.toLowerCase().equalsIgnoreCase("more")) {
             return mongoClient.getDB(database).command("serverStatus");
         }
         return getMongo();
