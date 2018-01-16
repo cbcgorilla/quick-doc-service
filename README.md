@@ -5,15 +5,15 @@
 
 存储（MongoDB）
 
-服务端：Spring Framework 5.0.0.RC3（WebFlux + Web） 
+服务端：Spring Framework 5.0.2.RELEASE（WebFlux + Web） 
 
 Spring Boot 2.0 Actuator 提供MongoDB状态监控点
 
-Spring Security 5.0.0.BUILD-SNAPSHOT
+Spring Security 5.0.0.RELEASE
 
 Kotlin 做实体Bean设计，大量简化代码工作量
 
-Web层： BootStrap 4.0 Beta， + font-awesome.css 4.7 + jquery
+Web层： BootStrap 3.3.7， + font-awesome.css 4.7 + jquery
 
 ## 待办：
 
