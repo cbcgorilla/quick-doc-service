@@ -24,7 +24,7 @@ public class UserRestController {
     }
     // -------------------Retrieve All Users---------------------------------------------
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value = "返回所有用户信息清单")
     public Flux<UserEntity> listAllUsers() {
         return reactiveUserService.findAllUsers();/*
@@ -37,13 +37,13 @@ public class UserRestController {
 
     // -------------------Retrieve Single User------------------------------------------
 
-    @RequestMapping(value = "/user/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "/get-user/{username}", method = RequestMethod.GET)
     @ApiOperation(value = "根据用户名返回用户信息详情")
     public Mono<UserEntity> getUser(@PathVariable("username") String username) {
         return reactiveUserService.findUser(username);
     }
 
-    @PostMapping(value = "/addUser",
+    @PostMapping(value = "/save-user",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "新增或保存系统用户")
     public Mono<RestResponse<UserEntity>> addUser(
@@ -55,9 +55,9 @@ public class UserRestController {
                         RestResponse.CODE.SUCCESS, user));
     }
 
-    @PostMapping(value = "/deleteUser/{username}")
+    @DeleteMapping(value = "/delete-user/{username}")
     @ApiOperation(value = "删除系统用户")
-    public Mono<RestResponse> deleteUser(@PathVariable("username")  String username){
+    public Mono<RestResponse> deleteUser(@PathVariable String username){
         reactiveUserService.deleteUser(username).subscribe();
         return Mono.just(new RestResponse("删除系统用户", RestResponse.CODE.SUCCESS,null));
     }

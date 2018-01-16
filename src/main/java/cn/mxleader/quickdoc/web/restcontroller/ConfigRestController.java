@@ -6,6 +6,7 @@ import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.web.dto.CategoryReplaceModel;
+import cn.mxleader.quickdoc.web.dto.WebDirectory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/rest/config-api")
-@Api(value = "Configuration API",description = "配置修改接口")
+@Api(value = "Configuration API", description = "配置修改接口")
 public class ConfigRestController {
 
     private static final String ACTION_ADD_CATEGORY = "新增文件分类名";
@@ -38,13 +39,13 @@ public class ConfigRestController {
         this.reactiveDirectoryService = reactiveDirectoryService;
     }
 
-    @GetMapping("/getCategories")
+    @GetMapping("/category/list")
     @ApiOperation(value = "返回所有文件分类清单")
     public Flux<FsCategory> getCategories() {
         return reactiveCategoryService.findAll();
     }
 
-    @PostMapping("/addCategory/{type}")
+    @PostMapping("/category/add/{type}")
     @ApiOperation(value = "新增文件分类信息")
     public Mono<RestResponse<FsCategory>> addCategory(@PathVariable String type) {
         return reactiveCategoryService.addCategory(type)
@@ -54,34 +55,47 @@ public class ConfigRestController {
                         fsCategory));
     }
 
-    @PostMapping(value = "/addDirectory/{flag}",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "保存目录信息")
-    public Mono<RestResponse<FsDirectory>> saveDirectory(@PathVariable Boolean flag,
-                                                         @RequestBody FsDirectory directory) {
-        return reactiveDirectoryService.addDirectory(directory, flag)
-                .map(fsDirectory -> (new RestResponse<>(
-                        ACTION_ADD_DIRECTORY,
-                        RestResponse.CODE.SUCCESS,
-                        fsDirectory)));
-    }
-
-    @PostMapping(value = "/renameCategory",
+    @PostMapping(value = "/category/rename",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "更改目录名称")
     public Mono<RestResponse> renameCategory(
             @RequestBody CategoryReplaceModel replaceModel) {
         return reactiveCategoryService.renameCategory(replaceModel.getOldType(),
                 replaceModel.getNewType())
-                .flatMap(fsCategory -> {return Mono.just(new RestResponse<>(
-                        ACTION_RENAME_CATEGORY,
-                        RestResponse.CODE.SUCCESS,
-                        fsCategory));})
+                .flatMap(fsCategory -> {
+                    return Mono.just(new RestResponse<>(
+                            ACTION_RENAME_CATEGORY,
+                            RestResponse.CODE.SUCCESS,
+                            fsCategory));
+                })
                 .doOnError(v -> log.warn(v.getMessage()))
                 .onErrorReturn(new RestResponse(
-                            ACTION_RENAME_CATEGORY,
-                            RestResponse.CODE.FAIL,
-                            "文件重命名失败, 请检查已有文件名和新文件名是否有误！"));
+                        ACTION_RENAME_CATEGORY,
+                        RestResponse.CODE.FAIL,
+                        "文件重命名失败, 请检查已有文件名和新文件名是否有误！"));
+    }
+
+    @GetMapping("/directory/list")
+    @ApiOperation(value = "获取根目录列表")
+    public Flux<WebDirectory> getDirectories() {
+        return reactiveDirectoryService.findAllByParentId(0L);
+    }
+
+    @GetMapping("/directory/list/{parentId}")
+    @ApiOperation(value = "根据上级目录ID获取下级目录列表")
+    public Flux<WebDirectory> getDirectories(@PathVariable("parentId") Long parentId) {
+        return reactiveDirectoryService.findAllByParentId(parentId);
+    }
+
+    @PostMapping(value = "/directory/save",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "保存目录信息")
+    public Mono<RestResponse<FsDirectory>> saveDirectory(@RequestBody FsDirectory directory) {
+        return reactiveDirectoryService.saveDirectory(directory)
+                .map(fsDirectory -> (new RestResponse<>(
+                        ACTION_ADD_DIRECTORY,
+                        RestResponse.CODE.SUCCESS,
+                        fsDirectory)));
     }
 
 }

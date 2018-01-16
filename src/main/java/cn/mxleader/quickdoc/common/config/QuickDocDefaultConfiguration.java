@@ -35,7 +35,7 @@ public class QuickDocDefaultConfiguration {
                         if (!quickDocConfig.getInitialized()) {
                             // 初始化Admin管理账号
                             reactiveUserService
-                                    .saveUser(new UserEntity(null, "admin",
+                                    .saveUser(new UserEntity(KeyUtil.stringUUID(), "admin",
                                                     "chenbichao",
                                                     new String[]{"ADMIN","USER"})).subscribe();
 
@@ -46,8 +46,8 @@ public class QuickDocDefaultConfiguration {
                             reactiveCategoryService.addCategory("视频").subscribe();
 
                             // 初始化根目录
-                            reactiveDirectoryService.addDirectory("root", 0L,
-                                    null, false).subscribe();
+                            reactiveDirectoryService.saveDirectory("root", 0L,
+                                    null).subscribe();
 
                             quickDocConfig.setInitialized(true);
                         }
@@ -59,32 +59,6 @@ public class QuickDocDefaultConfiguration {
                         return v;
                     })
                     .subscribe(v -> log.info(v.toString()));
-        };
-    }
-
-    //@Bean
-    CommandLineRunner initDirectory(ReactiveDirectoryService reactiveDirectoryService) {
-        return args -> {
-            reactiveDirectoryService.addDirectory("root", null, null, false).subscribe();
-            // 对所有跟目录新增子目录, 并修改子目录属主
-            reactiveDirectoryService.allRootDirectories()
-                    .flatMap(v -> {
-                                return reactiveDirectoryService.updateFsOwners(v, getRandomOwners());
-                            }
-                    )
-                    .flatMap(parent -> reactiveDirectoryService.addDirectory("service-desk", parent.getId(), null, false)
-                            .flatMap(
-                                    v -> {
-                                        return reactiveDirectoryService.updateFsOwners(v, getRandomOwners());
-                                    }
-                            )
-                    )
-                    .onErrorMap(v -> {
-                        log.warn(v.getMessage());
-                        return v;
-                    })
-                    .subscribe(v -> log.info(v.toString()));
-
         };
     }
 
@@ -147,45 +121,6 @@ public class QuickDocDefaultConfiguration {
                                 }
                         ).subscribe(v -> log.info(v.toString()));
             }
-        };
-    }
-
-    // @Bean
-    CommandLineRunner testDirectory(ReactiveDirectoryService reactiveDirectoryService) {
-        return args -> {
-            for (int i = 0; i < 10; i++) {
-                Thread.sleep(280);
-                reactiveDirectoryService.addDirectory("root", null, null, false).subscribe();
-                reactiveDirectoryService.addDirectory("michael", null, null, false).subscribe();
-                reactiveDirectoryService.addDirectory("chenbichao", null, null, false).subscribe();
-            }
-
-            // 重命名 michael 目录
-            reactiveDirectoryService.findByPathAndParentId("michael", 0L)
-                    .flatMap(directory -> reactiveDirectoryService.renameDirectory(directory, "michael new"))
-                    .onErrorMap(v -> {
-                        log.warn(v.getMessage());
-                        return v;
-                    })
-                    .subscribe(v -> log.info(v.toString()));
-
-            // 删除 chenbichao/sub子目录
-            reactiveDirectoryService.findByPathAndParentId("sub", 1503973850289331809L)
-                    .flatMap(reactiveDirectoryService::deleteDirectory)
-                    .onErrorMap(v -> {
-                        log.warn(v.getMessage());
-                        return v;
-                    })
-                    .subscribe(v -> log.info(v.toString()));
-
-            // 删除 chenbichao子目录
-            reactiveDirectoryService.findByPathAndParentId("chenbichao", 0L)
-                    .flatMap(reactiveDirectoryService::deleteDirectory)
-                    .onErrorMap(v -> {
-                        log.warn(v.getMessage());
-                        return v;
-                    })
-                    .subscribe(v -> log.info(v.toString()));
         };
     }
 

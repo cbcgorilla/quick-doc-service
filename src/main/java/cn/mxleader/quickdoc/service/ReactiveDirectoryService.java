@@ -39,15 +39,11 @@ public class ReactiveDirectoryService {
      * @param owners
      * @return
      */
-    public Mono<FsDirectory> addDirectory(String path, Long parentId, FsOwner[] owners, Boolean updateFlag) {
+    public Mono<FsDirectory> saveDirectory(String path, Long parentId, FsOwner[] owners) {
         return reactiveDirectoryRepository.findByPathAndParentId(path, parentId)
                 .defaultIfEmpty(new FsDirectory(longID(), path, parentId, owners))
                 .flatMap(entity -> {
-                    if (updateFlag) {
-                        entity.setPath(path);
-                        entity.setParentId(parentId);
-                        entity.setOwners(owners);
-                    }
+                    entity.setOwners(owners);
                     return reactiveDirectoryRepository.save(entity);
                 });
     }
@@ -58,8 +54,10 @@ public class ReactiveDirectoryService {
      * @param fsDirectory
      * @return
      */
-    public Mono<FsDirectory> addDirectory(FsDirectory fsDirectory, Boolean updateFlag) {
-        return addDirectory(fsDirectory.getPath(), fsDirectory.getParentId(), fsDirectory.getOwners(), updateFlag);
+    public Mono<FsDirectory> saveDirectory(FsDirectory fsDirectory) {
+        return saveDirectory(fsDirectory.getPath(),
+                fsDirectory.getParentId(),
+                fsDirectory.getOwners());
     }
 
     /**
@@ -199,15 +197,6 @@ public class ReactiveDirectoryService {
      */
     public Mono<FsDirectory> findById(Long id) {
         return reactiveDirectoryRepository.findById(id);
-    }
-
-    /**
-     * 获取所有根目录
-     *
-     * @return
-     */
-    public Flux<FsDirectory> allRootDirectories() {
-        return reactiveDirectoryRepository.findAllByParentId(0L);
     }
 
 }

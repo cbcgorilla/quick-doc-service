@@ -21,9 +21,9 @@ public class MessageUtil {
 
     private static final String MSG_NO_FILE = "[Exception class: {0}] 在目录（{1}）找不到文件：{2}";
 
-    private static final String USER_NOT_FOUND = "[Exception class: {0}] 用户名（{1}）不存在";
+    private static final String USER_NOT_FOUND = "用户名（{0}）不存在";
 
-    private static final String INVALID_PASSWORD = "[Exception class: {0}] 密码无效";
+    private static final String INVALID_PASSWORD = "密码（{0}）无效";
 
     public static <T> Mono<T> noCategoryMsg(Object... args) {
         return error(MSG_NO_CATEGORY, NoSuchElementException.class, getCallerClassName(), args);
@@ -50,20 +50,25 @@ public class MessageUtil {
     }
 
     public static <T> Mono<T> userNotFoundMsg(Object... args) {
-        return error(USER_NOT_FOUND, UsernameNotFoundException.class, getCallerClassName(), args);
+        return error(USER_NOT_FOUND, UsernameNotFoundException.class, args);
     }
 
-    public static <T> Mono<T> invalidPasswordMsg() {
-        return error(INVALID_PASSWORD, BadCredentialsException.class, getCallerClassName(), "");
+    public static <T> Mono<T> invalidPasswordMsg(Object... args) {
+        return error(INVALID_PASSWORD, BadCredentialsException.class, args);
     }
 
-    protected static <T> Mono<T> error(String template, Class clazz, String callerClazz, Object... args) {
+    protected static <T> Mono<T> error(String template, Class clazz,
+                                       String callerClazz, Object... args) {
         String[] bindArgs = new String[args.length + 1];
         bindArgs[0] = callerClazz;
         for (int i = 1; i <= args.length; i++) {
             bindArgs[i] = args[i - 1].toString();
         }
-        String message = MessageFormat.format(template, bindArgs);
+        return error(template, clazz, args);
+    }
+
+    protected static <T> Mono<T> error(String template, Class clazz, Object... args) {
+        String message = MessageFormat.format(template, args);
         try {
             Constructor ctor = clazz.getDeclaredConstructor(String.class);
             ctor.setAccessible(true);

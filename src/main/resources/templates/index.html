@@ -199,6 +199,12 @@
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
+                                    <li th:case="mp3">
+                                        <a th:href="@{'/download/'+${file.storedId}}">
+                                            <i class="fa fa-file-audio-o"></i>
+                                            <span th:text="${file.filename}"></span>
+                                        </a>
+                                    </li>
                                     <li th:case="zip">
                                         <a th:href="@{'/download/'+${file.storedId}}">
                                             <i class="fa fa-file-zip-o"></i>

@@ -2,6 +2,7 @@ package cn.mxleader.quickdoc.management;
 
 import com.mongodb.CommandResult;
 import com.mongodb.MongoClient;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -24,15 +25,7 @@ public class MongoStatusEndpoint {
     }
 
     @ReadOperation
-    public CommandResult getMongoDetail(@Selector String type) {
-        if (type.toLowerCase().equalsIgnoreCase("more")) {
-            return mongoClient.getDB(database).command("serverStatus");
-        }
-        return getMongo();
-    }
-
-    @ReadOperation
-    public CommandResult getMongo() {
-        return mongoClient.getDB(database).getStats();
+    public Document getMongoDBStatus() {
+        return mongoClient.getDatabase(database).runCommand(new Document("serverStatus",1));
     }
 }

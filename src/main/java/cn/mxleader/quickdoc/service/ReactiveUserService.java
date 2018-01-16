@@ -49,7 +49,7 @@ public class ReactiveUserService {
                 .switchIfEmpty(MessageUtil.userNotFoundMsg(username))
                 .flatMap(user -> {
                     if (!MD5Util.validPassword(password, user.getPassword())) {
-                        return MessageUtil.invalidPasswordMsg();
+                        return MessageUtil.invalidPasswordMsg(password);
                     }
                     return Mono.just(user);
                 });
