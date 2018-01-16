@@ -35,9 +35,9 @@ public class QuickDocDefaultConfiguration {
                         if (!quickDocConfig.getInitialized()) {
                             // 初始化Admin管理账号
                             reactiveUserService
-                                    .saveUser(new UserEntity(KeyUtil.stringUUID(), "admin",
+                                    .saveUser(new UserEntity(null, "admin",
                                                     "chenbichao",
-                                                    new String[]{"USER"})).subscribe();
+                                                    new String[]{"ADMIN","USER"})).subscribe();
 
                             // 初始化文件分类
                             reactiveCategoryService.addCategory("照片").subscribe();
