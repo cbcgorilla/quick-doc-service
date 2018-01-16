@@ -1,0 +1,42 @@
+.user-img {
+    width:60px;
+    height:60px;
+    border-radius:6px;
+}
+
+footer{
+    display:flex;
+    flex-direction:column;
+    background-color:#444;
+    color:#FFF;
+    padding: 20px 0;
+    text-align:center;
+    align-items: center;
+}
+
+footer ul{
+    display:flex;
+    margin-bottom: 5px;
+    font-size:14px;
+    text-decoration: none;
+
+}
+
+footer ul li{
+    margin: 0 16px;
+    list-style-type: none;
+}
+
+footer ul li:first-child{
+    margin-left: 0;
+}
+
+footer ul li:last-child{
+    margin-right: 0;
+}
+
+footer p{
+    font-size:14px;
+    color:rgba(255,255,255,.6);
+    margin-bottom: 0;
+}

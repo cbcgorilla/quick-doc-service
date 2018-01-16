@@ -26,3 +26,5 @@ Web层： BootStrap 4.0 Beta， + font-awesome.css 4.7 + jquery
 4. 前端显示优化：文件夹图标，下载用图标替换按钮
 
 5. Android客户端： 自动同步本地图片文件
+
+Lombok在 Java 9环境导致编译异常

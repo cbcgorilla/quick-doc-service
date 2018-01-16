@@ -5,18 +5,25 @@
 <head>
     <meta charset="utf-8">
     <title th:text="${title}"></title>
-    <link href="css/app.css" rel="stylesheet"/>
-    <link href="css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/login-style.css" type="text/css">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
 </head>
 <body class="template-bg-image">
 
 <div class="container">
     <div class="col-md-12">
         <form class="form-horizontal template-login-form" role="form" th:action="@{/login}" method="post">
-            <div class="banner-container">
+            <div class="row">
                 <div class="col-md-12">
-                    <h1 th:text="${title}">系统登录</h1>
+                    <h1>快捷文档共享</h1>
                 </div>
             </div>
             <div>
@@ -43,8 +50,9 @@
                     </div>
                     <div class="form-group">
                         <div class="col-md-12">
-                            <div class="alert alert-warning" th:if="${param.error}">
-                                用户名或密码错误！
+                            <div class="alert alert-warning" th:if="${param.error}"
+                                 th:with="errorMsg=${session['SPRING_SECURITY_LAST_EXCEPTION'].message}">
+                                登录异常：<span th:text="${errorMsg}">输入信息有误！</span>
                             </div>
                             <div class="alert alert-success" th:if="${param.logout}">
                                 成功退出！

@@ -1,0 +1,73 @@
+buildscript {
+	ext.kotlin_version = '1.2.10'
+	ext {
+		springBootVersion = '2.0.0.M7'
+		swagger_version='2.8.0'
+		junit_version = '4.12'
+        junit_jupiter_version='5.0.2'
+		junit_vintage_version="$junit_version.0"
+        junit_platform_version='1.0.0'
+	}
+	repositories {
+		mavenCentral()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'cn.mxleader.quickdoc'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+	maven { url "https://repo.spring.io/snapshot" }
+	maven { url "https://repo.spring.io/milestone" }
+}
+
+
+dependencies {
+	compile("org.springframework.boot:spring-boot-starter-actuator")
+	compile("org.springframework.boot:spring-boot-starter-hateoas")
+	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+	compile("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+	compile("org.springframework.boot:spring-boot-starter-security")
+	compile("org.springframework.boot:spring-boot-starter-web")
+	compile("org.springframework.boot:spring-boot-starter-webflux")
+	compile("io.springfox:springfox-swagger2:$swagger_version")
+	compile("io.springfox:springfox-swagger-ui:$swagger_version")
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+	compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+	compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+	compile "com.fasterxml.jackson.module:jackson-module-kotlin"
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('io.projectreactor:reactor-test')
+	testCompile('org.springframework.security:spring-security-test')
+	testCompile("junit:junit:$junit_version")
+	testCompile("org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version")
+	testCompile("org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version")
+	testCompile("org.junit.platform:junit-platform-runner:$junit_platform_version")
+	testCompile("org.junit.platform:junit-platform-launcher:$junit_platform_version")
+	testCompile("org.junit.vintage:junit-vintage-engine:$junit_vintage_version")
+}
+compileKotlin {
+	kotlinOptions {
+		jvmTarget = "1.8"
+	}
+}
+compileTestKotlin {
+	kotlinOptions {
+		jvmTarget = "1.8"
+	}
+}
