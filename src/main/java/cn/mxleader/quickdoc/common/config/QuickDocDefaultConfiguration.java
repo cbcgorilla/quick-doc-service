@@ -24,6 +24,11 @@ import static cn.mxleader.quickdoc.common.utils.KeyUtil.getSHA256UUID;
 public class QuickDocDefaultConfiguration {
     private final Logger log = LoggerFactory.getLogger(QuickDocDefaultConfiguration.class);
 
+    public static final FsOwner SYSTEM_PUBLIC_OWNER = new FsOwner("public",
+            FsOwner.Type.TYPE_PUBLIC, 1);
+    public static final FsOwner SYSTEM_ADMIN_GROUP_OWNER = new FsOwner("admin",
+            FsOwner.Type.TYPE_GROUP, 7);
+
     @Bean
     CommandLineRunner setupConfiguration(ReactiveUserService reactiveUserService,
                                          ReactiveCategoryService reactiveCategoryService,
@@ -36,8 +41,8 @@ public class QuickDocDefaultConfiguration {
                             // 初始化Admin管理账号
                             reactiveUserService
                                     .saveUser(new UserEntity(KeyUtil.stringUUID(), "admin",
-                                                    "chenbichao",
-                                                    new String[]{"ADMIN","USER"})).subscribe();
+                                            "chenbichao",
+                                            new String[]{"ADMIN", "USER"}, "admin")).subscribe();
 
                             // 初始化文件分类
                             reactiveCategoryService.addCategory("照片").subscribe();
@@ -46,8 +51,13 @@ public class QuickDocDefaultConfiguration {
                             reactiveCategoryService.addCategory("视频").subscribe();
 
                             // 初始化根目录
+                            FsOwner[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
+                            reactiveDirectoryService.saveDirectory("config", 0L,
+                                    configOwners).subscribe();
+
+                            FsOwner[] rootOwners = {SYSTEM_PUBLIC_OWNER, SYSTEM_ADMIN_GROUP_OWNER};
                             reactiveDirectoryService.saveDirectory("root", 0L,
-                                    null).subscribe();
+                                    rootOwners).subscribe();
 
                             quickDocConfig.setInitialized(true);
                         }

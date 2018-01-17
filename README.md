@@ -3,17 +3,19 @@
 
 架构组成： 
 
-存储（MongoDB）
+存储（MongoDB 3.6.2）
 
 服务端：Spring Framework 5.0.2.RELEASE（WebFlux + Web） 
 
-Spring Boot 2.0 Actuator 提供MongoDB状态监控点
+Spring Boot 2.0 Actuator 提供MongoDB状态及系统配置信息监控点
 
 Spring Security 5.0.0.RELEASE
 
-Kotlin 做实体Bean设计，大量简化代码工作量
+Kotlin 1.2 实现实体映射Bean
 
 Web层： BootStrap 3.3.7， + font-awesome.css 4.7 + jquery
+
+Springfox Swagger 2.8.0 实现REST API文档化交付界面
 
 ## 待办：
 

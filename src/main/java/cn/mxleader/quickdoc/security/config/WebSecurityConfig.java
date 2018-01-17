@@ -87,7 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //http.antMatcher("/guest/**").authorizeRequests().anyRequest().permitAll();
 
             http.antMatcher("/rest/**").authorizeRequests()
-                    .anyRequest().hasAuthority(AUTHORITY_USER)
+                    .anyRequest().hasAuthority(AUTHORITY_ADMIN)
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -112,11 +112,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Order(3)
     public static class GeneralLoginConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
+        /**
+         * SWAGGER API 接口文档界面资源授权白名单 swagger ui
+         */
         private static final String[] SWAGGER_AUTH_WHITELIST = {
-
-                // -- swagger ui
+                //"/swagger-ui.html",
                 "/swagger-resources/**",
-                "/swagger-ui.html",
                 "/v2/api-docs",
                 "/webjars/**"
         };
@@ -139,17 +140,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // @formatter:off
             http
                     .authorizeRequests()
-                    .antMatchers(SWAGGER_AUTH_WHITELIST).permitAll()
-                    .antMatchers("/login*", "/login*", "/signin/**", "/signup/**", "/invalidSession*",
-                            "/user/registration*", "/registrationConfirm*", "/expiredAccount*", "/registration*",
-                            "/forgetPassword*", "/user/resetPassword*", "/user/changePassword*").permitAll()
+                    .antMatchers("/login*", "/login*", "/signin/**", "/signup/**").permitAll()
                     //.antMatchers("/invalidSession*").anonymous()
-                    .antMatchers("/admin*").hasAuthority(AUTHORITY_ADMIN)
+                    .antMatchers(SWAGGER_AUTH_WHITELIST).permitAll()
+                    .antMatchers("/admin*","/swagger-ui.html").hasAuthority(AUTHORITY_ADMIN)
                     .anyRequest().hasAuthority(AUTHORITY_USER)
                     .and()
                     .formLogin()
                     .loginPage("/login")
-                    .defaultSuccessUrl("/homepage.html")
+                    //.defaultSuccessUrl("/homepage.html")
                     .failureUrl("/login?error=true")
                     .successHandler(webAuthenticationSuccessHandler)
                     /*.failureHandler(webAuthenticationFailureHandler) @TODO 未启用 */

@@ -30,12 +30,12 @@ public class KeyUtil {
     }
 
     /**
-     * ID生成规则： 系统当前时间 + 长度为6的随机数
+     * ID生成规则： 系统当前时间 + 长度为4的随机数
      *
      * @return
      */
     public static long longID() {
-        return longID(1000000L);
+        return longID(10000L);
     }
 
     /**

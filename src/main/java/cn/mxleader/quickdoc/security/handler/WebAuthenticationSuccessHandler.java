@@ -1,6 +1,8 @@
 package cn.mxleader.quickdoc.security.handler;
 
 import cn.mxleader.quickdoc.security.model.ActiveUser;
+import cn.mxleader.quickdoc.service.ReactiveUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -26,6 +28,9 @@ public class WebAuthenticationSuccessHandler implements
 
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
+    @Autowired
+    private ReactiveUserService reactiveUserService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
@@ -34,7 +39,11 @@ public class WebAuthenticationSuccessHandler implements
         final HttpSession session = request.getSession(false);
         if (session != null) {
             session.setMaxInactiveInterval(30 * 60);
-            session.setAttribute(SESSION_USER, new ActiveUser(authentication.getName(), authentication.getAuthorities()));
+            String userGroup = reactiveUserService.findUser(authentication.getName())
+                    .block().getGroup();
+            session.setAttribute(SESSION_USER, new ActiveUser(authentication.getName(),
+                    userGroup,
+                    authentication.getAuthorities()));
         }
         redirectStrategy.sendRedirect(request, response, determineTargetUrl(authentication));
         clearAuthenticationAttributes(request);

@@ -81,8 +81,8 @@ public class IndexController {
      * @return
      */
     @GetMapping()
-    public String index(Model model) {
-        refreshDirList(model, 0L);
+    public String index(Model model, HttpSession session) {
+        refreshDirList(model, 0L, session);
         return "index";
     }
 
@@ -94,10 +94,10 @@ public class IndexController {
      * @return
      */
     @GetMapping("/path@{directoryId}")
-    public String index(@PathVariable Long directoryId, Model model) {
+    public String index(@PathVariable Long directoryId, Model model, HttpSession session) {
         FsDirectory directoryMono = reactiveDirectoryFsService.findById(directoryId).block();
         model.addAttribute("currentdirectory", directoryMono);
-        refreshDirList(model, directoryId);
+        refreshDirList(model, directoryId, session);
 
         return "index";
     }
@@ -244,7 +244,7 @@ public class IndexController {
                 fsDetail,
                 file.getInputStream())
                 .subscribe();
-        refreshDirList(model, directoryId);
+        refreshDirList(model, directoryId, session);
         redirectAttributes.addFlashAttribute("message", "成功上传文件： " + filename);
         return "redirect:/path@" + directoryId;
     }
@@ -271,15 +271,66 @@ public class IndexController {
      * @param model
      * @param directoryId
      */
-    private void refreshDirList(Model model, Long directoryId) {
+    private void refreshDirList(Model model, Long directoryId,
+                                HttpSession session) {
+        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("directories",
                 reactiveDirectoryFsService.findAllByParentId(directoryId)
+                        .filter(webDirectory -> {
+                            return webDirectory.getOwners() != null;
+                        })
+                        .filter(webDirectory -> {
+                            return checkAuthentication(webDirectory.getOwners(),
+                                    activeUser.getGroup(), activeUser.getUsername());
+                        })
                         .toStream()
                         .collect(Collectors.toList()));
         model.addAttribute("files",
                 reactiveFileService.getStoredFiles(directoryId)
+                        .filter(fsDetail -> {
+                            return fsDetail.getOwners() != null;
+                        })
+                        .filter(fsDetail -> {
+                            return checkAuthentication(fsDetail.getOwners(),
+                                    activeUser.getGroup(), activeUser.getUsername());
+                        })
                         .toStream()
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * 检查是否有授权访问该目录或文件
+     *
+     * @param owners
+     * @return
+     */
+    private Boolean checkAuthentication(FsOwner[] owners, String groupName, String username) {
+        if (owners.length > 0) {
+            for (FsOwner owner : owners) {
+                int read = owner.getPrivilege() & 1;
+                if (read > 0) {
+                    switch (owner.getType()) {
+                        case TYPE_PUBLIC:
+                            return true;
+                        case TYPE_GROUP:
+                            if (owner.getName().equalsIgnoreCase(groupName)) {
+                                return true;
+                            } else {
+                                break;
+                            }
+                        case TYPE_PRIVATE:
+                            if (owner.getName().equalsIgnoreCase(username)) {
+                                return true;
+                            } else {
+                                break;
+                            }
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     /**

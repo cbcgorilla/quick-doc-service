@@ -5,7 +5,7 @@ import cn.mxleader.quickdoc.entities.FsCategory;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
-import cn.mxleader.quickdoc.web.dto.CategoryReplaceModel;
+import cn.mxleader.quickdoc.web.dto.RenameCategory;
 import cn.mxleader.quickdoc.web.dto.WebDirectory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -58,21 +58,22 @@ public class ConfigRestController {
     @PostMapping(value = "/category/rename",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "更改目录名称")
-    public Mono<RestResponse> renameCategory(
-            @RequestBody CategoryReplaceModel replaceModel) {
+    public Mono<RestResponse<String>> renameCategory(
+            @RequestBody RenameCategory replaceModel) {
         return reactiveCategoryService.renameCategory(replaceModel.getOldType(),
                 replaceModel.getNewType())
                 .flatMap(fsCategory -> {
-                    return Mono.just(new RestResponse<>(
-                            ACTION_RENAME_CATEGORY,
-                            RestResponse.CODE.SUCCESS,
-                            fsCategory));
+                    return Mono.just(
+                            new RestResponse<String>(
+                                    ACTION_RENAME_CATEGORY,
+                                    RestResponse.CODE.SUCCESS,
+                                    "文件分类改名成功！"));
                 })
                 .doOnError(v -> log.warn(v.getMessage()))
-                .onErrorReturn(new RestResponse(
+                .onErrorReturn(new RestResponse<String>(
                         ACTION_RENAME_CATEGORY,
                         RestResponse.CODE.FAIL,
-                        "文件重命名失败, 请检查已有文件名和新文件名是否有误！"));
+                        "文件分类重命名失败, 请检查新文件分类名是否有误！"));
     }
 
     @GetMapping("/directory/list")

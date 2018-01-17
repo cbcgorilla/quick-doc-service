@@ -12,11 +12,13 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @EnableSwagger2
 @Configuration
 public class SwaggerConfig {
+    private static final String REST_API_PACKAGE = "cn.mxleader.quickdoc.web";
+
     @Bean
-    public Docket productApi(){
+    public Docket productApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("cn.mxleader.quickdoc.web"))
+                .apis(RequestHandlerSelectors.basePackage(REST_API_PACKAGE))
                 .paths(regex("/rest.*"))
                 .build();
     }
