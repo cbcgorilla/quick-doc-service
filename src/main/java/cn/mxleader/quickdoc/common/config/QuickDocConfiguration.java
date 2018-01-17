@@ -19,16 +19,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_ADMIN_GROUP_OWNER;
+import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_PUBLIC_OWNER;
 import static cn.mxleader.quickdoc.common.utils.KeyUtil.getSHA256UUID;
 
 @SpringBootConfiguration
-public class QuickDocDefaultConfiguration {
-    private final Logger log = LoggerFactory.getLogger(QuickDocDefaultConfiguration.class);
-
-    public static final FsOwner SYSTEM_PUBLIC_OWNER = new FsOwner("public",
-            FsOwner.Type.TYPE_PUBLIC, 1);
-    public static final FsOwner SYSTEM_ADMIN_GROUP_OWNER = new FsOwner("admin",
-            FsOwner.Type.TYPE_GROUP, 7);
+public class QuickDocConfiguration {
+    private final Logger log = LoggerFactory.getLogger(QuickDocConfiguration.class);
 
     @Bean
     CommandLineRunner setupConfiguration(ReactiveUserServiceImpl reactiveUserService,

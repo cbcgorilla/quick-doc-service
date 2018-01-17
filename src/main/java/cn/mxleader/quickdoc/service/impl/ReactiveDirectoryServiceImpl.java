@@ -1,10 +1,10 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.entities.FsDirectory;
-import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.dao.DirectoryRepository;
 import cn.mxleader.quickdoc.dao.FsDetailRepository;
 import cn.mxleader.quickdoc.dao.ReactiveDirectoryRepository;
+import cn.mxleader.quickdoc.entities.FsDirectory;
+import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.web.dto.WebDirectory;
 import org.springframework.beans.BeanUtils;
@@ -14,11 +14,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static cn.mxleader.quickdoc.common.config.QuickDocDefaultConfiguration.SYSTEM_ADMIN_GROUP_OWNER;
+import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_ADMIN_GROUP_OWNER;
 import static cn.mxleader.quickdoc.common.utils.KeyUtil.longID;
-import static cn.mxleader.quickdoc.common.utils.MessageUtil.dirConflictMsg;
-import static cn.mxleader.quickdoc.common.utils.MessageUtil.noDirectoryMsg;
-import static cn.mxleader.quickdoc.common.utils.MessageUtil.notEmptyDirMsg;
+import static cn.mxleader.quickdoc.common.utils.MessageUtil.*;
 
 @Service
 public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
