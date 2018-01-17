@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.persistent.template;
+package cn.mxleader.quickdoc.dao.utils;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Query;

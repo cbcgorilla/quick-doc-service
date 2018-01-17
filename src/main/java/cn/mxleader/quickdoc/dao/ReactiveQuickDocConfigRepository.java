@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.persistent.dao;
+package cn.mxleader.quickdoc.dao;
 
 import cn.mxleader.quickdoc.entities.QuickDocConfig;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;

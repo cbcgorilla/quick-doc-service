@@ -1,35 +1,12 @@
 package cn.mxleader.quickdoc.service;
 
-import cn.mxleader.quickdoc.entities.FsOwner;
-import cn.mxleader.quickdoc.persistent.dao.DirectoryRepository;
-import cn.mxleader.quickdoc.web.dto.WebDirectory;
 import cn.mxleader.quickdoc.entities.FsDirectory;
-import cn.mxleader.quickdoc.persistent.dao.FsDetailRepository;
-import cn.mxleader.quickdoc.persistent.dao.ReactiveDirectoryRepository;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
+import cn.mxleader.quickdoc.entities.FsOwner;
+import cn.mxleader.quickdoc.web.dto.WebDirectory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
-import static cn.mxleader.quickdoc.common.utils.KeyUtil.longID;
-import static cn.mxleader.quickdoc.common.utils.MessageUtil.*;
-
-@Service
-public class ReactiveDirectoryService {
-
-    private final DirectoryRepository directoryRepository;
-    private final FsDetailRepository fsDetailRepository;
-    private final ReactiveDirectoryRepository reactiveDirectoryRepository;
-
-    ReactiveDirectoryService(DirectoryRepository directoryRepository,
-                             FsDetailRepository fsDetailRepository,
-                             ReactiveDirectoryRepository reactiveDirectoryRepository) {
-        this.directoryRepository = directoryRepository;
-        this.fsDetailRepository = fsDetailRepository;
-        this.reactiveDirectoryRepository = reactiveDirectoryRepository;
-    }
+public interface ReactiveDirectoryService {
 
     /**
      * 新增文件目录, 默认上级目录ID为0；
@@ -39,14 +16,7 @@ public class ReactiveDirectoryService {
      * @param owners
      * @return
      */
-    public Mono<FsDirectory> saveDirectory(String path, Long parentId, FsOwner[] owners) {
-        return reactiveDirectoryRepository.findByPathAndParentId(path, parentId)
-                .defaultIfEmpty(new FsDirectory(longID(), path, parentId, owners))
-                .flatMap(entity -> {
-                    entity.setOwners(owners);
-                    return reactiveDirectoryRepository.save(entity);
-                });
-    }
+    Mono<FsDirectory> saveDirectory(String path, Long parentId, FsOwner[] owners);
 
     /**
      * 新增文件目录;
@@ -54,11 +24,7 @@ public class ReactiveDirectoryService {
      * @param fsDirectory
      * @return
      */
-    public Mono<FsDirectory> saveDirectory(FsDirectory fsDirectory) {
-        return saveDirectory(fsDirectory.getPath(),
-                fsDirectory.getParentId(),
-                fsDirectory.getOwners());
-    }
+    Mono<FsDirectory> saveDirectory(FsDirectory fsDirectory);
 
     /**
      * 重命名文件目录
@@ -68,18 +34,7 @@ public class ReactiveDirectoryService {
      * @param newPath
      * @return
      */
-    public Mono<FsDirectory> renameDirectory(FsDirectory directory, String newPath) {
-        return reactiveDirectoryRepository.findById(directory.getId())
-                .switchIfEmpty(noDirectoryMsg(directory.toString()))
-                .flatMap(v -> {
-                    if (directoryRepository.findByPathAndParentId(newPath,
-                            directory.getParentId()) != null) {
-                        return dirConflictMsg(newPath);
-                    }
-                    v.setPath(newPath);
-                    return reactiveDirectoryRepository.save(v);
-                });
-    }
+    Mono<FsDirectory> renameDirectory(FsDirectory directory, String newPath);
 
     /**
      * 迁移文件目录
@@ -89,9 +44,7 @@ public class ReactiveDirectoryService {
      * @param newDirectory 新上级目录
      * @return
      */
-    public Mono<FsDirectory> moveDirectory(FsDirectory directory, FsDirectory newDirectory) {
-        return moveDirectory(directory, newDirectory.getId());
-    }
+    Mono<FsDirectory> moveDirectory(FsDirectory directory, FsDirectory newDirectory);
 
     /**
      * 迁移文件目录
@@ -101,17 +54,7 @@ public class ReactiveDirectoryService {
      * @param newDirectoryId 新上级目录ID
      * @return
      */
-    public Mono<FsDirectory> moveDirectory(FsDirectory directory, Long newDirectoryId) {
-        return reactiveDirectoryRepository.findById(directory.getId())
-                .switchIfEmpty(noDirectoryMsg(directory.toString()))
-                .flatMap(v -> {
-                    if (directoryRepository.findById(newDirectoryId) != null) {
-                        return noDirectoryMsg(newDirectoryId.toString());
-                    }
-                    v.setParentId(newDirectoryId);
-                    return reactiveDirectoryRepository.save(v);
-                });
-    }
+    Mono<FsDirectory> moveDirectory(FsDirectory directory, Long newDirectoryId);
 
     /**
      * 更新文件目录属主信息
@@ -120,14 +63,7 @@ public class ReactiveDirectoryService {
      * @param owners
      * @return
      */
-    public Mono<FsDirectory> updateFsOwners(FsDirectory directory, FsOwner[] owners) {
-        return reactiveDirectoryRepository.findById(directory.getId())
-                .switchIfEmpty(noDirectoryMsg(directory.toString()))
-                .flatMap(v -> {
-                    v.setOwners(owners);
-                    return reactiveDirectoryRepository.save(v);
-                });
-    }
+    Mono<FsDirectory> updateFsOwners(FsDirectory directory, FsOwner[] owners);
 
     /**
      * 删除文件目录
@@ -136,9 +72,7 @@ public class ReactiveDirectoryService {
      * @param directory
      * @return
      */
-    public Mono<Void> deleteDirectory(FsDirectory directory) {
-        return deleteDirectory(directory.getId());
-    }
+    Mono<Void> deleteDirectory(FsDirectory directory);
 
     /**
      * 删除文件目录
@@ -147,18 +81,7 @@ public class ReactiveDirectoryService {
      * @param directoryId
      * @return
      */
-    public Mono<Void> deleteDirectory(Long directoryId) {
-        return reactiveDirectoryRepository.findById(directoryId)
-                .switchIfEmpty(noDirectoryMsg(directoryId.toString()))
-                .flatMap(v -> {
-                    List<FsDirectory> subList = directoryRepository.findAllByParentId(directoryId);
-                    if (subList == null || subList.size() == 0) {
-                        return reactiveDirectoryRepository.delete(v);
-                    } else {
-                        return notEmptyDirMsg("[" + directoryId.toString() + "] " + v.getPath());
-                    }
-                });
-    }
+    Mono<Void> deleteDirectory(Long directoryId);
 
     /**
      * 根据上级目录ID信息获取子文件目录
@@ -166,17 +89,7 @@ public class ReactiveDirectoryService {
      * @param parentId
      * @return
      */
-    public Flux<WebDirectory> findAllByParentId(Long parentId) {
-        return reactiveDirectoryRepository.findAllByParentId(parentId)
-                .map(directory -> {
-                    WebDirectory webDirectory = new WebDirectory();
-                    BeanUtils.copyProperties(directory, webDirectory);
-                    Long dirCount = directoryRepository.countFsDirectoriesByParentIdIs(directory.getId());
-                    Long filesCount = fsDetailRepository.countFsEntitiesByDirectoryIdIs(directory.getId());
-                    webDirectory.setChildrenCount(dirCount + filesCount);
-                    return webDirectory;
-                });
-    }
+    Flux<WebDirectory> findAllByParentId(Long parentId);
 
     /**
      * 获取文件目录
@@ -185,9 +98,7 @@ public class ReactiveDirectoryService {
      * @param parentId 上级目录ID
      * @return
      */
-    public Mono<FsDirectory> findByPathAndParentId(String path, Long parentId) {
-        return reactiveDirectoryRepository.findByPathAndParentId(path, parentId);
-    }
+    Mono<FsDirectory> findByPathAndParentId(String path, Long parentId);
 
     /**
      * 根据ID获取文件目录信息
@@ -195,8 +106,6 @@ public class ReactiveDirectoryService {
      * @param id 文件目录ID
      * @return
      */
-    public Mono<FsDirectory> findById(Long id) {
-        return reactiveDirectoryRepository.findById(id);
-    }
+    Mono<FsDirectory> findById(Long id);
 
 }

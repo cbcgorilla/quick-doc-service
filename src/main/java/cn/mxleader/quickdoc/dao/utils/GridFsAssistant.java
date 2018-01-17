@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.persistent;
+package cn.mxleader.quickdoc.dao.utils;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;

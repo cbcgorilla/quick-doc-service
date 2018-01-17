@@ -1,26 +1,10 @@
 package cn.mxleader.quickdoc.service;
 
-import cn.mxleader.quickdoc.common.utils.MessageUtil;
 import cn.mxleader.quickdoc.entities.FsCategory;
-import cn.mxleader.quickdoc.persistent.dao.CategoryRepository;
-import cn.mxleader.quickdoc.persistent.dao.ReactiveCategoryRepository;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static cn.mxleader.quickdoc.common.utils.KeyUtil.longID;
-
-@Service
-public class ReactiveCategoryService {
-
-    private final CategoryRepository categoryRepository;
-    private final ReactiveCategoryRepository reactiveCategoryRepository;
-
-    ReactiveCategoryService(CategoryRepository categoryRepository,
-                            ReactiveCategoryRepository reactiveCategoryRepository) {
-        this.categoryRepository = categoryRepository;
-        this.reactiveCategoryRepository = reactiveCategoryRepository;
-    }
+public interface ReactiveCategoryService {
 
     /**
      * 新增文件分类
@@ -28,11 +12,7 @@ public class ReactiveCategoryService {
      * @param type
      * @return
      */
-    public Mono<FsCategory> addCategory(String type) {
-        return reactiveCategoryRepository.findByType(type)
-                .defaultIfEmpty(new FsCategory(longID(),type))
-                .flatMap(reactiveCategoryRepository::save);
-    }
+    Mono<FsCategory> addCategory(String type);
 
     /**
      * 重命名文件分类
@@ -42,17 +22,7 @@ public class ReactiveCategoryService {
      * @param newType
      * @return
      */
-    public Mono<FsCategory> renameCategory(String oldType, String newType) {
-        return reactiveCategoryRepository.findByType(oldType)
-                .switchIfEmpty(MessageUtil.noCategoryMsg(oldType))
-                .flatMap(category -> {
-                    if (categoryRepository.findByType(newType) != null) {
-                        return MessageUtil.categoryConflictMsg(newType);
-                    }
-                    category.setType(newType);
-                    return reactiveCategoryRepository.save(category);
-                });
-    }
+    Mono<FsCategory> renameCategory(String oldType, String newType);
 
     /**
      * 删除文件分类
@@ -61,11 +31,7 @@ public class ReactiveCategoryService {
      * @param type
      * @return
      */
-    public Mono<Void> deleteCategory(String type) {
-        return reactiveCategoryRepository.findByType(type)
-                .switchIfEmpty(MessageUtil.noCategoryMsg(type))
-                .flatMap(reactiveCategoryRepository::delete);
-    }
+    Mono<Void> deleteCategory(String type);
 
     /**
      * 根据ID获取文件分类信息
@@ -73,9 +39,7 @@ public class ReactiveCategoryService {
      * @param id
      * @return
      */
-    public Mono<FsCategory> findById(Long id) {
-        return reactiveCategoryRepository.findById(id);
-    }
+    Mono<FsCategory> findById(Long id);
 
     /**
      * 根据分类名获取FsCategory
@@ -83,16 +47,13 @@ public class ReactiveCategoryService {
      * @param type
      * @return
      */
-    public Mono<FsCategory> findByType(String type) {
-        return reactiveCategoryRepository.findByType(type);
-    }
+    Mono<FsCategory> findByType(String type);
 
     /**
      * 获取所有文件分类信息
+     *
      * @return
      */
-    public Flux<FsCategory> findAll() {
-        return reactiveCategoryRepository.findAll();
-    }
+    Flux<FsCategory> findAll();
 
 }

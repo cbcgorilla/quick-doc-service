@@ -5,6 +5,7 @@ import cn.mxleader.quickdoc.entities.FsDetail;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.service.*;
+import cn.mxleader.quickdoc.service.impl.ReactiveUserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -30,7 +31,7 @@ public class QuickDocDefaultConfiguration {
             FsOwner.Type.TYPE_GROUP, 7);
 
     @Bean
-    CommandLineRunner setupConfiguration(ReactiveUserService reactiveUserService,
+    CommandLineRunner setupConfiguration(ReactiveUserServiceImpl reactiveUserService,
                                          ReactiveCategoryService reactiveCategoryService,
                                          ReactiveDirectoryService reactiveDirectoryService,
                                          ReactiveQuickDocConfigService reactiveQuickDocConfigService) {

@@ -1,6 +1,5 @@
-package cn.mxleader.quickdoc.persistent.dao;
+package cn.mxleader.quickdoc.dao;
 
-import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.entities.UserEntity;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Mono;

@@ -46,8 +46,8 @@ dependencies {
 	compile("org.springframework.boot:spring-boot-starter-webflux")
 	compile("io.springfox:springfox-swagger2:$swagger_version")
 	compile("io.springfox:springfox-swagger-ui:$swagger_version")
-	compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-	compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 	compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 	compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 	compile "com.fasterxml.jackson.module:jackson-module-kotlin"
