@@ -5,10 +5,9 @@ import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
-public class QuickDocApplication /* extends SpringBootServletInitializer */{
+public class QuickDocApplication {
 
     /**
      * 设置SLF4J日志输出级别

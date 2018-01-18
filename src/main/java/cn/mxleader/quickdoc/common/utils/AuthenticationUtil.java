@@ -3,10 +3,6 @@ package cn.mxleader.quickdoc.common.utils;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
 
-import javax.servlet.http.HttpSession;
-
-import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
-
 public class AuthenticationUtil {
 
     /**

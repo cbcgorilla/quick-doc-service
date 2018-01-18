@@ -1,6 +1,5 @@
 package cn.mxleader.quickdoc.web.controller;
 
-import cn.mxleader.quickdoc.common.utils.StringUtil;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.stream.Collectors;
+
+import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
 
 @Controller
 @RequestMapping("/admin")
@@ -30,7 +31,7 @@ public class AdminController {
      */
     @ModelAttribute("title")
     public String pageTitle() {
-        return StringUtil.HOME_TITLE;
+        return HOME_TITLE;
     }
 
     /**

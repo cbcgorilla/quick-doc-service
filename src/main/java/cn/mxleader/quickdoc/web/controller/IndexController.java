@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 import static cn.mxleader.quickdoc.common.CommonCode.*;
 import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.checkAuthentication;
 import static cn.mxleader.quickdoc.common.utils.KeyUtil.getSHA256UUID;
-import static cn.mxleader.quickdoc.common.utils.StringUtil.HOME_TITLE;
 
 @Controller
 @RequestMapping("/")
@@ -71,7 +70,7 @@ public class IndexController {
      */
     @ModelAttribute("title")
     public String pageTitle() {
-        return HOME_TITLE;
+        return  HOME_TITLE;
     }
 
     /**

@@ -4,6 +4,8 @@ import cn.mxleader.quickdoc.entities.FsOwner;
 
 public class CommonCode {
 
+    public static final String HOME_TITLE = "快捷文档共享";
+
     public static final String SESSION_USER = "ActiveUser";
 
     public static final Integer READ_PRIVILEGE = 1;

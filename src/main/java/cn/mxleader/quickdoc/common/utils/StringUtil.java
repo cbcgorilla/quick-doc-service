@@ -4,8 +4,6 @@ import org.springframework.lang.Nullable;
 
 public class StringUtil {
 
-    public static final String HOME_TITLE = "快捷文档共享";
-
     @Nullable
     public static String getFilename(String path) {
         if (path == null) {
