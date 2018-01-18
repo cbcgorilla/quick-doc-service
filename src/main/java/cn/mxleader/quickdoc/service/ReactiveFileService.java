@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.entities.FsDetail;
+import cn.mxleader.quickdoc.security.session.ActiveUser;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import org.bson.types.ObjectId;
 import reactor.core.publisher.Flux;
@@ -21,6 +22,8 @@ public interface ReactiveFileService {
      */
     Mono<FsDetail> getStoredFile(String filename, Long directoryId);
 
+    Mono<FsDetail> getStoredFile(String fsDetailId);
+
     /**
      * 枚举目录内的所有文件
      *
@@ -29,33 +32,30 @@ public interface ReactiveFileService {
      */
     Flux<FsDetail> getStoredFiles(Long directoryId);
 
-    Mono<Long> countFsEntitiesByDirectoryId(Long directoryId);
-
     /**
      * 存储文件， 如同名文件已存在则更新文件内容
      *
-     * @param fileEntity 文件描述信息
-     * @param file       文件二进制流
+     * @param fsDetail 文件描述信息
+     * @param file     文件二进制流
      * @return
      */
-    Mono<FsDetail> storeFile(FsDetail fileEntity,
-                             InputStream file);
+    Mono<FsDetail> storeFile(FsDetail fsDetail, InputStream file);
 
     /**
      * 删除Mongo库内文件
      *
-     * @param fileEntity 文件信息
+     * @param fsDetail 文件信息
      * @return
      */
-    Mono<Void> deleteFile(FsDetail fileEntity);
+    Mono<Void> deleteFile(FsDetail fsDetail);
 
     /**
      * 删除Mongo库内文件
      *
-     * @param fsEntityId 文件ID信息
+     * @param fsDetailId 文件ID信息
      * @return
      */
-    Mono<Void> deleteFile(String fsEntityId);
+    Mono<Void> deleteFile(String fsDetailId);
 
     /**
      * 根据输入文件ID获取二进制流
@@ -72,6 +72,6 @@ public interface ReactiveFileService {
      * @param fos         生成的zip文件存在路径（包括文件名）
      * @param categoryId  待压缩的文件分类ID，为0L则压缩所有分类
      */
-    void createZip(Long directoryId, OutputStream fos, Long categoryId) throws IOException;
+    void createZip(Long directoryId, OutputStream fos, Long categoryId, ActiveUser activeUser) throws IOException;
 
 }

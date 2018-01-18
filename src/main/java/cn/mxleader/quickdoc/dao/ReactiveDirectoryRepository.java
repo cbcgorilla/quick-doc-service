@@ -10,4 +10,5 @@ public interface ReactiveDirectoryRepository extends ReactiveMongoRepository<FsD
     Mono<FsDirectory> findByPathAndParentId(String path, Long parentId);
 
     Flux<FsDirectory> findAllByParentId(Long parentId);
+    Mono<Long> countFsDirectoriesByParentIdIs(Long parentId);
 }

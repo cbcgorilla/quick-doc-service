@@ -2,7 +2,6 @@ package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.common.utils.MessageUtil;
 import cn.mxleader.quickdoc.entities.FsCategory;
-import cn.mxleader.quickdoc.dao.CategoryRepository;
 import cn.mxleader.quickdoc.dao.ReactiveCategoryRepository;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import org.springframework.stereotype.Service;
@@ -12,14 +11,11 @@ import reactor.core.publisher.Mono;
 import static cn.mxleader.quickdoc.common.utils.KeyUtil.longID;
 
 @Service
-public class ReactiveCategoryServiceImpl implements ReactiveCategoryService{
+public class ReactiveCategoryServiceImpl implements ReactiveCategoryService {
 
-    private final CategoryRepository categoryRepository;
     private final ReactiveCategoryRepository reactiveCategoryRepository;
 
-    ReactiveCategoryServiceImpl(CategoryRepository categoryRepository,
-                            ReactiveCategoryRepository reactiveCategoryRepository) {
-        this.categoryRepository = categoryRepository;
+    ReactiveCategoryServiceImpl(ReactiveCategoryRepository reactiveCategoryRepository) {
         this.reactiveCategoryRepository = reactiveCategoryRepository;
     }
 
@@ -31,7 +27,7 @@ public class ReactiveCategoryServiceImpl implements ReactiveCategoryService{
      */
     public Mono<FsCategory> addCategory(String type) {
         return reactiveCategoryRepository.findByType(type)
-                .defaultIfEmpty(new FsCategory(longID(),type))
+                .defaultIfEmpty(new FsCategory(longID(), type))
                 .flatMap(reactiveCategoryRepository::save);
     }
 
@@ -47,7 +43,8 @@ public class ReactiveCategoryServiceImpl implements ReactiveCategoryService{
         return reactiveCategoryRepository.findByType(oldType)
                 .switchIfEmpty(MessageUtil.noCategoryMsg(oldType))
                 .flatMap(category -> {
-                    if (categoryRepository.findByType(newType) != null) {
+                    if (reactiveCategoryRepository.findByType(newType)
+                            .blockOptional().isPresent()) {
                         return MessageUtil.categoryConflictMsg(newType);
                     }
                     category.setType(newType);
@@ -90,6 +87,7 @@ public class ReactiveCategoryServiceImpl implements ReactiveCategoryService{
 
     /**
      * 获取所有文件分类信息
+     *
      * @return
      */
     public Flux<FsCategory> findAll() {

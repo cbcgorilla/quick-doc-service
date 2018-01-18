@@ -11,5 +11,7 @@ public interface ReactiveFsDetailRepository extends ReactiveMongoRepository<FsDe
 
     Flux<FsDetail> findAllByDirectoryId(Long directoryId);
 
-    Mono<Long> countFsEntitiesByDirectoryIdIs(Long directoryId);
+    Flux<FsDetail> findAllByDirectoryIdAndCategoryId(Long directoryId,Long categoryId);
+
+    Mono<Long> countFsDetailsByDirectoryIdIs(Long directoryId);
 }

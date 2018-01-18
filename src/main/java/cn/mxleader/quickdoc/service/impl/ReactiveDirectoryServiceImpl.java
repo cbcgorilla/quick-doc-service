@@ -1,8 +1,7 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.dao.DirectoryRepository;
-import cn.mxleader.quickdoc.dao.FsDetailRepository;
 import cn.mxleader.quickdoc.dao.ReactiveDirectoryRepository;
+import cn.mxleader.quickdoc.dao.ReactiveFsDetailRepository;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
@@ -21,16 +20,13 @@ import static cn.mxleader.quickdoc.common.utils.MessageUtil.*;
 @Service
 public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
 
-    private final DirectoryRepository directoryRepository;
-    private final FsDetailRepository fsDetailRepository;
+    private final ReactiveFsDetailRepository reactiveFsDetailRepository;
     private final ReactiveDirectoryRepository reactiveDirectoryRepository;
 
-    ReactiveDirectoryServiceImpl(DirectoryRepository directoryRepository,
-                                 FsDetailRepository fsDetailRepository,
-                                 ReactiveDirectoryRepository reactiveDirectoryRepository) {
-        this.directoryRepository = directoryRepository;
-        this.fsDetailRepository = fsDetailRepository;
+    ReactiveDirectoryServiceImpl(ReactiveDirectoryRepository reactiveDirectoryRepository,
+                                 ReactiveFsDetailRepository reactiveFsDetailRepository) {
         this.reactiveDirectoryRepository = reactiveDirectoryRepository;
+        this.reactiveFsDetailRepository = reactiveFsDetailRepository;
     }
 
     /**
@@ -79,8 +75,8 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
         return reactiveDirectoryRepository.findById(directory.getId())
                 .switchIfEmpty(noDirectoryMsg(directory.toString()))
                 .flatMap(v -> {
-                    if (directoryRepository.findByPathAndParentId(newPath,
-                            directory.getParentId()) != null) {
+                    if (reactiveDirectoryRepository.findByPathAndParentId(newPath,
+                            directory.getParentId()).blockOptional().isPresent()) {
                         return dirConflictMsg(newPath);
                     }
                     v.setPath(newPath);
@@ -112,7 +108,8 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
         return reactiveDirectoryRepository.findById(directory.getId())
                 .switchIfEmpty(noDirectoryMsg(directory.toString()))
                 .flatMap(v -> {
-                    if (directoryRepository.findById(newDirectoryId) != null) {
+                    if (reactiveDirectoryRepository.findById(newDirectoryId)
+                            .blockOptional().isPresent()) {
                         return noDirectoryMsg(newDirectoryId.toString());
                     }
                     v.setParentId(newDirectoryId);
@@ -158,8 +155,8 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
         return reactiveDirectoryRepository.findById(directoryId)
                 .switchIfEmpty(noDirectoryMsg(directoryId.toString()))
                 .flatMap(v -> {
-                    List<FsDirectory> subList = directoryRepository.findAllByParentId(directoryId);
-                    if (subList == null || subList.size() == 0) {
+                    Flux<FsDirectory> subFlux = reactiveDirectoryRepository.findAllByParentId(directoryId);
+                    if (subFlux == null || subFlux.count().block() == 0) {
                         return reactiveDirectoryRepository.delete(v);
                     } else {
                         return notEmptyDirMsg("[" + directoryId.toString() + "] " + v.getPath());
@@ -178,8 +175,8 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
                 .map(directory -> {
                     WebDirectory webDirectory = new WebDirectory();
                     BeanUtils.copyProperties(directory, webDirectory);
-                    Long dirCount = directoryRepository.countFsDirectoriesByParentIdIs(directory.getId());
-                    Long filesCount = fsDetailRepository.countFsEntitiesByDirectoryIdIs(directory.getId());
+                    Long dirCount = reactiveDirectoryRepository.countFsDirectoriesByParentIdIs(directory.getId()).block();
+                    Long filesCount = reactiveFsDetailRepository.countFsDetailsByDirectoryIdIs(directory.getId()).block();
                     webDirectory.setChildrenCount(dirCount + filesCount);
                     return webDirectory;
                 });

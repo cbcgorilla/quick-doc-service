@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cn.mxleader.quickdoc.common.CommonCode.*;
+import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.checkAuthentication;
 import static cn.mxleader.quickdoc.common.utils.KeyUtil.getSHA256UUID;
 import static cn.mxleader.quickdoc.common.utils.StringUtil.HOME_TITLE;
 
@@ -38,8 +40,6 @@ import static cn.mxleader.quickdoc.common.utils.StringUtil.HOME_TITLE;
 @RequestMapping("/")
 @SessionAttributes("ActiveUser")
 public class IndexController {
-
-    private static final String SESSION_USER = "ActiveUser";
 
     private final ReactiveCategoryService reactiveCategoryService;
     private final ReactiveDirectoryService reactiveDirectoryFsService;
@@ -83,6 +83,8 @@ public class IndexController {
     @GetMapping()
     public String index(Model model, HttpSession session) {
         refreshDirList(model, 0L, session);
+        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        model.addAttribute("isAdmin", activeUser.isAdmin());
         return "index";
     }
 
@@ -98,6 +100,8 @@ public class IndexController {
         FsDirectory directoryMono = reactiveDirectoryFsService.findById(directoryId).block();
         model.addAttribute("currentdirectory", directoryMono);
         refreshDirList(model, directoryId, session);
+        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        model.addAttribute("isAdmin", activeUser.isAdmin());
 
         return "index";
     }
@@ -112,13 +116,15 @@ public class IndexController {
     @GetMapping(value = "/zip-resource/{directoryId}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public @ResponseBody
     void downloadDocument(HttpServletResponse response,
-                          @PathVariable Long directoryId) throws IOException {
+                          @PathVariable Long directoryId,
+                          HttpSession session) throws IOException {
+        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader("Content-Disposition",
                 "attachment; filename=" + directoryId + ".zip");
         //response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
 
-        reactiveFileService.createZip(directoryId, response.getOutputStream(), 0L);
+        reactiveFileService.createZip(directoryId, response.getOutputStream(), 0L, activeUser);
     }
 
     /**
@@ -204,7 +210,7 @@ public class IndexController {
         header.set("Content-Disposition", "inline; filename=" + fs.getGridFSFile().getFilename());
         header.setContentLength(document.length);
 
-        return new HttpEntity<byte[]>(document, header);
+        return new HttpEntity<>(document, header);
     }
 
     /**
@@ -227,25 +233,32 @@ public class IndexController {
                              Model model,
                              HttpSession session) throws IOException {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
-        FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 5);
-        String filename = StringUtil.getFilename(file.getOriginalFilename());
-        FsDetail fsDetail = new FsDetail(getSHA256UUID(),
-                filename,
-                file.getSize(),
-                StringUtils.getFilenameExtension(filename).toLowerCase(),
-                new Date(),
-                categoryId,
-                directoryId,
-                null,
-                new FsOwner[]{owner},
-                null,
-                null);
-        reactiveFileService.storeFile(
-                fsDetail,
-                file.getInputStream())
-                .subscribe();
-        refreshDirList(model, directoryId, session);
-        redirectAttributes.addFlashAttribute("message", "成功上传文件： " + filename);
+        FsDirectory fsDirectory = reactiveDirectoryFsService.findById(directoryId).block();
+        if (checkAuthentication(fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
+            FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 7);
+            String filename = StringUtil.getFilename(file.getOriginalFilename());
+            FsDetail fsDetail = new FsDetail(getSHA256UUID(),
+                    filename,
+                    file.getSize(),
+                    StringUtils.getFilenameExtension(filename).toLowerCase(),
+                    new Date(),
+                    categoryId,
+                    directoryId,
+                    null,
+                    new FsOwner[]{owner},
+                    null,
+                    null);
+            reactiveFileService.storeFile(
+                    fsDetail,
+                    file.getInputStream())
+                    .subscribe();
+            refreshDirList(model, directoryId, session);
+            redirectAttributes.addFlashAttribute("message",
+                    "成功上传文件： " + filename);
+        } else {
+            redirectAttributes.addFlashAttribute("message",
+                    "您无此目录的上传权限： " + fsDirectory.getPath() + "，请联系管理员获取！");
+        }
         return "redirect:/path@" + directoryId;
     }
 
@@ -253,15 +266,24 @@ public class IndexController {
      * 删除文件
      *
      * @param directoryId
-     * @param fsEntityId
+     * @param fsDetailId
      * @return
      */
     @DeleteMapping("/deleteFile")
     public String deleteFile(@RequestParam("directoryId") Long directoryId,
-                             @RequestParam String fsEntityId,
+                             @RequestParam String fsDetailId,
+                             HttpSession session,
                              RedirectAttributes redirectAttributes) {
-        reactiveFileService.deleteFile(fsEntityId).subscribe();
-        redirectAttributes.addFlashAttribute("message", "成功删除文件： " + fsEntityId);
+        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        FsDetail fsDetail = reactiveFileService.getStoredFile(fsDetailId).block();
+        if (checkAuthentication(fsDetail.getOwners(), activeUser, DELETE_PRIVILEGE)) {
+            reactiveFileService.deleteFile(fsDetailId).subscribe();
+            redirectAttributes.addFlashAttribute("message",
+                    "成功删除文件： " + fsDetailId);
+        } else {
+            redirectAttributes.addFlashAttribute("message",
+                    "您无删除此文件的权限： " + fsDetail.getFilename() + "，请联系管理员获取！");
+        }
         return "redirect:/path@" + directoryId;
     }
 
@@ -276,62 +298,16 @@ public class IndexController {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("directories",
                 reactiveDirectoryFsService.findAllByParentId(directoryId)
-                        .filter(webDirectory -> {
-                            return webDirectory.getOwners() != null;
-                        })
-                        .filter(webDirectory -> {
-                            return checkAuthentication(webDirectory.getOwners(),
-                                    activeUser.getGroup(), activeUser.getUsername());
-                        })
+                        .filter(webDirectory -> checkAuthentication(webDirectory.getOwners(), activeUser, READ_PRIVILEGE))
                         .toStream()
                         .collect(Collectors.toList()));
         model.addAttribute("files",
                 reactiveFileService.getStoredFiles(directoryId)
-                        .filter(fsDetail -> {
-                            return fsDetail.getOwners() != null;
-                        })
-                        .filter(fsDetail -> {
-                            return checkAuthentication(fsDetail.getOwners(),
-                                    activeUser.getGroup(), activeUser.getUsername());
-                        })
+                        .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(), activeUser, READ_PRIVILEGE))
                         .toStream()
                         .collect(Collectors.toList()));
     }
 
-    /**
-     * 检查是否有授权访问该目录或文件
-     *
-     * @param owners
-     * @return
-     */
-    private Boolean checkAuthentication(FsOwner[] owners, String groupName, String username) {
-        if (owners.length > 0) {
-            for (FsOwner owner : owners) {
-                int read = owner.getPrivilege() & 1;
-                if (read > 0) {
-                    switch (owner.getType()) {
-                        case TYPE_PUBLIC:
-                            return true;
-                        case TYPE_GROUP:
-                            if (owner.getName().equalsIgnoreCase(groupName)) {
-                                return true;
-                            } else {
-                                break;
-                            }
-                        case TYPE_PRIVATE:
-                            if (owner.getName().equalsIgnoreCase(username)) {
-                                return true;
-                            } else {
-                                break;
-                            }
-                    }
-                } else {
-                    return false;
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * 同名文件多并发请求时有冲突可能, 占用服务端本地缓存目录，需要定期清理Web服务器缓存目录

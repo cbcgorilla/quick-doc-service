@@ -1,12 +1,12 @@
 package cn.mxleader.quickdoc.service.impl;
 
+import cn.mxleader.quickdoc.dao.ReactiveCategoryRepository;
+import cn.mxleader.quickdoc.dao.ReactiveDirectoryRepository;
 import cn.mxleader.quickdoc.entities.FsDetail;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.dao.utils.GridFsAssistant;
-import cn.mxleader.quickdoc.dao.CategoryRepository;
-import cn.mxleader.quickdoc.dao.DirectoryRepository;
-import cn.mxleader.quickdoc.dao.FsDetailRepository;
 import cn.mxleader.quickdoc.dao.ReactiveFsDetailRepository;
+import cn.mxleader.quickdoc.security.session.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveFileService;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import org.bson.types.ObjectId;
@@ -18,9 +18,12 @@ import reactor.core.publisher.Mono;
 import java.io.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static cn.mxleader.quickdoc.common.CommonCode.READ_PRIVILEGE;
+import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.checkAuthentication;
 import static cn.mxleader.quickdoc.common.utils.MessageUtil.fileNotExistMsg;
 import static cn.mxleader.quickdoc.dao.utils.QueryTemplate.keyQuery;
 
@@ -31,22 +34,19 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
 
     private final GridFsAssistant gridFsAssistant;
     private final GridFsTemplate gridFsTemplate;
-    private final CategoryRepository categoryRepository;
-    private final DirectoryRepository directoryRepository;
-    private final FsDetailRepository fsDetailRepository;
+    private final ReactiveCategoryRepository reactiveCategoryRepository;
+    private final ReactiveDirectoryRepository reactiveDirectoryRepository;
     private final ReactiveFsDetailRepository reactiveFsDetailRepository;
 
     ReactiveFileServiceImpl(GridFsAssistant gridFsAssistant,
-                        GridFsTemplate gridFsTemplate,
-                        CategoryRepository categoryRepository,
-                        DirectoryRepository directoryRepository,
-                        FsDetailRepository fsDetailRepository,
-                        ReactiveFsDetailRepository reactiveFsDetailRepository) {
+                            GridFsTemplate gridFsTemplate,
+                            ReactiveCategoryRepository reactiveCategoryRepository,
+                            ReactiveDirectoryRepository reactiveDirectoryRepository,
+                            ReactiveFsDetailRepository reactiveFsDetailRepository) {
         this.gridFsAssistant = gridFsAssistant;
         this.gridFsTemplate = gridFsTemplate;
-        this.categoryRepository = categoryRepository;
-        this.directoryRepository = directoryRepository;
-        this.fsDetailRepository = fsDetailRepository;
+        this.reactiveCategoryRepository = reactiveCategoryRepository;
+        this.reactiveDirectoryRepository = reactiveDirectoryRepository;
         this.reactiveFsDetailRepository = reactiveFsDetailRepository;
     }
 
@@ -62,6 +62,10 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
         return reactiveFsDetailRepository.findByFilenameAndDirectoryId(filename, directoryId);
     }
 
+    public Mono<FsDetail> getStoredFile(String fsDetailId) {
+        return reactiveFsDetailRepository.findById(fsDetailId);
+    }
+
     /**
      * 枚举目录内的所有文件
      *
@@ -71,39 +75,35 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
     public Flux<FsDetail> getStoredFiles(Long directoryId) {
         return reactiveFsDetailRepository.findAllByDirectoryId(directoryId)
                 .map(v -> {
-                    v.setCategory(categoryRepository.findById(v.getCategoryId()).get().getType());
-                    v.setDirectory((directoryRepository.findById(v.getDirectoryId()).get().getPath()));
+                    v.setCategory(reactiveCategoryRepository.findById(v.getCategoryId()).block().getType());
+                    v.setDirectory((reactiveDirectoryRepository.findById(v.getDirectoryId()).block().getPath()));
                     return v;
                 });
-    }
-
-    public Mono<Long> countFsEntitiesByDirectoryId(Long directoryId){
-        return  reactiveFsDetailRepository.countFsEntitiesByDirectoryIdIs(directoryId);
     }
 
     /**
      * 存储文件， 如同名文件已存在则更新文件内容
      *
-     * @param fileEntity 文件描述信息
-     * @param file       文件二进制流
+     * @param fsDetail 文件描述信息
+     * @param file     文件二进制流
      * @return
      */
-    public Mono<FsDetail> storeFile(FsDetail fileEntity,
+    public Mono<FsDetail> storeFile(FsDetail fsDetail,
                                     InputStream file) {
-        return getStoredFile(fileEntity.getFilename(), fileEntity.getDirectoryId())
-                .defaultIfEmpty(fileEntity)
+        return getStoredFile(fsDetail.getFilename(), fsDetail.getDirectoryId())
+                .defaultIfEmpty(fsDetail)
                 .flatMap(
                         entity -> {
                             // 删除库中同名历史文件
                             deleteFile(entity);
-                            fileEntity.setId(entity.getId());
-                            fileEntity.setStoredId(
+                            fsDetail.setId(entity.getId());
+                            fsDetail.setStoredId(
                                     gridFsTemplate.store(file,
-                                            fileEntity.getFilename(),
-                                            fileEntity.getContentType()
+                                            fsDetail.getFilename(),
+                                            fsDetail.getContentType()
                                     )
                             );
-                            return reactiveFsDetailRepository.save(fileEntity);
+                            return reactiveFsDetailRepository.save(fsDetail);
                         }
                 );
     }
@@ -111,14 +111,14 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
     /**
      * 删除Mongo库内文件
      *
-     * @param fileEntity 文件信息
+     * @param fsDetail 文件信息
      * @return
      */
-    public Mono<Void> deleteFile(FsDetail fileEntity) {
-        return getStoredFile(fileEntity.getFilename(), fileEntity.getDirectoryId())
+    public Mono<Void> deleteFile(FsDetail fsDetail) {
+        return getStoredFile(fsDetail.getFilename(), fsDetail.getDirectoryId())
                 .switchIfEmpty(
-                        fileNotExistMsg(new Long(fileEntity.getDirectoryId()).toString(),
-                                fileEntity.getFilename())
+                        fileNotExistMsg(new Long(fsDetail.getDirectoryId()).toString(),
+                                fsDetail.getFilename())
                 )
                 .flatMap(entity -> {
                     gridFsTemplate.delete(keyQuery(entity.getStoredId()));
@@ -129,13 +129,13 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
     /**
      * 删除Mongo库内文件
      *
-     * @param fsEntityId 文件ID信息
+     * @param fsDetailId 文件ID信息
      * @return
      */
-    public Mono<Void> deleteFile(String fsEntityId) {
-        return reactiveFsDetailRepository.findById(fsEntityId)
+    public Mono<Void> deleteFile(String fsDetailId) {
+        return reactiveFsDetailRepository.findById(fsDetailId)
                 .switchIfEmpty(
-                        fileNotExistMsg(fsEntityId)
+                        fileNotExistMsg(fsDetailId)
                 )
                 .flatMap(entity -> {
                     gridFsTemplate.delete(keyQuery(entity.getStoredId()));
@@ -159,15 +159,17 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @param directoryId 文件或文件夹路径
      * @param fos         生成的zip文件存在路径（包括文件名）
      * @param categoryId  待压缩的文件分类ID，为0L则压缩所有分类
+     * @param activeUser  当前操作用户信息（用于判断是否有操作权限）
      */
     public void createZip(Long directoryId,
                           OutputStream fos,
-                          Long categoryId) throws IOException {
+                          Long categoryId,
+                          ActiveUser activeUser) throws IOException {
         ZipOutputStream zos = new ZipOutputStream(fos);
-        Optional<FsDirectory> optionalDirectory = directoryRepository.findById(directoryId);
+        Optional<FsDirectory> optionalDirectory = reactiveDirectoryRepository.findById(directoryId).blockOptional();
         if (optionalDirectory.isPresent()) {
             FsDirectory directory = optionalDirectory.get();
-            compressDirectory(directory, zos, directory.getPath(), categoryId);
+            compressDirectory(directory, zos, directory.getPath(), categoryId, activeUser);
         } else {
             throw new FileNotFoundException("文件夹ID：" + directoryId);
         }
@@ -181,30 +183,38 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @param out        ZIP输出流
      * @param basedir    当前目录
      * @param categoryId 待压缩的文件分类ID，为0L则压缩所有分类
+     * @param activeUser 当前操作用户信息（用于判断是否有操作权限）
      */
     private void compressDirectory(FsDirectory directory,
                                    ZipOutputStream out,
                                    String basedir,
-                                   Long categoryId) {
+                                   Long categoryId,
+                                   ActiveUser activeUser) {
         // 递归压缩目录
-        List<FsDirectory> directories = directoryRepository.findAllByParentId(directory.getId());
+        List<FsDirectory> directories = reactiveDirectoryRepository.findAllByParentId(directory.getId())
+                .filter(webDirectory -> checkAuthentication(webDirectory.getOwners(), activeUser, READ_PRIVILEGE))
+                .toStream()
+                .collect(Collectors.toList());
         if (directories != null && directories.size() > 0) {
             for (FsDirectory subdirectory : directories) {
-                compressDirectory(subdirectory,
-                        out,
-                        basedir + "/" + subdirectory.getPath(),
-                        categoryId);
+                compressDirectory(subdirectory, out, basedir + "/" + subdirectory.getPath(),
+                        categoryId, activeUser);
             }
         }
         // 压缩目录内的文件
-        List<FsDetail> fileList = null;
+        Flux<FsDetail> fsDetailFlux;
         if (categoryId == 0) {
-            fileList = fsDetailRepository.findAllByDirectoryId(directory.getId());
+            // 压缩所有分类
+            fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryId(directory.getId())
+                    .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(), activeUser, READ_PRIVILEGE));
         } else {
-            fileList = fsDetailRepository.findAllByDirectoryIdAndCategoryId(directory.getId(), categoryId);
+            // 压缩指定分类文件
+            fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryIdAndCategoryId(directory.getId(), categoryId)
+                    .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(), activeUser, READ_PRIVILEGE));
         }
-        if (fileList != null && fileList.size() > 0) {
-            for (FsDetail file : fileList) {
+        List<FsDetail> fsDetailList = fsDetailFlux.toStream().collect(Collectors.toList());
+        if (fsDetailList != null && fsDetailList.size() > 0) {
+            for (FsDetail file : fsDetailList) {
                 compressFile(getFileStream(file.getStoredId()), out, basedir);
             }
         }
@@ -218,8 +228,8 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @param basedir       当前文件所在目录
      */
     private void compressFile(GridFSDownloadStream fsInputStream,
-                              ZipOutputStream out,
-                              String basedir) {
+                                ZipOutputStream out,
+                                String basedir) {
         try {
             BufferedInputStream bis = new BufferedInputStream(fsInputStream);
             ZipEntry entry = new ZipEntry(basedir + "/" + fsInputStream.getGridFSFile().getFilename());

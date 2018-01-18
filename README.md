@@ -1,11 +1,12 @@
 # quick-doc-service
 功能说明：简易登录，文件上传，下载，分类管理，文件夹管理，批量下载。
+分权限管理目录，批量打包下载仅下载权限可访问的资源。
 
 架构组成： 
 
 存储（MongoDB 3.6.2）
 
-服务端：Spring Framework 5.0.2.RELEASE（WebFlux + Web） 
+服务端：Spring Framework 5.0.2.RELEASE
 
 Spring Boot 2.0 Actuator 提供MongoDB状态及系统配置信息监控点
 
@@ -13,7 +14,7 @@ Spring Security 5.0.0.RELEASE
 
 Kotlin 1.2 实现实体映射Bean
 
-Web层： BootStrap 3.3.7， + font-awesome.css 4.7 + jquery
+Web层： BootStrap 3.3.7， + font-awesome.css 4.7 + jquery + Thymeleaf
 
 Springfox Swagger 2.8.0 实现REST API文档化交付界面
 

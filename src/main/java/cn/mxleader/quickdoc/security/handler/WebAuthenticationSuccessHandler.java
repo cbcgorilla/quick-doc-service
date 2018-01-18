@@ -21,11 +21,12 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
+import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
+
 @Component("webAuthenticationSuccessHandler")
 public class WebAuthenticationSuccessHandler implements
         AuthenticationSuccessHandler {
 
-    private static final String SESSION_USER = "ActiveUser";
     private static final String AUTHORITY_ADMIN = "ADMIN";
     private static final String AUTHORITY_USER = "USER";
 
@@ -33,6 +34,7 @@ public class WebAuthenticationSuccessHandler implements
 
     @Autowired
     private ReactiveUserService reactiveUserService;
+
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 

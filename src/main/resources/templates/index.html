@@ -22,10 +22,10 @@
             <a class="navbar-brand" href="/">文件管理</a>
         </div>
 
-        <div class="navbar-header">
+        <div class="navbar-header" th:if="${isAdmin}">
             <a class="navbar-brand" href="/admin">目录管理</a>
         </div>
-        <div class="navbar-header">
+        <div class="navbar-header" th:if="${isAdmin}">
             <a class="navbar-brand" href="/admin">账号管理</a>
         </div>
 
@@ -224,7 +224,7 @@
                             </td>
                             <td th:text="${file.category}">ID</td>
                             <td>
-                                <input type="hidden" id="fsEntityId" name="fsEntityId"
+                                <input type="hidden" id="fsDetailId" name="fsDetailId"
                                        th:value="${file.id}"/>
                                 <input type="hidden" id="directoryId" name="directoryId"
                                        th:value="${currentdirectory.id}"/>
