@@ -22,6 +22,8 @@ import java.util.Date;
 import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_ADMIN_GROUP_OWNER;
 import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_PUBLIC_OWNER;
 import static cn.mxleader.quickdoc.common.utils.KeyUtil.getSHA256UUID;
+import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_ADMIN;
+import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_USER;
 
 @SpringBootConfiguration
 public class QuickDocConfiguration {
@@ -40,7 +42,7 @@ public class QuickDocConfiguration {
                             reactiveUserService
                                     .saveUser(new UserEntity(KeyUtil.stringUUID(), "admin",
                                             "chenbichao",
-                                            new String[]{"ADMIN", "USER"}, "admin")).subscribe();
+                                            new String[]{AUTHORITY_ADMIN, AUTHORITY_USER}, "admin")).subscribe();
 
                             // 初始化文件分类
                             reactiveCategoryService.addCategory("照片").subscribe();

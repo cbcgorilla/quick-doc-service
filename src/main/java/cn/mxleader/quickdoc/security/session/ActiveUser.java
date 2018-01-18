@@ -10,6 +10,8 @@ import javax.servlet.http.HttpSessionBindingListener;
 import java.util.Collection;
 import java.util.Iterator;
 
+import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_ADMIN;
+
 @Document
 public class ActiveUser implements HttpSessionBindingListener {
 
@@ -60,7 +62,7 @@ public class ActiveUser implements HttpSessionBindingListener {
         Iterator<? extends GrantedAuthority> it = authorities.iterator();
         while (it.hasNext()) {
             GrantedAuthority entry = it.next();
-            if (entry.getAuthority().equalsIgnoreCase("ADMIN")) {
+            if (entry.getAuthority().equalsIgnoreCase(AUTHORITY_ADMIN)) {
                 this.admin = true;
                 break;
             } else {

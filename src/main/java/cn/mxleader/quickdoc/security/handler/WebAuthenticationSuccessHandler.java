@@ -21,14 +21,14 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
+import static cn.mxleader.quickdoc.common.CommonCode.SESSION_STREAM_TOPIC;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
+import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_ADMIN;
+import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_USER;
 
 @Component("webAuthenticationSuccessHandler")
 public class WebAuthenticationSuccessHandler implements
         AuthenticationSuccessHandler {
-
-    private static final String AUTHORITY_ADMIN = "ADMIN";
-    private static final String AUTHORITY_USER = "USER";
 
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
@@ -55,7 +55,7 @@ public class WebAuthenticationSuccessHandler implements
             // 发送用户登录消息到Kafka平台
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String ctime = formatter.format(new Date());
-            kafkaTemplate.send("active-session",
+            kafkaTemplate.send(SESSION_STREAM_TOPIC,
                     ctime + " [User login ] username: " +
                             authentication.getName() +
                             " & user group: " + userGroup);

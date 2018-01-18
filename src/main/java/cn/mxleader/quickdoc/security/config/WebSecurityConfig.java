@@ -27,8 +27,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String AUTHORITY_USER = "USER";
-    private static final String AUTHORITY_ADMIN = "ADMIN";
+    public static final String AUTHORITY_USER = "USER";
+    public static final String AUTHORITY_ADMIN = "ADMIN";
 
     @Autowired
     private WebAuthenticationProvider authProvider;
