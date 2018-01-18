@@ -5,7 +5,7 @@ import cn.mxleader.quickdoc.entities.FsCategory;
 import cn.mxleader.quickdoc.entities.FsDetail;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
-import cn.mxleader.quickdoc.security.model.ActiveUser;
+import cn.mxleader.quickdoc.security.session.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.service.ReactiveFileService;

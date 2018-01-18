@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.security.authprovider;
 
 import cn.mxleader.quickdoc.entities.UserEntity;
-import cn.mxleader.quickdoc.security.model.WebAuthority;
+import cn.mxleader.quickdoc.security.session.WebAuthority;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;

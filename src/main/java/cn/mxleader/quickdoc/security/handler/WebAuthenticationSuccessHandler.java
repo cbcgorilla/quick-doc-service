@@ -1,8 +1,9 @@
 package cn.mxleader.quickdoc.security.handler;
 
-import cn.mxleader.quickdoc.security.model.ActiveUser;
+import cn.mxleader.quickdoc.security.session.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -16,7 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 
 @Component("webAuthenticationSuccessHandler")
 public class WebAuthenticationSuccessHandler implements
@@ -30,6 +33,8 @@ public class WebAuthenticationSuccessHandler implements
 
     @Autowired
     private ReactiveUserService reactiveUserService;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -44,6 +49,14 @@ public class WebAuthenticationSuccessHandler implements
             session.setAttribute(SESSION_USER, new ActiveUser(authentication.getName(),
                     userGroup,
                     authentication.getAuthorities()));
+
+            // 发送用户登录消息到Kafka平台
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String ctime = formatter.format(new Date());
+            kafkaTemplate.send("active-session",
+                    ctime + " [User login ] username: " +
+                            authentication.getName() +
+                            " & user group: " + userGroup);
         }
         redirectStrategy.sendRedirect(request, response, determineTargetUrl(authentication));
         clearAuthenticationAttributes(request);

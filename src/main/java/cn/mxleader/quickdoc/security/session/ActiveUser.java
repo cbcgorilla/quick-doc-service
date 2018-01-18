@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.security.model;
+package cn.mxleader.quickdoc.security.session;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
