@@ -3,36 +3,34 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${title}"></title>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="/css/font-awesome.min.css">
-
     <!-- Metis core stylesheet -->
-    <link rel="stylesheet" href="/css/app-style.css">
+    <link rel="stylesheet" href="css/app-style.css">
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="css/fontawesome-all.min.css">
+
+    <script src="js/bootstrap.min.js"></script>
 
 </head>
 <body>
 
-<nav class="navbar navbar-inverse" role="navigation">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="/">文件管理</a>
-        </div>
-
-        <div class="navbar-header" th:if="${isAdmin}">
-            <a class="navbar-brand" href="/admin">目录管理</a>
-        </div>
-        <div class="navbar-header" th:if="${isAdmin}">
-            <a class="navbar-brand" href="/admin">账号管理</a>
-        </div>
-
-        <div class="navbar-text navbar-right">
-            <a href="/logout">退出系统</a>
-        </div>
-    </div>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <!-- Links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/">文件管理</a>
+        </li>
+        <li class="nav-item" th:if="${isAdmin}">
+            <a class="nav-link" href="/admin">目录管理</a>
+        </li>
+        <li class="nav-item" th:if="${isAdmin}">
+            <a class="nav-link" href="/admin">账号管理</a>
+        </li>
+        <li class="nav-item navbar-right">
+            <a class="nav-link" href="/logout">退出系统</a>
+        </li>
+    </ul>
 </nav>
 
 <div id="wrap">
@@ -95,8 +93,8 @@
                     </tr>
                     <tr th:each="directory : ${directories}">
                         <td>
-                            <i th:if="${directory.childrenCount>0}" class="fa fa-folder"></i>
-                            <i th:if="${directory.childrenCount==0}" class="fa fa-folder-o"></i>
+                            <i th:if="${directory.childrenCount>0}" class="fas fa-folder"></i>
+                            <i th:if="${directory.childrenCount==0}" class="far fa-folder"></i>
                             <a th:href="@{'/path@'+${directory.id}}" th:text="${directory.path}"/>
                         </td>
                         <td th:text="@{'文件夹'}" colspan="3"></td>
@@ -111,109 +109,109 @@
                                 <ul th:switch="${file.contentType}">
                                     <li th:case="pdf">
                                         <a th:href="@{'/view-pdf/'+${file.storedId}}">
-                                            <i class="fa fa-file-pdf-o"></i>
+                                            <i class="far fa-file-pdf"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="gif">
                                         <a th:href="@{'/view-gif/'+${file.storedId}}">
-                                            <i class="fa fa-file-image-o"></i>
+                                            <i class="far fa-file-image"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="jpg">
                                         <a th:href="@{'/view-jpeg/'+${file.storedId}}">
-                                            <i class="fa fa-file-image-o"></i>
+                                            <i class="far fa-file-image"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="jpeg">
                                         <a th:href="@{'/view-jpeg/'+${file.storedId}}">
-                                            <i class="fa fa-file-image-o"></i>
+                                            <i class="far fa-file-image"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="png">
                                         <a th:href="@{'/view-png/'+${file.storedId}}">
-                                            <i class="fa fa-file-image-o"></i>
+                                            <i class="far fa-file-image"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="bmp">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-image-o"></i>
+                                            <i class="far fa-file-image"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="tif">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-image-o"></i>
+                                            <i class="far fa-file-image"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="tiff">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-image-o"></i>
+                                            <i class="far fa-file-image"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="xls">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-excel-o"></i>
+                                            <i class="far fa-file-excel"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="xlsx">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-excel-o"></i>
+                                            <i class="far fa-file-excel"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="doc">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-word-o"></i>
+                                            <i class="far fa-file-word"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="docx">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-word-o"></i>
+                                            <i class="far fa-file-word"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="ppt">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-powerpoint-o"></i>
+                                            <i class="far fa-file-powerpoint"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="pptx">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-powerpoint-o"></i>
+                                            <i class="far fa-file-powerpoint"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="txt">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-text-o"></i>
+                                            <i class="far fa-file-text"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="mp3">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-audio-o"></i>
+                                            <i class="far fa-file-audio"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="zip">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-zip-o"></i>
+                                            <i class="far fa-file-zip"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>
                                     <li th:case="rar">
                                         <a th:href="@{'/download/'+${file.storedId}}">
-                                            <i class="fa fa-file-zip-o"></i>
+                                            <i class="far fa-file-zip"></i>
                                             <span th:text="${file.filename}"></span>
                                         </a>
                                     </li>

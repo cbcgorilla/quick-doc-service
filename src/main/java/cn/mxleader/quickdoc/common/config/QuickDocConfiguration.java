@@ -99,10 +99,10 @@ public class QuickDocConfiguration {
         };
     }
 
-    @Bean
+    //@Bean
     CommandLineRunner uploadLocalFiles(ReactiveFileService reactiveFileService) {
         return args -> {
-            File directory = new File("E:\\devKit\\技术参考文档\\J2EE\\SpringFramework");
+            File directory = new File("E:\\BaiduYunDownload\\发展路线图");
             if (directory.exists() && directory.isDirectory()) {
                 Flux.just(directory.listFiles())
                         .filter(file -> file.getName().toLowerCase().endsWith(".pdf"))
@@ -114,8 +114,8 @@ public class QuickDocConfiguration {
                                                 file.length(),
                                                 StringUtils.getFilenameExtension(file.getName()).toLowerCase(),
                                                 new Date(),
-                                                15162841874839250L,
-                                                15162841874917052L,
+                                                15162005167600724L,
+                                                15162005167728678L,
                                                 null,
                                                 getRandomOwners(),
                                                 null,

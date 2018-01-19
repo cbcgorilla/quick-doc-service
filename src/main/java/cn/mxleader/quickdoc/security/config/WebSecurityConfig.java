@@ -44,11 +44,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 针对 css 和 images 资源忽略认证
         web.ignoring()
                 .antMatchers(HttpMethod.GET,"/css/**/*")
-                .antMatchers(HttpMethod.GET, "/fonts/**/*")
                 .antMatchers(HttpMethod.GET, "/images/**/*")
                 .antMatchers(HttpMethod.GET, "/js/**/*")
                 .antMatchers(HttpMethod.GET, "/less/**/*")
-                .antMatchers(HttpMethod.GET, "/scss/**/*");
+                .antMatchers(HttpMethod.GET, "/scss/**/*")
+                .antMatchers(HttpMethod.GET, "/webfonts/**/*");
     }
 
     @Configuration
