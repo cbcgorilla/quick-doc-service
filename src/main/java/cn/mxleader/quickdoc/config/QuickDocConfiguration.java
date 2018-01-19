@@ -1,12 +1,12 @@
 package cn.mxleader.quickdoc.config;
 
-import cn.mxleader.quickdoc.common.utils.KeyUtil;
 import cn.mxleader.quickdoc.entities.FsDetail;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.service.*;
 import cn.mxleader.quickdoc.service.impl.KafkaServiceImpl;
 import cn.mxleader.quickdoc.service.impl.ReactiveUserServiceImpl;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -26,7 +26,6 @@ import java.util.Date;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_ADMIN_GROUP_OWNER;
 import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_PUBLIC_OWNER;
-import static cn.mxleader.quickdoc.common.utils.KeyUtil.getSHA256UUID;
 import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_ADMIN;
 import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_USER;
 
@@ -59,7 +58,7 @@ public class QuickDocConfiguration {
                         if (!quickDocConfig.getInitialized()) {
                             // 初始化Admin管理账号
                             reactiveUserService
-                                    .saveUser(new UserEntity(KeyUtil.stringUUID(), "admin",
+                                    .saveUser(new UserEntity(ObjectId.get(), "admin",
                                             "chenbichao",
                                             new String[]{AUTHORITY_ADMIN, AUTHORITY_USER}, "admin")).subscribe();
 
@@ -71,11 +70,11 @@ public class QuickDocConfiguration {
 
                             // 初始化根目录
                             FsOwner[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
-                            reactiveDirectoryService.saveDirectory("config", 0L,
+                            reactiveDirectoryService.saveDirectory("config", new ObjectId("6249b4ddd2781d08c09890d2"),
                                     configOwners).subscribe();
 
                             FsOwner[] rootOwners = {SYSTEM_PUBLIC_OWNER, SYSTEM_ADMIN_GROUP_OWNER};
-                            reactiveDirectoryService.saveDirectory("root", 0L,
+                            reactiveDirectoryService.saveDirectory("root", new ObjectId("6249b4ddd2781d08c09890d2"),
                                     rootOwners).subscribe();
 
                             quickDocConfig.setInitialized(true);
@@ -128,13 +127,13 @@ public class QuickDocConfiguration {
                         .map(
                                 file -> {
                                     try {
-                                        FsDetail fsDetail = new FsDetail(getSHA256UUID(),
+                                        FsDetail fsDetail = new FsDetail(ObjectId.get(),
                                                 file.getName(),
                                                 file.length(),
                                                 StringUtils.getFilenameExtension(file.getName()).toLowerCase(),
                                                 new Date(),
-                                                15162005167600724L,
-                                                15162005167728678L,
+                                                ObjectId.get(),
+                                                ObjectId.get(),
                                                 null,
                                                 getRandomOwners(),
                                                 null,

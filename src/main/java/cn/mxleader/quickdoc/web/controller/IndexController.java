@@ -81,7 +81,7 @@ public class IndexController {
      */
     @GetMapping()
     public String index(Model model, HttpSession session) {
-        refreshDirList(model, 0L, session);
+        refreshDirList(model, new ObjectId("6249b4ddd2781d08c09890d2"), session);
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
         return "index";
@@ -95,9 +95,9 @@ public class IndexController {
      * @return
      */
     @GetMapping("/path@{directoryId}")
-    public String index(@PathVariable Long directoryId, Model model, HttpSession session) {
-        FsDirectory directoryMono = reactiveDirectoryFsService.findById(directoryId).block();
-        model.addAttribute("currentdirectory", directoryMono);
+    public String index(@PathVariable ObjectId directoryId, Model model, HttpSession session) {
+        FsDirectory fsDirectory = reactiveDirectoryFsService.findById(directoryId).block();
+        model.addAttribute("currentdirectory", fsDirectory);
         refreshDirList(model, directoryId, session);
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
@@ -115,7 +115,7 @@ public class IndexController {
     @GetMapping(value = "/zip-resource/{directoryId}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public @ResponseBody
     void downloadDocument(HttpServletResponse response,
-                          @PathVariable Long directoryId,
+                          @PathVariable ObjectId directoryId,
                           HttpSession session) throws IOException {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
@@ -123,7 +123,7 @@ public class IndexController {
                 "attachment; filename=" + directoryId + ".zip");
         //response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
 
-        reactiveFileService.createZip(directoryId, response.getOutputStream(), 0L, activeUser);
+        reactiveFileService.createZip(directoryId, response.getOutputStream(), null, activeUser);
     }
 
     /**
@@ -226,8 +226,8 @@ public class IndexController {
      */
     @PostMapping("/uploadFile")
     public String uploadFile(@RequestParam("file") MultipartFile file,
-                             @RequestParam("directoryId") Long directoryId,
-                             @RequestParam("categoryId") Long categoryId,
+                             @RequestParam("directoryId") ObjectId directoryId,
+                             @RequestParam("categoryId") ObjectId categoryId,
                              RedirectAttributes redirectAttributes,
                              Model model,
                              HttpSession session) throws IOException {
@@ -236,7 +236,7 @@ public class IndexController {
         if (checkAuthentication(fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
             FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 7);
             String filename = StringUtil.getFilename(file.getOriginalFilename());
-            FsDetail fsDetail = new FsDetail(getSHA256UUID(),
+            FsDetail fsDetail = new FsDetail(ObjectId.get(),
                     filename,
                     file.getSize(),
                     StringUtils.getFilenameExtension(filename).toLowerCase(),
@@ -270,7 +270,7 @@ public class IndexController {
      */
     @DeleteMapping("/deleteFile")
     public String deleteFile(@RequestParam("directoryId") Long directoryId,
-                             @RequestParam String fsDetailId,
+                             @RequestParam ObjectId fsDetailId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
@@ -292,7 +292,7 @@ public class IndexController {
      * @param model
      * @param directoryId
      */
-    private void refreshDirList(Model model, Long directoryId,
+    private void refreshDirList(Model model, ObjectId directoryId,
                                 HttpSession session) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("directories",

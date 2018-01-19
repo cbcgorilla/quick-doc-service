@@ -6,13 +6,13 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
 @Document
-data class FsDetail(@Id var id: String,
+data class FsDetail(@Id var id: ObjectId,
                     var filename: String,
                     var contentLength: Long,
                     var contentType: String,
                     var uploadDate: Date,
-                    var categoryId: Long,
-                    var directoryId: Long,
+                    var categoryId: ObjectId,
+                    var directoryId: ObjectId,
                     var storedId: ObjectId? = null,
                     var owners: Array<FsOwner>? = null,
                     var category: String? = null,

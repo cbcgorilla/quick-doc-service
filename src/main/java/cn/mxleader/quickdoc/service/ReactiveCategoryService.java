@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.entities.FsCategory;
+import org.bson.types.ObjectId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -39,7 +40,7 @@ public interface ReactiveCategoryService {
      * @param id
      * @return
      */
-    Mono<FsCategory> findById(Long id);
+    Mono<FsCategory> findById(ObjectId id);
 
     /**
      * 根据分类名获取FsCategory

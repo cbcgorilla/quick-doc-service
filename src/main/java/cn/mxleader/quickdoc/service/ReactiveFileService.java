@@ -20,9 +20,9 @@ public interface ReactiveFileService {
      * @param directoryId 所在目录ID
      * @return
      */
-    Mono<FsDetail> getStoredFile(String filename, Long directoryId);
+    Mono<FsDetail> getStoredFile(String filename, ObjectId directoryId);
 
-    Mono<FsDetail> getStoredFile(String fsDetailId);
+    Mono<FsDetail> getStoredFile(ObjectId fsDetailId);
 
     /**
      * 枚举目录内的所有文件
@@ -30,7 +30,7 @@ public interface ReactiveFileService {
      * @param directoryId 所在目录ID
      * @return
      */
-    Flux<FsDetail> getStoredFiles(Long directoryId);
+    Flux<FsDetail> getStoredFiles(ObjectId directoryId);
 
     /**
      * 存储文件， 如同名文件已存在则更新文件内容
@@ -55,7 +55,7 @@ public interface ReactiveFileService {
      * @param fsDetailId 文件ID信息
      * @return
      */
-    Mono<Void> deleteFile(String fsDetailId);
+    Mono<Void> deleteFile(ObjectId fsDetailId);
 
     /**
      * 根据输入文件ID获取二进制流
@@ -72,6 +72,7 @@ public interface ReactiveFileService {
      * @param fos         生成的zip文件存在路径（包括文件名）
      * @param categoryId  待压缩的文件分类ID，为0L则压缩所有分类
      */
-    void createZip(Long directoryId, OutputStream fos, Long categoryId, ActiveUser activeUser) throws IOException;
+    void createZip(ObjectId directoryId, OutputStream fos,
+                   ObjectId categoryId, ActiveUser activeUser) throws IOException;
 
 }

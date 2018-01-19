@@ -1,14 +1,13 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.common.utils.MessageUtil;
-import cn.mxleader.quickdoc.entities.FsCategory;
 import cn.mxleader.quickdoc.dao.ReactiveCategoryRepository;
+import cn.mxleader.quickdoc.entities.FsCategory;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import static cn.mxleader.quickdoc.common.utils.KeyUtil.longID;
 
 @Service
 public class ReactiveCategoryServiceImpl implements ReactiveCategoryService {
@@ -27,7 +26,7 @@ public class ReactiveCategoryServiceImpl implements ReactiveCategoryService {
      */
     public Mono<FsCategory> addCategory(String type) {
         return reactiveCategoryRepository.findByType(type)
-                .defaultIfEmpty(new FsCategory(longID(), type))
+                .defaultIfEmpty(new FsCategory(ObjectId.get(), type))
                 .flatMap(reactiveCategoryRepository::save);
     }
 
@@ -71,7 +70,7 @@ public class ReactiveCategoryServiceImpl implements ReactiveCategoryService {
      * @param id
      * @return
      */
-    public Mono<FsCategory> findById(Long id) {
+    public Mono<FsCategory> findById(ObjectId id) {
         return reactiveCategoryRepository.findById(id);
     }
 

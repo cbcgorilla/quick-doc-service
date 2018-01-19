@@ -1,11 +1,12 @@
 package cn.mxleader.quickdoc.entities
 
+import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
 @Document
-data class UserEntity(@Id var id:String,
+data class UserEntity(@Id var id: ObjectId,
                       var username:String,
                       var password:String,
                       var authorities:Array<String>?=null,

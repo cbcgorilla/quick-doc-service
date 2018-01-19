@@ -58,11 +58,11 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @return
      */
     public Mono<FsDetail> getStoredFile(String filename,
-                                        Long directoryId) {
+                                        ObjectId directoryId) {
         return reactiveFsDetailRepository.findByFilenameAndDirectoryId(filename, directoryId);
     }
 
-    public Mono<FsDetail> getStoredFile(String fsDetailId) {
+    public Mono<FsDetail> getStoredFile(ObjectId fsDetailId) {
         return reactiveFsDetailRepository.findById(fsDetailId);
     }
 
@@ -72,7 +72,7 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @param directoryId 所在目录ID
      * @return
      */
-    public Flux<FsDetail> getStoredFiles(Long directoryId) {
+    public Flux<FsDetail> getStoredFiles(ObjectId directoryId) {
         return reactiveFsDetailRepository.findAllByDirectoryId(directoryId)
                 .map(v -> {
                     v.setCategory(reactiveCategoryRepository.findById(v.getCategoryId()).block().getType());
@@ -117,7 +117,7 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
     public Mono<Void> deleteFile(FsDetail fsDetail) {
         return getStoredFile(fsDetail.getFilename(), fsDetail.getDirectoryId())
                 .switchIfEmpty(
-                        fileNotExistMsg(new Long(fsDetail.getDirectoryId()).toString(),
+                        fileNotExistMsg(fsDetail.getDirectoryId(),
                                 fsDetail.getFilename())
                 )
                 .flatMap(entity -> {
@@ -132,7 +132,7 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @param fsDetailId 文件ID信息
      * @return
      */
-    public Mono<Void> deleteFile(String fsDetailId) {
+    public Mono<Void> deleteFile(ObjectId fsDetailId) {
         return reactiveFsDetailRepository.findById(fsDetailId)
                 .switchIfEmpty(
                         fileNotExistMsg(fsDetailId)
@@ -161,9 +161,9 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @param categoryId  待压缩的文件分类ID，为0L则压缩所有分类
      * @param activeUser  当前操作用户信息（用于判断是否有操作权限）
      */
-    public void createZip(Long directoryId,
+    public void createZip(ObjectId directoryId,
                           OutputStream fos,
-                          Long categoryId,
+                          ObjectId categoryId,
                           ActiveUser activeUser) throws IOException {
         ZipOutputStream zos = new ZipOutputStream(fos);
         Optional<FsDirectory> optionalDirectory = reactiveDirectoryRepository.findById(directoryId).blockOptional();
@@ -188,7 +188,7 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
     private void compressDirectory(FsDirectory directory,
                                    ZipOutputStream out,
                                    String basedir,
-                                   Long categoryId,
+                                   ObjectId categoryId,
                                    ActiveUser activeUser) {
         // 递归压缩目录
         List<FsDirectory> directories = reactiveDirectoryRepository.findAllByParentId(directory.getId())
@@ -203,7 +203,7 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
         }
         // 压缩目录内的文件
         Flux<FsDetail> fsDetailFlux;
-        if (categoryId == 0) {
+        if (categoryId == null) {
             // 压缩所有分类
             fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryId(directory.getId())
                     .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(), activeUser, READ_PRIVILEGE));
@@ -228,8 +228,8 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @param basedir       当前文件所在目录
      */
     private void compressFile(GridFSDownloadStream fsInputStream,
-                                ZipOutputStream out,
-                                String basedir) {
+                              ZipOutputStream out,
+                              String basedir) {
         try {
             BufferedInputStream bis = new BufferedInputStream(fsInputStream);
             ZipEntry entry = new ZipEntry(basedir + "/" + fsInputStream.getGridFSFile().getFilename());

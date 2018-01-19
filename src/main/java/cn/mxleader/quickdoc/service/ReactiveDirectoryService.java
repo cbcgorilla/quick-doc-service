@@ -3,6 +3,7 @@ package cn.mxleader.quickdoc.service;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.web.dto.WebDirectory;
+import org.bson.types.ObjectId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,7 +17,7 @@ public interface ReactiveDirectoryService {
      * @param owners
      * @return
      */
-    Mono<FsDirectory> saveDirectory(String path, Long parentId, FsOwner[] owners);
+    Mono<FsDirectory> saveDirectory(String path, ObjectId parentId, FsOwner[] owners);
 
     /**
      * 新增文件目录;
@@ -54,7 +55,7 @@ public interface ReactiveDirectoryService {
      * @param newDirectoryId 新上级目录ID
      * @return
      */
-    Mono<FsDirectory> moveDirectory(FsDirectory directory, Long newDirectoryId);
+    Mono<FsDirectory> moveDirectory(FsDirectory directory, ObjectId newDirectoryId);
 
     /**
      * 更新文件目录属主信息
@@ -81,7 +82,7 @@ public interface ReactiveDirectoryService {
      * @param directoryId
      * @return
      */
-    Mono<Void> deleteDirectory(Long directoryId);
+    Mono<Void> deleteDirectory(ObjectId directoryId);
 
     /**
      * 根据上级目录ID信息获取子文件目录
@@ -89,7 +90,7 @@ public interface ReactiveDirectoryService {
      * @param parentId
      * @return
      */
-    Flux<WebDirectory> findAllByParentId(Long parentId);
+    Flux<WebDirectory> findAllByParentId(ObjectId parentId);
 
     /**
      * 获取文件目录
@@ -98,7 +99,7 @@ public interface ReactiveDirectoryService {
      * @param parentId 上级目录ID
      * @return
      */
-    Mono<FsDirectory> findByPathAndParentId(String path, Long parentId);
+    Mono<FsDirectory> findByPathAndParentId(String path, ObjectId parentId);
 
     /**
      * 根据ID获取文件目录信息
@@ -106,6 +107,6 @@ public interface ReactiveDirectoryService {
      * @param id 文件目录ID
      * @return
      */
-    Mono<FsDirectory> findById(Long id);
+    Mono<FsDirectory> findById(ObjectId id);
 
 }

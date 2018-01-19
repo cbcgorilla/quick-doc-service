@@ -14,29 +14,12 @@ public class KeyUtil {
     public static UUID randomUUID() {
         return UUID.randomUUID();
     }
+/*
 
     public static String stringUUID() {
         return randomUUID().toString();
     }
-
-    /**
-     * ID生成规则： 系统当前时间 + range范围的随机数
-     *
-     * @param range
-     * @return
-     */
-    public static long longID(long range) {
-        return System.currentTimeMillis() * range + (long) (Math.random() * range);
-    }
-
-    /**
-     * ID生成规则： 系统当前时间 + 长度为4的随机数
-     *
-     * @return
-     */
-    public static long longID() {
-        return longID(10000L);
-    }
+*/
 
     /**
      * 生成如下格式UUID

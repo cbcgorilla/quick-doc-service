@@ -5,11 +5,11 @@ import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.dao.ReactiveUserRepository;
 import cn.mxleader.quickdoc.common.utils.MD5Util;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static cn.mxleader.quickdoc.common.utils.KeyUtil.stringUUID;
 
 @Service
 public class ReactiveUserServiceImpl implements ReactiveUserService {
@@ -20,7 +20,7 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
     }
 
     public Mono<UserEntity> saveUser(UserEntity userEntity) {
-        userEntity.setId(stringUUID());
+        userEntity.setId(ObjectId.get());
         return reactiveUserRepository.findByUsername(userEntity.getUsername())
                 .defaultIfEmpty(userEntity)
                 .flatMap(entity -> {
@@ -56,7 +56,7 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
                 });
     }
 
-    public Mono<Void> deleteUserById(String userId) {
+    public Mono<Void> deleteUserById(ObjectId userId) {
         return reactiveUserRepository.findById(userId)
                 .flatMap(reactiveUserRepository::delete);
     }

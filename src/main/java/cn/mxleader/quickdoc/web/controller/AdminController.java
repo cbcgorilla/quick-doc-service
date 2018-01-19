@@ -3,6 +3,7 @@ package cn.mxleader.quickdoc.web.controller;
 import cn.mxleader.quickdoc.entities.FsDetail;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -75,7 +76,7 @@ public class AdminController {
      * @return
      */
     @DeleteMapping("/deleteUser")
-    public String deleteUser(@RequestParam("userId") String userId,
+    public String deleteUser(@RequestParam("userId") ObjectId userId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);

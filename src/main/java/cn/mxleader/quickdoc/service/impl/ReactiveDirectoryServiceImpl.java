@@ -6,15 +6,13 @@ import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.web.dto.WebDirectory;
+import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_ADMIN_GROUP_OWNER;
-import static cn.mxleader.quickdoc.common.utils.KeyUtil.longID;
 import static cn.mxleader.quickdoc.common.utils.MessageUtil.*;
 
 @Service
@@ -37,9 +35,9 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * @param owners
      * @return
      */
-    public Mono<FsDirectory> saveDirectory(String path, Long parentId, FsOwner[] owners) {
+    public Mono<FsDirectory> saveDirectory(String path, ObjectId parentId, FsOwner[] owners) {
         return reactiveDirectoryRepository.findByPathAndParentId(path, parentId)
-                .defaultIfEmpty(new FsDirectory(longID(), path, parentId, owners))
+                .defaultIfEmpty(new FsDirectory(ObjectId.get(), path, parentId, owners))
                 .flatMap(entity -> {
                     if (owners != null && owners.length > 0) {
                         entity.setOwners(owners);
@@ -104,7 +102,7 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * @param newDirectoryId 新上级目录ID
      * @return
      */
-    public Mono<FsDirectory> moveDirectory(FsDirectory directory, Long newDirectoryId) {
+    public Mono<FsDirectory> moveDirectory(FsDirectory directory, ObjectId newDirectoryId) {
         return reactiveDirectoryRepository.findById(directory.getId())
                 .switchIfEmpty(noDirectoryMsg(directory.toString()))
                 .flatMap(v -> {
@@ -151,7 +149,7 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * @param directoryId
      * @return
      */
-    public Mono<Void> deleteDirectory(Long directoryId) {
+    public Mono<Void> deleteDirectory(ObjectId directoryId) {
         return reactiveDirectoryRepository.findById(directoryId)
                 .switchIfEmpty(noDirectoryMsg(directoryId.toString()))
                 .flatMap(v -> {
@@ -170,7 +168,7 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * @param parentId
      * @return
      */
-    public Flux<WebDirectory> findAllByParentId(Long parentId) {
+    public Flux<WebDirectory> findAllByParentId(ObjectId parentId) {
         return reactiveDirectoryRepository.findAllByParentId(parentId)
                 .map(directory -> {
                     WebDirectory webDirectory = new WebDirectory();
@@ -189,7 +187,7 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * @param parentId 上级目录ID
      * @return
      */
-    public Mono<FsDirectory> findByPathAndParentId(String path, Long parentId) {
+    public Mono<FsDirectory> findByPathAndParentId(String path, ObjectId parentId) {
         return reactiveDirectoryRepository.findByPathAndParentId(path, parentId);
     }
 
@@ -199,7 +197,7 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * @param id 文件目录ID
      * @return
      */
-    public Mono<FsDirectory> findById(Long id) {
+    public Mono<FsDirectory> findById(ObjectId id) {
         return reactiveDirectoryRepository.findById(id);
     }
 

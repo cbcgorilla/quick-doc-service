@@ -9,6 +9,7 @@ import cn.mxleader.quickdoc.web.dto.RenameCategory;
 import cn.mxleader.quickdoc.web.dto.WebDirectory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,12 +80,12 @@ public class ConfigRestController {
     @GetMapping("/directory/list")
     @ApiOperation(value = "获取根目录列表")
     public Flux<WebDirectory> getDirectories() {
-        return reactiveDirectoryService.findAllByParentId(0L);
+        return reactiveDirectoryService.findAllByParentId(new ObjectId("root"));
     }
 
     @GetMapping("/directory/list/{parentId}")
     @ApiOperation(value = "根据上级目录ID获取下级目录列表")
-    public Flux<WebDirectory> getDirectories(@PathVariable("parentId") Long parentId) {
+    public Flux<WebDirectory> getDirectories(@PathVariable("parentId") ObjectId parentId) {
         return reactiveDirectoryService.findAllByParentId(parentId);
     }
 
