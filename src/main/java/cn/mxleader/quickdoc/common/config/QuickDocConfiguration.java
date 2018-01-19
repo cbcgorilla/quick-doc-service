@@ -5,12 +5,18 @@ import cn.mxleader.quickdoc.entities.FsDetail;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.service.*;
+import cn.mxleader.quickdoc.service.impl.KafkaServiceImpl;
 import cn.mxleader.quickdoc.service.impl.ReactiveUserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 
@@ -26,8 +32,22 @@ import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_A
 import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_USER;
 
 @SpringBootConfiguration
+@ConditionalOnClass(KafkaService.class)
+@EnableConfigurationProperties(QuickDocProperties.class)
 public class QuickDocConfiguration {
     private final Logger log = LoggerFactory.getLogger(QuickDocConfiguration.class);
+
+    private final QuickDocProperties quickDocProperties;
+
+    public QuickDocConfiguration(QuickDocProperties quickDocProperties) {
+        this.quickDocProperties = quickDocProperties;
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "quickdoc",value="stream-topic")
+    public KafkaService kafkaService(KafkaTemplate<String, String> kafkaTemplate){
+        return new KafkaServiceImpl(kafkaTemplate,quickDocProperties.getStreamTopic());
+    }
 
     @Bean
     CommandLineRunner setupConfiguration(ReactiveUserServiceImpl reactiveUserService,

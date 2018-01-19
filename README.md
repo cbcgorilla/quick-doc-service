@@ -2,6 +2,7 @@
 功能说明：简易登录，文件上传，下载，分类管理，文件夹管理，批量下载。
 
 分权限管理目录，批量打包下载仅下载权限可访问的资源。
+异步发送登录信息到Kafka消息平台，监控用户登录状态.
 
 架构组成： 
 
@@ -15,7 +16,7 @@ Spring Security 5.0.0.RELEASE
 
 Kotlin 1.2 实现实体映射Bean
 
-Web层： BootStrap 3.3.7， + font-awesome.css 4.7 + jquery + Thymeleaf
+Web层： BootStrap 4.0， + font-awesome.css 5.0 + Thymeleaf
 
 Springfox Swagger 2.8.0 实现REST API文档化交付界面
 

@@ -1,9 +1,9 @@
 package cn.mxleader.quickdoc.security.handler;
 
 import cn.mxleader.quickdoc.security.session.ActiveUser;
+import cn.mxleader.quickdoc.service.KafkaService;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
-import static cn.mxleader.quickdoc.common.CommonCode.SESSION_STREAM_TOPIC;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_ADMIN;
 import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_USER;
@@ -36,7 +35,7 @@ public class WebAuthenticationSuccessHandler implements
     private ReactiveUserService reactiveUserService;
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaService kafkaService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -51,14 +50,11 @@ public class WebAuthenticationSuccessHandler implements
             session.setAttribute(SESSION_USER, new ActiveUser(authentication.getName(),
                     userGroup,
                     authentication.getAuthorities()));
-
-            // 发送用户登录消息到Kafka平台
+            // 发送用户退出消息到Kafka平台
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String ctime = formatter.format(new Date());
-            kafkaTemplate.send(SESSION_STREAM_TOPIC,
-                    ctime + " [User login ] username: " +
-                            authentication.getName() +
-                            " & user group: " + userGroup);
+            kafkaService.sendMessage(ctime + " [User login ] username: " + authentication.getName() +
+                    " & user group: " + userGroup);
         }
         redirectStrategy.sendRedirect(request, response, determineTargetUrl(authentication));
         clearAuthenticationAttributes(request);

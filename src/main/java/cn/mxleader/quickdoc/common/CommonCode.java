@@ -7,7 +7,6 @@ public class CommonCode {
     public static final String HOME_TITLE = "快捷文档共享";
 
     public static final String SESSION_USER = "ActiveUser";
-    public static final String SESSION_STREAM_TOPIC = "active-session";
 
     public static final Integer READ_PRIVILEGE = 1;
     public static final Integer WRITE_PRIVILEGE = 2;

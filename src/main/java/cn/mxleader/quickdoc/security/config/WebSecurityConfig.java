@@ -168,7 +168,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .logoutSuccessHandler(webLogoutSuccessHandler)
                     .invalidateHttpSession(false)
                     .logoutSuccessUrl("/login?logout=true")
-                    .permitAll();
+                    .permitAll()
+                    .and().exceptionHandling()
+                    .accessDeniedHandler(accessDeniedHandler());
             // @formatter:on
         }
 
@@ -186,6 +188,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         public AuthenticationEntryPoint loginUrlauthenticationEntryPointWithWarning() {
             return new LoginUrlAuthenticationEntryPoint("/userLoginWithWarning");
         }
+
+        @Bean
+        public AccessDeniedHandler accessDeniedHandler() {
+            return new ApiAccessDeniedHandler();
+        }
+
 
     }
 

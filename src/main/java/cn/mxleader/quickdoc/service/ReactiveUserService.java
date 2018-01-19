@@ -10,6 +10,7 @@ public interface ReactiveUserService {
     Flux<UserEntity> findAllUsers();
     Mono<UserEntity> findUser(String username);
     Mono<UserEntity> validateUser(String username, String password);
-    Mono<Void> deleteUser(String username);
+    Mono<Void> deleteUserById(String userId);
+    Mono<Void> deleteUserByUsername(String username);
 
 }

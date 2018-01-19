@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.security.handler;
 
+import cn.mxleader.quickdoc.service.KafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class WebLogoutSuccessHandler implements LogoutSuccessHandler {
     private static final String SESSION_USER = "ActiveUser";
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaService kafkaService;
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request,
@@ -29,12 +29,13 @@ public class WebLogoutSuccessHandler implements LogoutSuccessHandler {
         final HttpSession session = request.getSession();
         if (session != null) {
             session.removeAttribute(SESSION_USER);
+
             // 发送用户退出消息到Kafka平台
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String ctime = formatter.format(new Date());
-            kafkaTemplate.send("active-session",
-                    ctime + " [User logout] username: " + authentication.getName());
+            kafkaService.sendMessage(ctime + " [User logout] username: " + authentication.getName());
         }
         response.sendRedirect("/login?logout=true");
     }
+
 }

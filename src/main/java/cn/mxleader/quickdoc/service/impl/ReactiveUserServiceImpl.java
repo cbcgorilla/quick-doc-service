@@ -56,7 +56,11 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
                 });
     }
 
-    public Mono<Void> deleteUser(String username) {
+    public Mono<Void> deleteUserById(String userId) {
+        return reactiveUserRepository.findById(userId)
+                .flatMap(reactiveUserRepository::delete);
+    }
+    public Mono<Void> deleteUserByUsername(String username) {
         return findUser(username).flatMap(reactiveUserRepository::delete);
     }
 

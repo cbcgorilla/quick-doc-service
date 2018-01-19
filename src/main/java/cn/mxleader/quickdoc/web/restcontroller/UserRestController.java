@@ -58,7 +58,7 @@ public class UserRestController {
     @DeleteMapping(value = "/delete-user/{username}")
     @ApiOperation(value = "删除系统用户")
     public Mono<RestResponse> deleteUser(@PathVariable String username){
-        reactiveUserService.deleteUser(username).subscribe();
+        reactiveUserService.deleteUserByUsername(username).subscribe();
         return Mono.just(new RestResponse("删除系统用户", RestResponse.CODE.SUCCESS,null));
     }
 
