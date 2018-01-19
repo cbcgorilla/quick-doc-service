@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.common.config;
+package cn.mxleader.quickdoc.config;
 
 import cn.mxleader.quickdoc.common.utils.KeyUtil;
 import cn.mxleader.quickdoc.entities.FsDetail;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

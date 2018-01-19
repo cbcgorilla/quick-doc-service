@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.mxleader.quickdoc.common.config.QuickDocConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.mxleader.quickdoc.config.QuickDocConfiguration

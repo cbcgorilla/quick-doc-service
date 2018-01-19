@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.common.config;
+package cn.mxleader.quickdoc.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
