@@ -58,9 +58,10 @@ public class QuickDocConfiguration {
                         if (!quickDocConfig.getInitialized()) {
                             // 初始化Admin管理账号
                             reactiveUserService
-                                    .saveUser(new UserEntity(ObjectId.get(), "admin",
+                                    .saveUser(new UserEntity(ObjectId.get(), "root",
                                             "chenbichao",
-                                            new String[]{AUTHORITY_ADMIN, AUTHORITY_USER}, "admin")).subscribe();
+                                            new String[]{AUTHORITY_ADMIN, AUTHORITY_USER},
+                                            "administrators")).subscribe();
 
                             // 初始化文件分类
                             reactiveCategoryService.addCategory("照片").subscribe();
@@ -70,11 +71,11 @@ public class QuickDocConfiguration {
 
                             // 初始化根目录
                             FsOwner[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
-                            reactiveDirectoryService.saveDirectory("config", new ObjectId("6249b4ddd2781d08c09890d2"),
+                            reactiveDirectoryService.saveDirectory("config", quickDocConfig.getId(),
                                     configOwners).subscribe();
 
                             FsOwner[] rootOwners = {SYSTEM_PUBLIC_OWNER, SYSTEM_ADMIN_GROUP_OWNER};
-                            reactiveDirectoryService.saveDirectory("root", new ObjectId("6249b4ddd2781d08c09890d2"),
+                            reactiveDirectoryService.saveDirectory("root", quickDocConfig.getId(),
                                     rootOwners).subscribe();
 
                             quickDocConfig.setInitialized(true);

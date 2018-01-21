@@ -31,7 +31,7 @@
             <a class="nav-link" href="/admin">账号管理</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/admin/swagger-ui">REST API 调用接口</a>
+            <a class="nav-link" href="/swagger-ui.html" target="_blank">REST API 调用接口</a>
         </li>
         <li class="nav-item navbar-right">
             <a class="nav-link" href="/logout">退出系统</a>
@@ -89,33 +89,6 @@
         </div>
     </div>
 </div><!-- /#wrap -->
-<div class="container" th:if="${adminPage}=='swagger-ui'">
-    <div class="row">
-        <div class="col-xs-12 col-lg-12">
-            <div style="width: 100%; height: 100%;">
-                <iframe id="test"  frameborder="0" marginheight="0" marginwidth="0"
-                        width="100%" height="900" scrolling="auto" target='_top' src="" style="margin:0px;" ></iframe>
-                <script language="JavaScript">
-                    var iframe = document.getElementById("test");
-                    iframe.src = "/swagger-ui.html";
-                    //以下判断iframe是否加载完,并且隐藏滚动条
-                    if (iframe.attachEvent){
-                        iframe.attachEvent("onload", function(){
-                            //hideS();
-                            //document.getElementById("loading").style.display="none";
-                        });
-                    } else {
-                        iframe.onload = function(){
-                            //   hideS();
-                            //document.getElementById("loading").style.display="none";
-                        };
-                    }
-                </script>
-            </div>
-        </div>
-    </div>
-</div>
-
 <footer>
     <p>2018 &copy; Quick Doc 快捷文档共享</p>
 </footer>

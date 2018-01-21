@@ -166,7 +166,8 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
                           ObjectId categoryId,
                           ActiveUser activeUser) throws IOException {
         ZipOutputStream zos = new ZipOutputStream(fos);
-        Optional<FsDirectory> optionalDirectory = reactiveDirectoryRepository.findById(directoryId).blockOptional();
+        Optional<FsDirectory> optionalDirectory = reactiveDirectoryRepository
+                .findById(directoryId).blockOptional();
         if (optionalDirectory.isPresent()) {
             FsDirectory directory = optionalDirectory.get();
             compressDirectory(directory, zos, directory.getPath(), categoryId, activeUser);
@@ -192,7 +193,8 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
                                    ActiveUser activeUser) {
         // 递归压缩目录
         List<FsDirectory> directories = reactiveDirectoryRepository.findAllByParentId(directory.getId())
-                .filter(webDirectory -> checkAuthentication(webDirectory.getOwners(), activeUser, READ_PRIVILEGE))
+                .filter(webDirectory -> checkAuthentication(webDirectory.getOwners(),
+                        activeUser, READ_PRIVILEGE))
                 .toStream()
                 .collect(Collectors.toList());
         if (directories != null && directories.size() > 0) {
@@ -205,12 +207,16 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
         Flux<FsDetail> fsDetailFlux;
         if (categoryId == null) {
             // 压缩所有分类
-            fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryId(directory.getId())
-                    .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(), activeUser, READ_PRIVILEGE));
+            fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryId(
+                    directory.getId())
+                    .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(),
+                            activeUser, READ_PRIVILEGE));
         } else {
             // 压缩指定分类文件
-            fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryIdAndCategoryId(directory.getId(), categoryId)
-                    .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(), activeUser, READ_PRIVILEGE));
+            fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryIdAndCategoryId(
+                    directory.getId(), categoryId)
+                    .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(),
+                            activeUser, READ_PRIVILEGE));
         }
         List<FsDetail> fsDetailList = fsDetailFlux.toStream().collect(Collectors.toList());
         if (fsDetailList != null && fsDetailList.size() > 0) {

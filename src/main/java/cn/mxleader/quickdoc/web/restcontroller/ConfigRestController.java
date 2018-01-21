@@ -5,6 +5,7 @@ import cn.mxleader.quickdoc.entities.FsCategory;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
+import cn.mxleader.quickdoc.service.ReactiveQuickDocConfigService;
 import cn.mxleader.quickdoc.web.dto.RenameCategory;
 import cn.mxleader.quickdoc.web.dto.WebDirectory;
 import io.swagger.annotations.Api;
@@ -30,14 +31,17 @@ public class ConfigRestController {
 
     private final ReactiveCategoryService reactiveCategoryService;
     private final ReactiveDirectoryService reactiveDirectoryService;
+    private final ReactiveQuickDocConfigService reactiveQuickDocConfigService;
 
     private final Logger log = LoggerFactory.getLogger(ConfigRestController.class);
 
     @Autowired
     ConfigRestController(ReactiveCategoryService reactiveCategoryService,
-                         ReactiveDirectoryService reactiveDirectoryService) {
+                         ReactiveDirectoryService reactiveDirectoryService,
+                         ReactiveQuickDocConfigService reactiveQuickDocConfigService) {
         this.reactiveCategoryService = reactiveCategoryService;
         this.reactiveDirectoryService = reactiveDirectoryService;
+        this.reactiveQuickDocConfigService = reactiveQuickDocConfigService;
     }
 
     @GetMapping("/category/list")
@@ -80,7 +84,9 @@ public class ConfigRestController {
     @GetMapping("/directory/list")
     @ApiOperation(value = "获取根目录列表")
     public Flux<WebDirectory> getDirectories() {
-        return reactiveDirectoryService.findAllByParentId(new ObjectId("root"));
+        return reactiveDirectoryService.findAllByParentId(
+                reactiveQuickDocConfigService.getQuickDocConfig()
+                        .block().getId());
     }
 
     @GetMapping("/directory/list/{parentId}")

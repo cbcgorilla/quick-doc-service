@@ -9,6 +9,8 @@ import cn.mxleader.quickdoc.security.session.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.service.ReactiveFileService;
+import cn.mxleader.quickdoc.service.ReactiveQuickDocConfigService;
+import cn.mxleader.quickdoc.web.dto.WebDirectory;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
@@ -23,10 +25,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,14 +47,17 @@ public class IndexController {
     private final ReactiveCategoryService reactiveCategoryService;
     private final ReactiveDirectoryService reactiveDirectoryFsService;
     private final ReactiveFileService reactiveFileService;
+    private final ReactiveQuickDocConfigService reactiveQuickDocConfigService;
 
     @Autowired
     public IndexController(ReactiveCategoryService reactiveCategoryService,
                            ReactiveDirectoryService reactiveDirectoryFsService,
-                           ReactiveFileService reactiveFileService) {
+                           ReactiveFileService reactiveFileService,
+                           ReactiveQuickDocConfigService reactiveQuickDocConfigService) {
         this.reactiveCategoryService = reactiveCategoryService;
         this.reactiveDirectoryFsService = reactiveDirectoryFsService;
         this.reactiveFileService = reactiveFileService;
+        this.reactiveQuickDocConfigService = reactiveQuickDocConfigService;
     }
 
     /**
@@ -70,7 +77,7 @@ public class IndexController {
      */
     @ModelAttribute("title")
     public String pageTitle() {
-        return  HOME_TITLE;
+        return HOME_TITLE;
     }
 
     /**
@@ -81,9 +88,23 @@ public class IndexController {
      */
     @GetMapping()
     public String index(Model model, HttpSession session) {
-        refreshDirList(model, new ObjectId("6249b4ddd2781d08c09890d2"), session);
+        ObjectId rootParentId = reactiveQuickDocConfigService.getQuickDocConfig().block().getId();
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
+        if (activeUser.isAdmin()) {
+            refreshDirList(model, rootParentId, session);
+        } else {
+            List<WebDirectory> directories = reactiveDirectoryFsService.findAllByParentId(rootParentId)
+                    .filter(webDirectory -> webDirectory.getPath().equalsIgnoreCase("root"))
+                    .toStream()
+                    .collect(Collectors.toList());
+            if (directories != null && directories.size() > 0) {
+                for (WebDirectory subdirectory : directories) {
+                    model.addAttribute("currentdirectory", subdirectory);
+                    refreshDirList(model, subdirectory.getId(), session);
+                }
+            }
+        }
         return "index";
     }
 
@@ -228,6 +249,7 @@ public class IndexController {
     public String uploadFile(@RequestParam("file") MultipartFile file,
                              @RequestParam("directoryId") ObjectId directoryId,
                              @RequestParam("categoryId") ObjectId categoryId,
+                             @RequestParam(value = "owners", required = false) String[] ownersRequest,
                              RedirectAttributes redirectAttributes,
                              Model model,
                              HttpSession session) throws IOException {
@@ -235,6 +257,18 @@ public class IndexController {
         FsDirectory fsDirectory = reactiveDirectoryFsService.findById(directoryId).block();
         if (checkAuthentication(fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
             FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 7);
+            List<FsOwner> fsOwnerList = new ArrayList<FsOwner>();
+            FsOwner[] fsOwnerDesc = new FsOwner[]{};
+            fsOwnerList.add(owner);
+            if (ownersRequest != null && ownersRequest.length > 0) {
+                for (String item : ownersRequest) {
+                    if (item.equalsIgnoreCase("PublicMode")) {
+                        fsOwnerList.add(new FsOwner("public", FsOwner.Type.TYPE_PUBLIC, 1));
+                    } else if (item.equalsIgnoreCase("GroupMode")) {
+                        fsOwnerList.add(new FsOwner(activeUser.getGroup(), FsOwner.Type.TYPE_GROUP, 3));
+                    }
+                }
+            }
             String filename = StringUtil.getFilename(file.getOriginalFilename());
             FsDetail fsDetail = new FsDetail(ObjectId.get(),
                     filename,
@@ -243,8 +277,8 @@ public class IndexController {
                     new Date(),
                     categoryId,
                     directoryId,
-                    null,
-                    new FsOwner[]{owner},
+                    ObjectId.get(),
+                    fsOwnerList.toArray(fsOwnerDesc),
                     null,
                     null);
             reactiveFileService.storeFile(
@@ -269,7 +303,7 @@ public class IndexController {
      * @return
      */
     @DeleteMapping("/deleteFile")
-    public String deleteFile(@RequestParam("directoryId") Long directoryId,
+    public String deleteFile(@RequestParam("directoryId") ObjectId directoryId,
                              @RequestParam ObjectId fsDetailId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
@@ -297,12 +331,14 @@ public class IndexController {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("directories",
                 reactiveDirectoryFsService.findAllByParentId(directoryId)
-                        .filter(webDirectory -> checkAuthentication(webDirectory.getOwners(), activeUser, READ_PRIVILEGE))
+                        .filter(webDirectory -> checkAuthentication(webDirectory.getOwners(),
+                                activeUser, READ_PRIVILEGE))
                         .toStream()
                         .collect(Collectors.toList()));
         model.addAttribute("files",
                 reactiveFileService.getStoredFiles(directoryId)
-                        .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(), activeUser, READ_PRIVILEGE))
+                        .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(),
+                                activeUser, READ_PRIVILEGE))
                         .toStream()
                         .collect(Collectors.toList()));
     }

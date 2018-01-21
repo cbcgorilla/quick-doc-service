@@ -28,7 +28,7 @@
             <a class="nav-link" href="/admin">账号管理</a>
         </li>
         <li class="nav-item" th:if="${isAdmin}">
-            <a class="nav-link" href="/admin/swagger-ui">REST API 调用接口</a>
+            <a class="nav-link" href="/swagger-ui.html" target="_blank">REST API 调用接口</a>
         </li>
             <a class="nav-link" href="/logout">退出系统</a>
         </li>
@@ -55,6 +55,10 @@
                                 </td>
                                 <td align="right">需要上传的文件:</td>
                                 <td><input type="file" name="file" class="input custom-file"/></td>
+                                <td>
+                                    <label><input id="owners" name="owners" type="checkbox" value="PublicMode" />全员共享</label>
+                                    <label><input id="owners" name="owners" type="checkbox" value="GroupMode" />组内共享</label>
+                                </td>
                                 <td>
                                     <input type="hidden" id="directoryId" name="directoryId"
                                            th:value="${currentdirectory.id}"/>
