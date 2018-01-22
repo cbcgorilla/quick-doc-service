@@ -254,7 +254,7 @@ public class IndexController {
                              HttpSession session) throws IOException {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         FsDirectory fsDirectory = reactiveDirectoryFsService.findById(directoryId).block();
-        if (checkAuthentication(fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
+        if (checkAuthentication(fsDirectory.getPublicVisible(), fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
             FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 7);
             List<FsOwner> fsOwnerList = new ArrayList<FsOwner>();
             FsOwner[] fsOwnerDesc = new FsOwner[]{};
@@ -311,7 +311,7 @@ public class IndexController {
                              RedirectAttributes redirectAttributes) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         FsDetail fsDetail = reactiveFileService.getStoredFile(fsDetailId).block();
-        if (checkAuthentication(fsDetail.getOwners(), activeUser, DELETE_PRIVILEGE)) {
+        if (checkAuthentication(fsDetail.getPublicVisible(), fsDetail.getOwners(), activeUser, DELETE_PRIVILEGE)) {
             reactiveFileService.deleteFile(fsDetailId).subscribe();
             redirectAttributes.addFlashAttribute("message",
                     "成功删除文件： " + fsDetailId);
@@ -333,13 +333,13 @@ public class IndexController {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("directories",
                 reactiveDirectoryFsService.findAllByParentIdInWebFormat(directoryId)
-                        .filter(webDirectory -> checkAuthentication(webDirectory.getOwners(),
+                        .filter(webDirectory -> checkAuthentication(webDirectory.getPublicVisible(), webDirectory.getOwners(),
                                 activeUser, READ_PRIVILEGE))
                         .toStream()
                         .collect(Collectors.toList()));
         model.addAttribute("files",
                 reactiveFileService.getStoredFiles(directoryId)
-                        .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(),
+                        .filter(fsDetail -> checkAuthentication(fsDetail.getPublicVisible(), fsDetail.getOwners(),
                                 activeUser, READ_PRIVILEGE))
                         .toStream()
                         .collect(Collectors.toList()));

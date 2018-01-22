@@ -193,7 +193,8 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
                                    ActiveUser activeUser) {
         // 递归压缩目录
         List<FsDirectory> directories = reactiveDirectoryRepository.findAllByParentId(directory.getId())
-                .filter(webDirectory -> checkAuthentication(webDirectory.getOwners(),
+                .filter(webDirectory -> checkAuthentication(webDirectory.getPublicVisible(),
+                        webDirectory.getOwners(),
                         activeUser, READ_PRIVILEGE))
                 .toStream()
                 .collect(Collectors.toList());
@@ -209,13 +210,15 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
             // 压缩所有分类
             fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryId(
                     directory.getId())
-                    .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(),
+                    .filter(fsDetail -> checkAuthentication(fsDetail.getPublicVisible(),
+                            fsDetail.getOwners(),
                             activeUser, READ_PRIVILEGE));
         } else {
             // 压缩指定分类文件
             fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryIdAndCategoryId(
                     directory.getId(), categoryId)
-                    .filter(fsDetail -> checkAuthentication(fsDetail.getOwners(),
+                    .filter(fsDetail -> checkAuthentication(fsDetail.getPublicVisible(),
+                            fsDetail.getOwners(),
                             activeUser, READ_PRIVILEGE));
         }
         List<FsDetail> fsDetailList = fsDetailFlux.toStream().collect(Collectors.toList());

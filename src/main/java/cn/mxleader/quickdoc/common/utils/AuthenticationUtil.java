@@ -18,9 +18,12 @@ public class AuthenticationUtil {
      * @param owners
      * @return
      */
-    public static Boolean checkAuthentication(FsOwner[] owners, ActiveUser activeUser, Integer privilege) {
+    public static Boolean checkAuthentication(Boolean publicVisible, FsOwner[] owners, ActiveUser activeUser, Integer privilege) {
         // 管理员默认可访问所有目录和文件
         if (activeUser.isAdmin()) {
+            return true;
+        }
+        if (publicVisible && privilege == READ_PRIVILEGE) {
             return true;
         }
         if (owners != null && owners.length > 0) {
