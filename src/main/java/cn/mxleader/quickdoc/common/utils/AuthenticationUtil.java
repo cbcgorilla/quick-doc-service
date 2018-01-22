@@ -5,6 +5,13 @@ import cn.mxleader.quickdoc.security.session.ActiveUser;
 
 public class AuthenticationUtil {
 
+    public static final Integer READ_PRIVILEGE = 1;
+    public static final Integer WRITE_PRIVILEGE = 2;
+    public static final Integer DELETE_PRIVILEGE = 4;
+
+    public static final FsOwner SYSTEM_ADMIN_GROUP_OWNER = new FsOwner("administrators",
+            FsOwner.Type.TYPE_GROUP, 7);
+
     /**
      * 检查是否有授权访问该目录或文件
      *

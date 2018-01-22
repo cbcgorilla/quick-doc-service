@@ -22,7 +22,7 @@
             <a class="nav-link" href="/">文件管理</a>
         </li>
         <li class="nav-item" th:if="${isAdmin}">
-            <a class="nav-link" href="/admin">目录管理</a>
+            <a class="nav-link" href="/admin/folder-admin">目录管理</a>
         </li>
         <li class="nav-item" th:if="${isAdmin}">
             <a class="nav-link" href="/admin">账号管理</a>
@@ -86,13 +86,15 @@
                         <th>文件长度</th>
                         <th>上传日期</th>
                         <th>文件分类</th>
+                        <th>公开访问</th>
+                        <th>权限</th>
                         <th>操作</th>
                     </tr>
                     </thead>
 
                     <tbody>
                     <tr th:if="${currentdirectory}">
-                        <td colspan="5">
+                        <td colspan="7">
                             <a th:href="@{'/path@'+${currentdirectory.parentId}}"
                                th:text="@{'返回上级目录'}"></a>
                         </td>
@@ -104,6 +106,18 @@
                             <a th:href="@{'/path@'+${directory.id}}" th:text="${directory.path}"/>
                         </td>
                         <td th:text="@{'文件夹'}" colspan="3"></td>
+                        <td>
+                            <span th:if="${directory.publicVisible}">Y</span>
+                        </td>
+                        <td>
+                            <ul>
+                                <li th:each="owner:${directory.owners}">
+                                    <span th:text="${owner.type}"></span>||
+                                    <span th:text="${owner.name}"></span>||
+                                    <span th:text="${owner.privilege}"></span>
+                                </li>
+                            </ul>
+                        </td>
                         <td>
                             <a th:href="@{'/zip-resource/'+${directory.id}}" th:text="@{'下载此文件夹'}"
                                class="btn btn-success"></a>
@@ -227,6 +241,18 @@
                             <td th:text="${#dates.format(file.uploadDate,'yyyy-MM-dd HH:mm:ss')}">ID
                             </td>
                             <td th:text="${file.category}">ID</td>
+                            <td>
+                                <span th:if="${file.publicVisible}">Y</span>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li th:each="owner:${file.owners}">
+                                        <span th:text="${owner.type}"></span>||
+                                        <span th:text="${owner.name}"></span>||
+                                        <span th:text="${owner.privilege}"></span>
+                                    </li>
+                                </ul>
+                            </td>
                             <td>
                                 <input type="hidden" id="fsDetailId" name="fsDetailId"
                                        th:value="${file.id}"/>

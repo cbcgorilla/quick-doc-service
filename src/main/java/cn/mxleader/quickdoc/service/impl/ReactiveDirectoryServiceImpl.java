@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_ADMIN_GROUP_OWNER;
+import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.SYSTEM_ADMIN_GROUP_OWNER;
 import static cn.mxleader.quickdoc.common.utils.MessageUtil.*;
 
 @Service
@@ -35,9 +35,10 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * @param owners
      * @return
      */
-    public Mono<FsDirectory> saveDirectory(String path, ObjectId parentId, FsOwner[] owners) {
+    public Mono<FsDirectory> saveDirectory(String path, ObjectId parentId,
+                                           Boolean publicVisible,FsOwner[] owners) {
         return reactiveDirectoryRepository.findByPathAndParentId(path, parentId)
-                .defaultIfEmpty(new FsDirectory(ObjectId.get(), path, parentId, owners))
+                .defaultIfEmpty(new FsDirectory(ObjectId.get(), path, parentId, publicVisible,owners))
                 .flatMap(entity -> {
                     if (owners != null && owners.length > 0) {
                         entity.setOwners(owners);
@@ -58,6 +59,7 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
     public Mono<FsDirectory> saveDirectory(FsDirectory fsDirectory) {
         return saveDirectory(fsDirectory.getPath(),
                 fsDirectory.getParentId(),
+                fsDirectory.getPublicVisible(),
                 fsDirectory.getOwners());
     }
 
@@ -168,16 +170,31 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * @param parentId
      * @return
      */
-    public Flux<WebDirectory> findAllByParentId(ObjectId parentId) {
-        return reactiveDirectoryRepository.findAllByParentId(parentId)
-                .map(directory -> {
-                    WebDirectory webDirectory = new WebDirectory();
-                    BeanUtils.copyProperties(directory, webDirectory);
-                    Long dirCount = reactiveDirectoryRepository.countFsDirectoriesByParentIdIs(directory.getId()).block();
-                    Long filesCount = reactiveFsDetailRepository.countFsDetailsByDirectoryIdIs(directory.getId()).block();
-                    webDirectory.setChildrenCount(dirCount + filesCount);
-                    return webDirectory;
-                });
+    public Flux<WebDirectory> findAllByParentIdInWebFormat(ObjectId parentId) {
+        return switchToWebFormat(findAllByParentId(parentId));
+    }
+
+    public Flux<FsDirectory> findAllByParentId(ObjectId parentId) {
+        return reactiveDirectoryRepository.findAllByParentId(parentId);
+    }
+
+    public Flux<WebDirectory> findAllInWebFormat() {
+        return switchToWebFormat(findAll());
+    }
+
+    public Flux<FsDirectory> findAll() {
+        return reactiveDirectoryRepository.findAll();
+    }
+
+    private Flux<WebDirectory> switchToWebFormat(Flux<FsDirectory> fsDirectoryFlux) {
+        return fsDirectoryFlux.map(directory -> {
+            WebDirectory webDirectory = new WebDirectory();
+            BeanUtils.copyProperties(directory, webDirectory);
+            Long dirCount = reactiveDirectoryRepository.countFsDirectoriesByParentIdIs(directory.getId()).block();
+            Long filesCount = reactiveFsDetailRepository.countFsDetailsByDirectoryIdIs(directory.getId()).block();
+            webDirectory.setChildrenCount(dirCount + filesCount);
+            return webDirectory;
+        });
     }
 
     /**

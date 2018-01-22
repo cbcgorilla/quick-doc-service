@@ -84,7 +84,7 @@ public class ConfigRestController {
     @GetMapping("/directory/list")
     @ApiOperation(value = "获取根目录列表")
     public Flux<WebDirectory> getDirectories() {
-        return reactiveDirectoryService.findAllByParentId(
+        return reactiveDirectoryService.findAllByParentIdInWebFormat(
                 reactiveQuickDocConfigService.getQuickDocConfig()
                         .block().getId());
     }
@@ -92,7 +92,7 @@ public class ConfigRestController {
     @GetMapping("/directory/list/{parentId}")
     @ApiOperation(value = "根据上级目录ID获取下级目录列表")
     public Flux<WebDirectory> getDirectories(@PathVariable("parentId") ObjectId parentId) {
-        return reactiveDirectoryService.findAllByParentId(parentId);
+        return reactiveDirectoryService.findAllByParentIdInWebFormat(parentId);
     }
 
     @PostMapping(value = "/directory/save",

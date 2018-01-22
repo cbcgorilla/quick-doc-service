@@ -9,6 +9,7 @@ import java.util.*
 data class FsDirectory(@Id var id: ObjectId,
                        var path: String,
                        var parentId: ObjectId,
+                       var publicVisible:Boolean=false,
                        var owners: Array<FsOwner>? = null) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -19,6 +20,7 @@ data class FsDirectory(@Id var id: ObjectId,
         if (id != other.id) return false
         if (path != other.path) return false
         if (parentId != other.parentId) return false
+        if (publicVisible != other.publicVisible) return false
         if (!Arrays.equals(owners, other.owners)) return false
 
         return true
@@ -28,6 +30,7 @@ data class FsDirectory(@Id var id: ObjectId,
         var result = id.hashCode()
         result = 31 * result + path.hashCode()
         result = 31 * result + parentId.hashCode()
+        result = 31 * result + publicVisible.hashCode()
         result = 31 * result + (owners?.let { Arrays.hashCode(it) } ?: 0)
         return result
     }

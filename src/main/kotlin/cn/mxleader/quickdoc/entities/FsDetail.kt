@@ -14,6 +14,7 @@ data class FsDetail(@Id var id: ObjectId,
                     var categoryId: ObjectId,
                     var directoryId: ObjectId,
                     var storedId: ObjectId,
+                    var publicVisible:Boolean = false,
                     var owners: Array<FsOwner>? = null,
                     var category: String? = null,
                     var directory: String? = null) {
@@ -31,6 +32,7 @@ data class FsDetail(@Id var id: ObjectId,
         if (categoryId != other.categoryId) return false
         if (directoryId != other.directoryId) return false
         if (storedId != other.storedId) return false
+        if (publicVisible != other.publicVisible) return false
         if (!Arrays.equals(owners, other.owners)) return false
         if (category != other.category) return false
         if (directory != other.directory) return false
@@ -47,6 +49,7 @@ data class FsDetail(@Id var id: ObjectId,
         result = 31 * result + categoryId.hashCode()
         result = 31 * result + directoryId.hashCode()
         result = 31 * result + storedId.hashCode()
+        result = 31 * result + publicVisible.hashCode()
         result = 31 * result + (owners?.let { Arrays.hashCode(it) } ?: 0)
         result = 31 * result + (category?.hashCode() ?: 0)
         result = 31 * result + (directory?.hashCode() ?: 0)

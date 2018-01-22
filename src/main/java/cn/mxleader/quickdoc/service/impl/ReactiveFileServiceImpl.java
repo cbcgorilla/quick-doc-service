@@ -2,10 +2,10 @@ package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.dao.ReactiveCategoryRepository;
 import cn.mxleader.quickdoc.dao.ReactiveDirectoryRepository;
+import cn.mxleader.quickdoc.dao.ReactiveFsDetailRepository;
+import cn.mxleader.quickdoc.dao.utils.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.FsDetail;
 import cn.mxleader.quickdoc.entities.FsDirectory;
-import cn.mxleader.quickdoc.dao.utils.GridFsAssistant;
-import cn.mxleader.quickdoc.dao.ReactiveFsDetailRepository;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveFileService;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static cn.mxleader.quickdoc.common.CommonCode.READ_PRIVILEGE;
+import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.READ_PRIVILEGE;
 import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.checkAuthentication;
 import static cn.mxleader.quickdoc.common.utils.MessageUtil.fileNotExistMsg;
 import static cn.mxleader.quickdoc.dao.utils.QueryTemplate.keyQuery;

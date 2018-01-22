@@ -17,7 +17,7 @@ public interface ReactiveDirectoryService {
      * @param owners
      * @return
      */
-    Mono<FsDirectory> saveDirectory(String path, ObjectId parentId, FsOwner[] owners);
+    Mono<FsDirectory> saveDirectory(String path, ObjectId parentId, Boolean publicVisible, FsOwner[] owners);
 
     /**
      * 新增文件目录;
@@ -90,7 +90,13 @@ public interface ReactiveDirectoryService {
      * @param parentId
      * @return
      */
-    Flux<WebDirectory> findAllByParentId(ObjectId parentId);
+    Flux<WebDirectory> findAllByParentIdInWebFormat(ObjectId parentId);
+
+    Flux<FsDirectory> findAllByParentId(ObjectId parentId);
+
+    Flux<WebDirectory> findAllInWebFormat();
+
+    Flux<FsDirectory> findAll();
 
     /**
      * 获取文件目录

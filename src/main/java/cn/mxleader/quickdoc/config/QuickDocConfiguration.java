@@ -24,8 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_ADMIN_GROUP_OWNER;
-import static cn.mxleader.quickdoc.common.CommonCode.SYSTEM_PUBLIC_OWNER;
+import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.SYSTEM_ADMIN_GROUP_OWNER;
 import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_ADMIN;
 import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_USER;
 
@@ -42,9 +41,9 @@ public class QuickDocConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "quickdoc",value="stream-topic")
-    public KafkaService kafkaService(KafkaTemplate<String, String> kafkaTemplate){
-        return new KafkaServiceImpl(kafkaTemplate,quickDocProperties.getStreamTopic());
+    @ConditionalOnProperty(prefix = "quickdoc", value = "stream-topic")
+    public KafkaService kafkaService(KafkaTemplate<String, String> kafkaTemplate) {
+        return new KafkaServiceImpl(kafkaTemplate, quickDocProperties.getStreamTopic());
     }
 
     @Bean
@@ -72,11 +71,11 @@ public class QuickDocConfiguration {
                             // 初始化根目录
                             FsOwner[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
                             reactiveDirectoryService.saveDirectory("config", quickDocConfig.getId(),
-                                    configOwners).subscribe();
+                                    false, configOwners).subscribe();
 
-                            FsOwner[] rootOwners = {SYSTEM_PUBLIC_OWNER, SYSTEM_ADMIN_GROUP_OWNER};
+                            FsOwner[] rootOwners = {SYSTEM_ADMIN_GROUP_OWNER};
                             reactiveDirectoryService.saveDirectory("root", quickDocConfig.getId(),
-                                    rootOwners).subscribe();
+                                    true, rootOwners).subscribe();
 
                             quickDocConfig.setInitialized(true);
                         }
@@ -136,6 +135,7 @@ public class QuickDocConfiguration {
                                                 ObjectId.get(),
                                                 ObjectId.get(),
                                                 null,
+                                                false,
                                                 getRandomOwners(),
                                                 null,
                                                 null);

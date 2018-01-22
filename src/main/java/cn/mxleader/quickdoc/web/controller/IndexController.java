@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -35,9 +34,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static cn.mxleader.quickdoc.common.CommonCode.*;
-import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.checkAuthentication;
-import static cn.mxleader.quickdoc.common.utils.KeyUtil.getSHA256UUID;
+import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
+import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
+import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.*;
 
 @Controller
 @RequestMapping("/")
@@ -94,7 +93,7 @@ public class IndexController {
         if (activeUser.isAdmin()) {
             refreshDirList(model, rootParentId, session);
         } else {
-            List<WebDirectory> directories = reactiveDirectoryFsService.findAllByParentId(rootParentId)
+            List<WebDirectory> directories = reactiveDirectoryFsService.findAllByParentIdInWebFormat(rootParentId)
                     .filter(webDirectory -> webDirectory.getPath().equalsIgnoreCase("root"))
                     .toStream()
                     .collect(Collectors.toList());
@@ -260,10 +259,12 @@ public class IndexController {
             List<FsOwner> fsOwnerList = new ArrayList<FsOwner>();
             FsOwner[] fsOwnerDesc = new FsOwner[]{};
             fsOwnerList.add(owner);
+            Boolean publicVisible = false;
             if (ownersRequest != null && ownersRequest.length > 0) {
                 for (String item : ownersRequest) {
                     if (item.equalsIgnoreCase("PublicMode")) {
-                        fsOwnerList.add(new FsOwner("public", FsOwner.Type.TYPE_PUBLIC, 1));
+                        //fsOwnerList.add(new FsOwner("public", FsOwner.Type.TYPE_PUBLIC, 1));
+                        publicVisible = true;
                     } else if (item.equalsIgnoreCase("GroupMode")) {
                         fsOwnerList.add(new FsOwner(activeUser.getGroup(), FsOwner.Type.TYPE_GROUP, 3));
                     }
@@ -278,6 +279,7 @@ public class IndexController {
                     categoryId,
                     directoryId,
                     ObjectId.get(),
+                    publicVisible,
                     fsOwnerList.toArray(fsOwnerDesc),
                     null,
                     null);
@@ -330,7 +332,7 @@ public class IndexController {
                                 HttpSession session) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("directories",
-                reactiveDirectoryFsService.findAllByParentId(directoryId)
+                reactiveDirectoryFsService.findAllByParentIdInWebFormat(directoryId)
                         .filter(webDirectory -> checkAuthentication(webDirectory.getOwners(),
                                 activeUser, READ_PRIVILEGE))
                         .toStream()
