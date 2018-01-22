@@ -39,9 +39,9 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * @return
      */
     public Mono<FsDirectory> saveDirectory(String path, ObjectId parentId,
-                                           Boolean publicVisible,FsOwner[] owners) {
+                                           Boolean publicVisible, FsOwner[] owners) {
         return reactiveDirectoryRepository.findByPathAndParentId(path, parentId)
-                .defaultIfEmpty(new FsDirectory(ObjectId.get(), path, parentId, publicVisible,owners))
+                .defaultIfEmpty(new FsDirectory(ObjectId.get(), path, parentId, publicVisible, owners))
                 .flatMap(entity -> {
                     if (owners != null && owners.length > 0) {
                         entity.setOwners(owners);
@@ -158,8 +158,9 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
         return reactiveDirectoryRepository.findById(directoryId)
                 .switchIfEmpty(noDirectoryMsg(directoryId.toString()))
                 .flatMap(v -> {
-                    Flux<FsDirectory> subFlux = reactiveDirectoryRepository.findAllByParentId(directoryId);
-                    if (subFlux == null || subFlux.count().block() == 0) {
+                    if (mongoTemplate.count(
+                            Query.query(Criteria.where("parentId").is(directoryId)),
+                            FsDirectory.class) == 0) {
                         return reactiveDirectoryRepository.delete(v);
                     } else {
                         return notEmptyDirMsg("[" + directoryId.toString() + "] " + v.getPath());
