@@ -3,6 +3,7 @@ buildscript {
 	ext {
 		springBootVersion = '2.0.0.M7'
 		swagger_version='2.8.0'
+		swagger_bootstrap_version = '1.7.2'
 		spring_kafka_version='2.1.0.RELEASE'
 		junit_version = '4.12'
         junit_jupiter_version='5.0.2'
@@ -54,6 +55,7 @@ dependencies {
 	compile("org.springframework.boot:spring-boot-starter-webflux")
 	compile("io.springfox:springfox-swagger2:$swagger_version")
 	compile("io.springfox:springfox-swagger-ui:$swagger_version")
+	compile ("com.github.xiaoymin:swagger-bootstrap-ui:$swagger_bootstrap_version")
 	compile("org.springframework.kafka:spring-kafka:$spring_kafka_version")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
