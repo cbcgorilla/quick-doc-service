@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.web.dto
+package cn.mxleader.quickdoc.web.domain
 
 import cn.mxleader.quickdoc.entities.FsOwner
 import org.bson.types.ObjectId

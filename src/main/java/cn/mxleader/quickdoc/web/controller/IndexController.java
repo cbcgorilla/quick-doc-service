@@ -10,7 +10,7 @@ import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.service.ReactiveFileService;
 import cn.mxleader.quickdoc.service.ReactiveQuickDocConfigService;
-import cn.mxleader.quickdoc.web.dto.WebDirectory;
+import cn.mxleader.quickdoc.web.domain.WebDirectory;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;

@@ -2,7 +2,7 @@ package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
-import cn.mxleader.quickdoc.web.dto.WebDirectory;
+import cn.mxleader.quickdoc.web.domain.WebDirectory;
 import org.bson.types.ObjectId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
