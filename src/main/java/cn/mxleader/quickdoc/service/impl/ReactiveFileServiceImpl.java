@@ -1,15 +1,17 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.dao.ReactiveCategoryRepository;
-import cn.mxleader.quickdoc.dao.ReactiveDirectoryRepository;
 import cn.mxleader.quickdoc.dao.ReactiveFsDetailRepository;
 import cn.mxleader.quickdoc.dao.utils.GridFsAssistant;
+import cn.mxleader.quickdoc.entities.FsCategory;
 import cn.mxleader.quickdoc.entities.FsDetail;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveFileService;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -34,19 +36,16 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
 
     private final GridFsAssistant gridFsAssistant;
     private final GridFsTemplate gridFsTemplate;
-    private final ReactiveCategoryRepository reactiveCategoryRepository;
-    private final ReactiveDirectoryRepository reactiveDirectoryRepository;
+    private final MongoTemplate mongoTemplate;
     private final ReactiveFsDetailRepository reactiveFsDetailRepository;
 
     ReactiveFileServiceImpl(GridFsAssistant gridFsAssistant,
                             GridFsTemplate gridFsTemplate,
-                            ReactiveCategoryRepository reactiveCategoryRepository,
-                            ReactiveDirectoryRepository reactiveDirectoryRepository,
+                            MongoTemplate mongoTemplate,
                             ReactiveFsDetailRepository reactiveFsDetailRepository) {
         this.gridFsAssistant = gridFsAssistant;
         this.gridFsTemplate = gridFsTemplate;
-        this.reactiveCategoryRepository = reactiveCategoryRepository;
-        this.reactiveDirectoryRepository = reactiveDirectoryRepository;
+        this.mongoTemplate = mongoTemplate;
         this.reactiveFsDetailRepository = reactiveFsDetailRepository;
     }
 
@@ -75,8 +74,8 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
     public Flux<FsDetail> getStoredFiles(ObjectId directoryId) {
         return reactiveFsDetailRepository.findAllByDirectoryId(directoryId)
                 .map(v -> {
-                    v.setCategory(reactiveCategoryRepository.findById(v.getCategoryId()).block().getType());
-                    v.setDirectory((reactiveDirectoryRepository.findById(v.getDirectoryId()).block().getPath()));
+                    v.setCategory(mongoTemplate.findById(v.getCategoryId(), FsCategory.class).getType());
+                    v.setDirectory((mongoTemplate.findById(v.getDirectoryId(), FsDirectory.class).getPath()));
                     return v;
                 });
     }
@@ -166,10 +165,8 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
                           ObjectId categoryId,
                           ActiveUser activeUser) throws IOException {
         ZipOutputStream zos = new ZipOutputStream(fos);
-        Optional<FsDirectory> optionalDirectory = reactiveDirectoryRepository
-                .findById(directoryId).blockOptional();
-        if (optionalDirectory.isPresent()) {
-            FsDirectory directory = optionalDirectory.get();
+        FsDirectory directory = mongoTemplate.findById(directoryId, FsDirectory.class);
+        if (directory != null) {
             compressDirectory(directory, zos, directory.getPath(), categoryId, activeUser);
         } else {
             throw new FileNotFoundException("文件夹ID：" + directoryId);
@@ -192,11 +189,12 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
                                    ObjectId categoryId,
                                    ActiveUser activeUser) {
         // 递归压缩目录
-        List<FsDirectory> directories = reactiveDirectoryRepository.findAllByParentId(directory.getId())
+        List<FsDirectory> directories = mongoTemplate.find(
+                Query.query(Criteria.where("parentId").is(directory.getId())),
+                FsDirectory.class).stream()
                 .filter(webDirectory -> checkAuthentication(webDirectory.getPublicVisible(),
                         webDirectory.getOwners(),
                         activeUser, READ_PRIVILEGE))
-                .toStream()
                 .collect(Collectors.toList());
         if (directories != null && directories.size() > 0) {
             for (FsDirectory subdirectory : directories) {

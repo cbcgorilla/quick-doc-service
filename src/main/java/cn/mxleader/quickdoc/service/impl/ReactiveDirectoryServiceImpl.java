@@ -1,13 +1,16 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.dao.ReactiveDirectoryRepository;
-import cn.mxleader.quickdoc.dao.ReactiveFsDetailRepository;
+import cn.mxleader.quickdoc.entities.FsDetail;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.web.domain.WebDirectory;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,13 +21,13 @@ import static cn.mxleader.quickdoc.common.utils.MessageUtil.*;
 @Service
 public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
 
-    private final ReactiveFsDetailRepository reactiveFsDetailRepository;
     private final ReactiveDirectoryRepository reactiveDirectoryRepository;
+    private final MongoTemplate mongoTemplate;
 
     ReactiveDirectoryServiceImpl(ReactiveDirectoryRepository reactiveDirectoryRepository,
-                                 ReactiveFsDetailRepository reactiveFsDetailRepository) {
+                                 MongoTemplate mongoTemplate) {
         this.reactiveDirectoryRepository = reactiveDirectoryRepository;
-        this.reactiveFsDetailRepository = reactiveFsDetailRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     /**
@@ -190,8 +193,12 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
         return fsDirectoryFlux.map(directory -> {
             WebDirectory webDirectory = new WebDirectory();
             BeanUtils.copyProperties(directory, webDirectory);
-            Long dirCount = reactiveDirectoryRepository.countFsDirectoriesByParentIdIs(directory.getId()).block();
-            Long filesCount = reactiveFsDetailRepository.countFsDetailsByDirectoryIdIs(directory.getId()).block();
+            Long dirCount = mongoTemplate.count(
+                    Query.query(Criteria.where("parentId").is(directory.getId())),
+                    FsDirectory.class);
+            Long filesCount = mongoTemplate.count(
+                    Query.query(Criteria.where("directoryId").is(directory.getId())),
+                    FsDetail.class);
             webDirectory.setChildrenCount(dirCount + filesCount);
             return webDirectory;
         });
