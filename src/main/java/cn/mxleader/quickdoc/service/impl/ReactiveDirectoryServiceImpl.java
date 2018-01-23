@@ -78,6 +78,10 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
         return reactiveDirectoryRepository.findById(directory.getId())
                 .switchIfEmpty(noDirectoryMsg(directory.toString()))
                 .flatMap(v -> {
+                    /*mongoTemplate.exists(
+                            Query.query(
+                                    Criteria.where("path").is(newPath).and("parentId").in(directory.getParentId())),
+                            FsDirectory.class);*/
                     if (reactiveDirectoryRepository.findByPathAndParentId(newPath,
                             directory.getParentId()).blockOptional().isPresent()) {
                         return dirConflictMsg(newPath);
@@ -91,31 +95,19 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
      * 迁移文件目录
      * Mono流内抛出异常 NoSuchElementException
      *
-     * @param directory    待迁移文件夹
-     * @param newDirectory 新上级目录
+     * @param directoryId 待迁移文件夹ID
+     * @param newParentId 新上级目录ID
      * @return
      */
-    public Mono<FsDirectory> moveDirectory(FsDirectory directory, FsDirectory newDirectory) {
-        return moveDirectory(directory, newDirectory.getId());
-    }
-
-    /**
-     * 迁移文件目录
-     * Mono流内抛出异常 NoSuchElementException
-     *
-     * @param directory      待迁移文件夹
-     * @param newDirectoryId 新上级目录ID
-     * @return
-     */
-    public Mono<FsDirectory> moveDirectory(FsDirectory directory, ObjectId newDirectoryId) {
-        return reactiveDirectoryRepository.findById(directory.getId())
-                .switchIfEmpty(noDirectoryMsg(directory.toString()))
+    public Mono<FsDirectory> moveDirectory(ObjectId directoryId, ObjectId newParentId) {
+        return reactiveDirectoryRepository.findById(directoryId)
+                .switchIfEmpty(noDirectoryMsg(directoryId))
                 .flatMap(v -> {
-                    if (reactiveDirectoryRepository.findById(newDirectoryId)
+                    if (!reactiveDirectoryRepository.findById(newParentId)
                             .blockOptional().isPresent()) {
-                        return noDirectoryMsg(newDirectoryId.toString());
+                        return noDirectoryMsg(newParentId.toString());
                     }
-                    v.setParentId(newDirectoryId);
+                    v.setParentId(newParentId);
                     return reactiveDirectoryRepository.save(v);
                 });
     }
@@ -123,13 +115,13 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
     /**
      * 更新文件目录属主信息
      *
-     * @param directory
+     * @param directoryId
      * @param owners
      * @return
      */
-    public Mono<FsDirectory> updateFsOwners(FsDirectory directory, FsOwner[] owners) {
-        return reactiveDirectoryRepository.findById(directory.getId())
-                .switchIfEmpty(noDirectoryMsg(directory.toString()))
+    public Mono<FsDirectory> updateFsOwners(ObjectId directoryId, FsOwner[] owners) {
+        return reactiveDirectoryRepository.findById(directoryId)
+                .switchIfEmpty(noDirectoryMsg(directoryId))
                 .flatMap(v -> {
                     v.setOwners(owners);
                     return reactiveDirectoryRepository.save(v);
@@ -137,14 +129,19 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
     }
 
     /**
-     * 删除文件目录
-     * Mono流内抛出异常 NoSuchElementException
+     * 更新目录公共访问权限
      *
-     * @param directory
+     * @param directoryId
+     * @param publicVisible
      * @return
      */
-    public Mono<Void> deleteDirectory(FsDirectory directory) {
-        return deleteDirectory(directory.getId());
+    public Mono<FsDirectory> updatePublicVisible(ObjectId directoryId, Boolean publicVisible) {
+        return reactiveDirectoryRepository.findById(directoryId)
+                .switchIfEmpty(noDirectoryMsg(directoryId))
+                .flatMap(v -> {
+                    v.setPublicVisible(publicVisible);
+                    return reactiveDirectoryRepository.save(v);
+                });
     }
 
     /**

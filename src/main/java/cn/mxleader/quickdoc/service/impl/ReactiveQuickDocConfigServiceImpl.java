@@ -19,7 +19,7 @@ public class ReactiveQuickDocConfigServiceImpl implements ReactiveQuickDocConfig
     @Value("${server.port}")
     String serverPort;
 
-    private String getServiceAddress() throws UnknownHostException {
+    private String serviceAddress() throws UnknownHostException {
         return InetAddress.getLocalHost().getHostName() + ":" + serverPort;
     }
 
@@ -29,7 +29,7 @@ public class ReactiveQuickDocConfigServiceImpl implements ReactiveQuickDocConfig
 
     public Mono<QuickDocConfig> getQuickDocConfig() {
         try {
-            QuickDocConfig quickDocConfig = new QuickDocConfig(ObjectId.get(), getServiceAddress(),
+            QuickDocConfig quickDocConfig = new QuickDocConfig(ObjectId.get(), serviceAddress(),
                     false, new Date(), null);
             return reactiveQuickDocConfigRepository.findByServiceAddress(quickDocConfig.getServiceAddress())
                     .defaultIfEmpty(quickDocConfig);

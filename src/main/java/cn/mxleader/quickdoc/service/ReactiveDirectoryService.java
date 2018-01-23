@@ -41,39 +41,29 @@ public interface ReactiveDirectoryService {
      * 迁移文件目录
      * Mono流内抛出异常 NoSuchElementException
      *
-     * @param directory    待迁移文件夹
-     * @param newDirectory 新上级目录
+     * @param directoryId 待迁移文件夹ID
+     * @param newParentId 新上级目录ID
      * @return
      */
-    Mono<FsDirectory> moveDirectory(FsDirectory directory, FsDirectory newDirectory);
-
-    /**
-     * 迁移文件目录
-     * Mono流内抛出异常 NoSuchElementException
-     *
-     * @param directory      待迁移文件夹
-     * @param newDirectoryId 新上级目录ID
-     * @return
-     */
-    Mono<FsDirectory> moveDirectory(FsDirectory directory, ObjectId newDirectoryId);
+    Mono<FsDirectory> moveDirectory(ObjectId directoryId, ObjectId newParentId);
 
     /**
      * 更新文件目录属主信息
      *
-     * @param directory
+     * @param directoryId
      * @param owners
      * @return
      */
-    Mono<FsDirectory> updateFsOwners(FsDirectory directory, FsOwner[] owners);
+    Mono<FsDirectory> updateFsOwners(ObjectId directoryId, FsOwner[] owners);
 
     /**
-     * 删除文件目录
-     * Mono流内抛出异常 NoSuchElementException
+     * 更新目录公共访问权限
      *
-     * @param directory
+     * @param directoryId
+     * @param publicVisible
      * @return
      */
-    Mono<Void> deleteDirectory(FsDirectory directory);
+    Mono<FsDirectory> updatePublicVisible(ObjectId directoryId, Boolean publicVisible);
 
     /**
      * 删除文件目录
