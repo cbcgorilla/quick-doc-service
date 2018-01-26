@@ -64,10 +64,11 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         //super.postHandle(request, response, handler, modelAndView);
+        /*
         long startTime = (long) request.getAttribute("startTime");
         request.removeAttribute("startTime");
         long endTime = System.currentTimeMillis();
         System.out.println("本次请求处理时间为：" + new Long(endTime - startTime) + "ms");
-        request.setAttribute("handlingTime", endTime - startTime);
+        request.setAttribute("handlingTime", endTime - startTime);*/
     }
 }
