@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.service;
 
-public interface KafkaService {
+public interface StreamService {
 
     void sendMessage(String message);
 

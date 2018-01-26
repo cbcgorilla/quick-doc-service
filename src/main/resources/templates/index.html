@@ -135,7 +135,7 @@
             </td>
             <td th:text="@{'文件夹'}" colspan="3"></td>
             <td>
-                <span th:if="${directory.publicVisible}">Y</span>
+                <span th:if="${directory.publicVisible}"><i class="fas fa-check"></i></span>
             </td>
             <td>
                 <ul>
@@ -279,7 +279,7 @@
                     </select>-->
                 </td>
                 <td>
-                    <span th:if="${file.openVisible}">可公共访问</span>
+                    <span th:if="${file.openVisible}"><i class="fas fa-check"></i></span>
                 </td>
                 <td>
                     <ul>

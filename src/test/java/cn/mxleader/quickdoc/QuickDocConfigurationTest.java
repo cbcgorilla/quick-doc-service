@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc;
 
-import cn.mxleader.quickdoc.service.KafkaService;
+import cn.mxleader.quickdoc.service.StreamService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ public class QuickDocConfigurationTest {
     private final Logger log = LoggerFactory.getLogger(QuickDocConfigurationTest.class);
 
     @Autowired
-    private KafkaService kafkaService;
+    private StreamService streamService;
 
     @Autowired
     private AsyncServiceTest asyncServiceTest;
@@ -35,14 +35,14 @@ public class QuickDocConfigurationTest {
     @Test
     @DisplayName("Kafka Service Test")
     public void kafkaServiceTest() {
-        kafkaService.sendMessage("Hello Message from JUnit........");
+        streamService.sendMessage("Hello Message from JUnit........");
         log.info("Hello Message has benn sent out...");
     }
 
     @Test
     @DisplayName("Kafka Service Topic Test")
     public void kafkaServiceTopicTest() {
-        kafkaService.sendMessage("active-session", "Hello Message from JUnit........");
+        streamService.sendMessage("active-session", "Hello Message from JUnit........");
         log.info("Hello Message has benn sent out...");
     }
 

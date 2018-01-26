@@ -1,13 +1,11 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.service.KafkaService;
+import cn.mxleader.quickdoc.service.StreamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 
-@Service
-public class KafkaServiceImpl implements KafkaService {
+public class KafkaServiceImpl implements StreamService {
 
     private KafkaTemplate<String, String> kafkaTemplate;
 

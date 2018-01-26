@@ -5,10 +5,7 @@ import cn.mxleader.quickdoc.entities.FsDescription;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
-import cn.mxleader.quickdoc.service.ReactiveCategoryService;
-import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
-import cn.mxleader.quickdoc.service.ReactiveFileService;
-import cn.mxleader.quickdoc.service.ReactiveQuickDocConfigService;
+import cn.mxleader.quickdoc.service.*;
 import cn.mxleader.quickdoc.web.domain.WebDirectory;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -46,16 +43,19 @@ public class IndexController {
     private final ReactiveDirectoryService reactiveDirectoryFsService;
     private final ReactiveFileService reactiveFileService;
     private final ReactiveQuickDocConfigService reactiveQuickDocConfigService;
+    private final StreamService streamService;
 
     @Autowired
     public IndexController(ReactiveCategoryService reactiveCategoryService,
                            ReactiveDirectoryService reactiveDirectoryFsService,
                            ReactiveFileService reactiveFileService,
-                           ReactiveQuickDocConfigService reactiveQuickDocConfigService) {
+                           ReactiveQuickDocConfigService reactiveQuickDocConfigService,
+                           StreamService streamService) {
         this.reactiveCategoryService = reactiveCategoryService;
         this.reactiveDirectoryFsService = reactiveDirectoryFsService;
         this.reactiveFileService = reactiveFileService;
         this.reactiveQuickDocConfigService = reactiveQuickDocConfigService;
+        this.streamService = streamService;
     }
 
     @ModelAttribute("categoryMap")
@@ -278,6 +278,9 @@ public class IndexController {
                     file.getInputStream())
                     .subscribe();
             refreshDirList(model, directoryId, session);
+            // 发送MQ消息
+            streamService.sendMessage("用户" + activeUser.getUsername() +
+                    "成功上传文件： " + filename + "到目录：" + directoryId);
             redirectAttributes.addFlashAttribute("message",
                     "成功上传文件： " + filename);
         } else {

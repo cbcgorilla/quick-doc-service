@@ -2,10 +2,11 @@ package cn.mxleader.quickdoc.config;
 
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.entities.UserEntity;
-import cn.mxleader.quickdoc.service.KafkaService;
+import cn.mxleader.quickdoc.service.StreamService;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.service.ReactiveQuickDocConfigService;
+import cn.mxleader.quickdoc.service.impl.DefaultStreamServiceImpl;
 import cn.mxleader.quickdoc.service.impl.KafkaServiceImpl;
 import cn.mxleader.quickdoc.service.impl.ReactiveUserServiceImpl;
 import org.bson.types.ObjectId;
@@ -26,7 +27,7 @@ import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_A
 import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_USER;
 
 @SpringBootConfiguration
-@ConditionalOnClass(KafkaService.class)
+@ConditionalOnClass(StreamService.class)
 @EnableConfigurationProperties(QuickDocProperties.class)
 public class QuickDocConfiguration {
     private final Logger log = LoggerFactory.getLogger(QuickDocConfiguration.class);
@@ -38,9 +39,12 @@ public class QuickDocConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "quickdoc", value = "stream-topic")
-    public KafkaService kafkaService(KafkaTemplate<String, String> kafkaTemplate) {
-        return new KafkaServiceImpl(kafkaTemplate, quickDocProperties.getStreamTopic());
+    @ConditionalOnProperty(prefix = "quickdoc", value = "stream-enabled")
+    public StreamService streamService(KafkaTemplate<String, String> kafkaTemplate) {
+        if (quickDocProperties.getStreamEnabled())
+            return new KafkaServiceImpl(kafkaTemplate, quickDocProperties.getStreamTopic());
+        else
+            return new DefaultStreamServiceImpl();
     }
 
     @Bean

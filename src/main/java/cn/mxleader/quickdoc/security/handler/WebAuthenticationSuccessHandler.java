@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.security.handler;
 
 import cn.mxleader.quickdoc.security.session.ActiveUser;
-import cn.mxleader.quickdoc.service.KafkaService;
+import cn.mxleader.quickdoc.service.StreamService;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -35,7 +35,7 @@ public class WebAuthenticationSuccessHandler implements
     private ReactiveUserService reactiveUserService;
 
     @Autowired
-    private KafkaService kafkaService;
+    private StreamService streamService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -50,10 +50,8 @@ public class WebAuthenticationSuccessHandler implements
             session.setAttribute(SESSION_USER, new ActiveUser(authentication.getName(),
                     userGroups,
                     authentication.getAuthorities()));
-            // 发送用户退出消息到Kafka平台
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String ctime = formatter.format(new Date());
-            kafkaService.sendMessage(ctime + " [User login ] username: " + authentication.getName());
+            // 发送用户登录消息到平台MQ
+            streamService.sendMessage(" [User login ] username: " + authentication.getName());
         }
         redirectStrategy.sendRedirect(request, response, determineTargetUrl(authentication));
         clearAuthenticationAttributes(request);
