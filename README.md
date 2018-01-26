@@ -39,4 +39,9 @@ Springfox Swagger 2.8.0 实现REST API文档化交付界面
 
 5. Android客户端： 自动同步本地图片文件
 
-Lombok在 Java 9环境导致编译异常
+Lombok 在 Java 9 环境导致编译异常
+
+含Kotlin与Java代码的工程在MAVEN脚本编译过程会频繁出现找不到Kotlin类的错误，原因还未排查到。
+目前可通过在Gradle环境下实现完整编译和打包不出错。
+
+分离后端存储与前端web界面为2个独立工程, 后端存储可配合多项工程作共享存储用。

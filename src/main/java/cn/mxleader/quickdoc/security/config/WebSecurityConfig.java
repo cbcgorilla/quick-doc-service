@@ -43,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         // 针对 css 和 images 资源忽略认证
         web.ignoring()
-                .antMatchers(HttpMethod.GET,"/css/**/*")
+                .antMatchers(HttpMethod.GET, "/css/**/*")
                 .antMatchers(HttpMethod.GET, "/images/**/*")
                 .antMatchers(HttpMethod.GET, "/js/**/*")
                 .antMatchers(HttpMethod.GET, "/less/**/*")
@@ -143,8 +143,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/login*", "/login*", "/signin/**", "/signup/**").permitAll()
                     //.antMatchers("/invalidSession*").anonymous()
                     .antMatchers(SWAGGER_AUTH_WHITELIST).permitAll()
-                    .antMatchers("/admin*","/swagger-ui.html").hasAuthority(AUTHORITY_ADMIN)
-                    .anyRequest().hasAuthority(AUTHORITY_USER)
+                    .antMatchers("/admin*", "/admin/**", "/swagger-ui.html").hasAuthority(AUTHORITY_ADMIN)
+                    .anyRequest().hasAnyAuthority(AUTHORITY_ADMIN,AUTHORITY_USER)
                     .and()
                     .formLogin()
                     .loginPage("/login")

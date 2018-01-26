@@ -56,8 +56,9 @@ public class QuickDocConfiguration {
                             reactiveUserService
                                     .saveUser(new UserEntity(ObjectId.get(), "root",
                                             "chenbichao",
+                                            new String[]{"ADMIN"},
                                             new String[]{AUTHORITY_ADMIN, AUTHORITY_USER},
-                                            "administrators")).subscribe();
+                                            new String[]{"administrators"})).subscribe();
 
                             // 初始化文件分类
                             reactiveCategoryService.addCategory("照片").subscribe();

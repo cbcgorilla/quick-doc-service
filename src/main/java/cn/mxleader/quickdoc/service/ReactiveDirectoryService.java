@@ -48,24 +48,6 @@ public interface ReactiveDirectoryService {
     Mono<FsDirectory> moveDirectory(ObjectId directoryId, ObjectId newParentId);
 
     /**
-     * 更新文件目录属主信息
-     *
-     * @param directoryId
-     * @param owners
-     * @return
-     */
-    Mono<FsDirectory> updateFsOwners(ObjectId directoryId, FsOwner[] owners);
-
-    /**
-     * 更新目录公共访问权限
-     *
-     * @param directoryId
-     * @param publicVisible
-     * @return
-     */
-    Mono<FsDirectory> updatePublicVisible(ObjectId directoryId, Boolean publicVisible);
-
-    /**
      * 删除文件目录
      * Mono流内抛出异常 NoSuchElementException
      *

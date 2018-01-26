@@ -1,9 +1,11 @@
-package cn.mxleader.quickdoc.web.controller;
+package cn.mxleader.quickdoc.web;
 
+import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
-import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,23 +13,26 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
+import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_ADMIN;
+import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_USER;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
+    private final Logger log = LoggerFactory.getLogger(AdminController.class);
+
     private final ReactiveUserService reactiveUserService;
-    private final ReactiveDirectoryService reactiveDirectoryService;
 
     @Autowired
-    public AdminController(ReactiveUserService reactiveUserService,
-                           ReactiveDirectoryService reactiveDirectoryService) {
+    public AdminController(ReactiveUserService reactiveUserService) {
         this.reactiveUserService = reactiveUserService;
-        this.reactiveDirectoryService = reactiveDirectoryService;
     }
 
     /**
@@ -41,6 +46,19 @@ public class AdminController {
     }
 
     /**
+     * 获取系统标题
+     *
+     * @return
+     */
+    @ModelAttribute("userTypeMap")
+    public Map<String, String> getUserTypeMap() {
+        Map<String, String> userTypeMap = new HashMap<String, String>();
+        userTypeMap.put("USER", "普通用户");
+        userTypeMap.put("ADMIN", "系统管理员");
+        return userTypeMap;
+    }
+
+    /**
      * 登录后的首页
      *
      * @param model
@@ -48,62 +66,32 @@ public class AdminController {
      */
     @GetMapping()
     public String index(Model model) {
-        model.addAttribute("adminPage", "user-admin");
         model.addAttribute("users", reactiveUserService.findAllUsers()
                 .toStream()
                 .collect(Collectors.toList()));
         return "admin";
     }
 
-    /**
-     * 登录后的首页
-     *
-     * @param model
-     * @return
-     */
-    @GetMapping("/folder-admin")
-    public String folderAdmin(Model model) {
-        model.addAttribute("adminPage", "folder-admin");
-        model.addAttribute("directories", reactiveDirectoryService.findAllInWebFormat()
-                .toStream()
-                .collect(Collectors.toList()));
-        return "admin";
-    }
-
-    /**
-     * 删除文件夹
-     *
-     * @param directoryId
-     * @param session
-     * @param redirectAttributes
-     * @return
-     */
-    @DeleteMapping("/deleteDirectory")
-    public String deleteDirectory(@RequestParam("directoryId") ObjectId directoryId,
-                             HttpSession session,
-                             RedirectAttributes redirectAttributes) {
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
-        if (activeUser.isAdmin()) {
-            reactiveDirectoryService.deleteDirectory(directoryId).subscribe();
-            redirectAttributes.addFlashAttribute("message",
-                    "成功删除文件夹： " + directoryId);
+    @PostMapping("/addUser")
+    public String uploadFile(@RequestParam("username") String username,
+                             @RequestParam("password") String password,
+                             @RequestParam("userGroup") String userGroup,
+                             @RequestParam("userType") String userType,
+                             RedirectAttributes redirectAttributes,
+                             Model model,
+                             HttpSession session) {
+        String[] authorities;
+        if (userType.equalsIgnoreCase(AUTHORITY_ADMIN)) {
+            authorities = new String[]{AUTHORITY_ADMIN, AUTHORITY_USER};
         } else {
-            redirectAttributes.addFlashAttribute("message",
-                    "您无删除文件夹的权限，请联系管理员获取！");
+            authorities = new String[]{AUTHORITY_USER};
         }
-        return "redirect:/admin/folder-admin";
-    }
+        UserEntity userEntity = new UserEntity(ObjectId.get(), username, password, new String[]{},authorities, new String[]{userGroup});
+        reactiveUserService.saveUser(userEntity).subscribe();
 
-    /**
-     * 登录后的首页
-     *
-     * @param model
-     * @return
-     */
-    @GetMapping("/swagger-ui")
-    public String swaggerUI(Model model) {
-        model.addAttribute("adminPage", "swagger-ui");
-        return "admin";
+        redirectAttributes.addFlashAttribute("message",
+                "成功添加用户： " + username);
+        return "redirect:/admin";
     }
 
     /**

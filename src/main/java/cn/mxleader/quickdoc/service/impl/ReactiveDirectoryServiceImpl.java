@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.dao.ReactiveDirectoryRepository;
-import cn.mxleader.quickdoc.entities.FsDetail;
+import cn.mxleader.quickdoc.entities.FsDescription;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.SYSTEM_ADMIN_GROUP_OWNER;
 import static cn.mxleader.quickdoc.common.utils.MessageUtil.*;
 
 @Service
@@ -42,14 +41,10 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
                                            Boolean publicVisible, FsOwner[] owners) {
         return reactiveDirectoryRepository.findByPathAndParentId(path, parentId)
                 .defaultIfEmpty(new FsDirectory(ObjectId.get(), path, parentId, publicVisible, owners))
-                .flatMap(entity -> {
-                    if (owners != null && owners.length > 0) {
-                        entity.setOwners(owners);
-                    } else {
-                        FsOwner[] adminOwners = {SYSTEM_ADMIN_GROUP_OWNER};
-                        entity.setOwners(adminOwners);
-                    }
-                    return reactiveDirectoryRepository.save(entity);
+                .flatMap(fsDirectory -> {
+                    fsDirectory.setPublicVisible(publicVisible);
+                    fsDirectory.setOwners(owners);
+                    return reactiveDirectoryRepository.save(fsDirectory);
                 });
     }
 
@@ -113,38 +108,6 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
     }
 
     /**
-     * 更新文件目录属主信息
-     *
-     * @param directoryId
-     * @param owners
-     * @return
-     */
-    public Mono<FsDirectory> updateFsOwners(ObjectId directoryId, FsOwner[] owners) {
-        return reactiveDirectoryRepository.findById(directoryId)
-                .switchIfEmpty(noDirectoryMsg(directoryId))
-                .flatMap(v -> {
-                    v.setOwners(owners);
-                    return reactiveDirectoryRepository.save(v);
-                });
-    }
-
-    /**
-     * 更新目录公共访问权限
-     *
-     * @param directoryId
-     * @param publicVisible
-     * @return
-     */
-    public Mono<FsDirectory> updatePublicVisible(ObjectId directoryId, Boolean publicVisible) {
-        return reactiveDirectoryRepository.findById(directoryId)
-                .switchIfEmpty(noDirectoryMsg(directoryId))
-                .flatMap(v -> {
-                    v.setPublicVisible(publicVisible);
-                    return reactiveDirectoryRepository.save(v);
-                });
-    }
-
-    /**
      * 删除文件目录
      * Mono流内抛出异常 NoSuchElementException
      *
@@ -157,7 +120,10 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
                 .flatMap(v -> {
                     if (mongoTemplate.count(
                             Query.query(Criteria.where("parentId").is(directoryId)),
-                            FsDirectory.class) == 0) {
+                            FsDirectory.class) == 0 &&
+                            mongoTemplate.count(
+                                    Query.query(Criteria.where("directoryId").is(directoryId)),
+                                    FsDescription.class) == 0) {
                         return reactiveDirectoryRepository.delete(v);
                     } else {
                         return notEmptyDirMsg("[" + directoryId.toString() + "] " + v.getPath());
@@ -196,7 +162,7 @@ public class ReactiveDirectoryServiceImpl implements ReactiveDirectoryService {
                     FsDirectory.class);
             Long filesCount = mongoTemplate.count(
                     Query.query(Criteria.where("directoryId").is(directory.getId())),
-                    FsDetail.class);
+                    FsDescription.class);
             webDirectory.setChildrenCount(dirCount + filesCount);
             return webDirectory;
         });

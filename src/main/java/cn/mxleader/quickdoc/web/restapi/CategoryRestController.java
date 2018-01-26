@@ -1,17 +1,11 @@
-package cn.mxleader.quickdoc.web.restcontroller;
+package cn.mxleader.quickdoc.web.restapi;
 
 import cn.mxleader.quickdoc.entities.FsCategory;
-import cn.mxleader.quickdoc.entities.FsDirectory;
-import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.entities.RestResponse;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
-import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
-import cn.mxleader.quickdoc.service.ReactiveQuickDocConfigService;
 import cn.mxleader.quickdoc.web.domain.RenameCategory;
-import cn.mxleader.quickdoc.web.domain.WebDirectory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 
 @RestController

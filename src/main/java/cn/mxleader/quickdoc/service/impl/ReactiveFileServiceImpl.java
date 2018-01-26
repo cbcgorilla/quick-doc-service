@@ -3,7 +3,7 @@ package cn.mxleader.quickdoc.service.impl;
 import cn.mxleader.quickdoc.dao.ReactiveFsDetailRepository;
 import cn.mxleader.quickdoc.dao.utils.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.FsCategory;
-import cn.mxleader.quickdoc.entities.FsDetail;
+import cn.mxleader.quickdoc.entities.FsDescription;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveFileService;
@@ -55,12 +55,12 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @param directoryId 所在目录ID
      * @return
      */
-    public Mono<FsDetail> getStoredFile(String filename,
-                                        ObjectId directoryId) {
+    public Mono<FsDescription> getStoredFile(String filename,
+                                             ObjectId directoryId) {
         return reactiveFsDetailRepository.findByFilenameAndDirectoryId(filename, directoryId);
     }
 
-    public Mono<FsDetail> getStoredFile(ObjectId fsDetailId) {
+    public Mono<FsDescription> getStoredFile(ObjectId fsDetailId) {
         return reactiveFsDetailRepository.findById(fsDetailId);
     }
 
@@ -70,38 +70,33 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @param directoryId 所在目录ID
      * @return
      */
-    public Flux<FsDetail> getStoredFiles(ObjectId directoryId) {
-        return reactiveFsDetailRepository.findAllByDirectoryId(directoryId)
-                .map(v -> {
-                    v.setCategory(mongoTemplate.findById(v.getCategoryId(), FsCategory.class).getType());
-                    v.setDirectory((mongoTemplate.findById(v.getDirectoryId(), FsDirectory.class).getPath()));
-                    return v;
-                });
+    public Flux<FsDescription> getStoredFiles(ObjectId directoryId) {
+        return reactiveFsDetailRepository.findAllByDirectoryId(directoryId);
     }
 
     /**
      * 存储文件， 如同名文件已存在则更新文件内容
      *
-     * @param fsDetail 文件描述信息
+     * @param fsDescription 文件描述信息
      * @param file     文件二进制流
      * @return
      */
-    public Mono<FsDetail> storeFile(FsDetail fsDetail,
-                                    InputStream file) {
-        return getStoredFile(fsDetail.getFilename(), fsDetail.getDirectoryId())
-                .defaultIfEmpty(fsDetail)
+    public Mono<FsDescription> storeFile(FsDescription fsDescription,
+                                         InputStream file) {
+        return getStoredFile(fsDescription.getFilename(), fsDescription.getDirectoryId())
+                .defaultIfEmpty(fsDescription)
                 .flatMap(
                         entity -> {
                             // 删除库中同名历史文件
                             deleteFile(entity);
-                            fsDetail.setId(entity.getId());
-                            fsDetail.setStoredId(
+                            fsDescription.setId(entity.getId());
+                            fsDescription.setStoredId(
                                     gridFsTemplate.store(file,
-                                            fsDetail.getFilename(),
-                                            fsDetail.getContentType()
+                                            fsDescription.getFilename(),
+                                            fsDescription.getType()
                                     )
                             );
-                            return reactiveFsDetailRepository.save(fsDetail);
+                            return reactiveFsDetailRepository.save(fsDescription);
                         }
                 );
     }
@@ -109,14 +104,14 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
     /**
      * 删除Mongo库内文件
      *
-     * @param fsDetail 文件信息
+     * @param fsDescription 文件信息
      * @return
      */
-    public Mono<Void> deleteFile(FsDetail fsDetail) {
-        return getStoredFile(fsDetail.getFilename(), fsDetail.getDirectoryId())
+    public Mono<Void> deleteFile(FsDescription fsDescription) {
+        return getStoredFile(fsDescription.getFilename(), fsDescription.getDirectoryId())
                 .switchIfEmpty(
-                        fileNotExistMsg(fsDetail.getDirectoryId(),
-                                fsDetail.getFilename())
+                        fileNotExistMsg(fsDescription.getDirectoryId(),
+                                fsDescription.getFilename())
                 )
                 .flatMap(entity -> {
                     gridFsTemplate.delete(keyQuery(entity.getStoredId()));
@@ -202,25 +197,25 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
             }
         }
         // 压缩目录内的文件
-        Flux<FsDetail> fsDetailFlux;
+        Flux<FsDescription> fsDetailFlux;
         if (categoryId == null) {
             // 压缩所有分类
             fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryId(
                     directory.getId())
-                    .filter(fsDetail -> checkAuthentication(fsDetail.getPublicVisible(),
+                    .filter(fsDetail -> checkAuthentication(fsDetail.getOpenVisible(),
                             fsDetail.getOwners(),
                             activeUser, READ_PRIVILEGE));
         } else {
             // 压缩指定分类文件
             fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryIdAndCategoryId(
                     directory.getId(), categoryId)
-                    .filter(fsDetail -> checkAuthentication(fsDetail.getPublicVisible(),
+                    .filter(fsDetail -> checkAuthentication(fsDetail.getOpenVisible(),
                             fsDetail.getOwners(),
                             activeUser, READ_PRIVILEGE));
         }
-        List<FsDetail> fsDetailList = fsDetailFlux.toStream().collect(Collectors.toList());
-        if (fsDetailList != null && fsDetailList.size() > 0) {
-            for (FsDetail file : fsDetailList) {
+        List<FsDescription> fsDescriptionList = fsDetailFlux.toStream().collect(Collectors.toList());
+        if (fsDescriptionList != null && fsDescriptionList.size() > 0) {
+            for (FsDescription file : fsDescriptionList) {
                 compressFile(getFileStream(file.getStoredId()), out, basedir);
             }
         }

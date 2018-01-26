@@ -59,12 +59,12 @@ public class MessageUtil {
 
     protected static <T> Mono<T> error(String template, Class clazz,
                                        String callerClazz, Object... args) {
-        String[] bindArgs = new String[args.length + 1];
+        Object[] bindArgs = new Object[args.length + 1];
         bindArgs[0] = callerClazz;
         for (int i = 1; i <= args.length; i++) {
             bindArgs[i] = args[i - 1].toString();
         }
-        return error(template, clazz, args);
+        return error(template, clazz, bindArgs);
     }
 
     protected static <T> Mono<T> error(String template, Class clazz, Object... args) {

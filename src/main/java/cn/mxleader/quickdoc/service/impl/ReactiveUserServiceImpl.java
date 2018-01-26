@@ -25,7 +25,9 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
                 .defaultIfEmpty(userEntity)
                 .flatMap(entity -> {
                     entity.setPassword(MD5Util.getEncryptedPwd(userEntity.getPassword()));
-                    entity.setAuthorities(userEntity.getAuthorities());
+                    entity.setRoles(userEntity.getRoles());
+                    entity.setPrivileges(userEntity.getPrivileges());
+                    entity.setGroups(userEntity.getGroups());
                     return reactiveUserRepository.save(entity);
                 });
     }
@@ -60,6 +62,7 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
         return reactiveUserRepository.findById(userId)
                 .flatMap(reactiveUserRepository::delete);
     }
+
     public Mono<Void> deleteUserByUsername(String username) {
         return findUser(username).flatMap(reactiveUserRepository::delete);
     }

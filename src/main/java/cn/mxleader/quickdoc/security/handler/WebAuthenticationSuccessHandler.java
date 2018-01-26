@@ -45,16 +45,15 @@ public class WebAuthenticationSuccessHandler implements
         final HttpSession session = request.getSession(false);
         if (session != null) {
             session.setMaxInactiveInterval(30 * 60);
-            String userGroup = reactiveUserService.findUser(authentication.getName())
-                    .block().getGroup();
+            String[] userGroups = reactiveUserService.findUser(authentication.getName())
+                    .block().getGroups();
             session.setAttribute(SESSION_USER, new ActiveUser(authentication.getName(),
-                    userGroup,
+                    userGroups,
                     authentication.getAuthorities()));
             // 发送用户退出消息到Kafka平台
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String ctime = formatter.format(new Date());
-            kafkaService.sendMessage(ctime + " [User login ] username: " + authentication.getName() +
-                    " & user group: " + userGroup);
+            kafkaService.sendMessage(ctime + " [User login ] username: " + authentication.getName());
         }
         redirectStrategy.sendRedirect(request, response, determineTargetUrl(authentication));
         clearAuthenticationAttributes(request);

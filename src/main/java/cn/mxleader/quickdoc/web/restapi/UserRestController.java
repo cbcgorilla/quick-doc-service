@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.web.restcontroller;
+package cn.mxleader.quickdoc.web.restapi;
 
 import cn.mxleader.quickdoc.entities.RestResponse;
 import cn.mxleader.quickdoc.entities.UserEntity;

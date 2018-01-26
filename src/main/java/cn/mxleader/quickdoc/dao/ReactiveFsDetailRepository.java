@@ -1,17 +1,17 @@
 package cn.mxleader.quickdoc.dao;
 
-import cn.mxleader.quickdoc.entities.FsDetail;
+import cn.mxleader.quickdoc.entities.FsDescription;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface ReactiveFsDetailRepository extends ReactiveMongoRepository<FsDetail, ObjectId> {
+public interface ReactiveFsDetailRepository extends ReactiveMongoRepository<FsDescription, ObjectId> {
 
-    Mono<FsDetail> findByFilenameAndDirectoryId(String filename, ObjectId directoryId);
+    Mono<FsDescription> findByFilenameAndDirectoryId(String filename, ObjectId directoryId);
 
-    Flux<FsDetail> findAllByDirectoryId(ObjectId directoryId);
+    Flux<FsDescription> findAllByDirectoryId(ObjectId directoryId);
 
-    Flux<FsDetail> findAllByDirectoryIdAndCategoryId(ObjectId directoryId, ObjectId categoryId);
+    Flux<FsDescription> findAllByDirectoryIdAndCategoryId(ObjectId directoryId, ObjectId categoryId);
 
 }

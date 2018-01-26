@@ -9,8 +9,9 @@ import java.util.*
 data class UserEntity(@Id var id: ObjectId,
                       var username:String,
                       var password:String,
-                      var authorities:Array<String>?=null,
-                      var group:String?=null) {
+                      var roles:Array<String>,
+                      var privileges:Array<String>,
+                      var groups:Array<String>) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -20,8 +21,9 @@ data class UserEntity(@Id var id: ObjectId,
         if (id != other.id) return false
         if (username != other.username) return false
         if (password != other.password) return false
-        if (!Arrays.equals(authorities, other.authorities)) return false
-        if (group != other.group) return false
+        if (!Arrays.equals(roles, other.roles)) return false
+        if (!Arrays.equals(privileges, other.privileges)) return false
+        if (!Arrays.equals(groups, other.groups)) return false
 
         return true
     }
@@ -30,8 +32,9 @@ data class UserEntity(@Id var id: ObjectId,
         var result = id.hashCode()
         result = 31 * result + username.hashCode()
         result = 31 * result + password.hashCode()
-        result = 31 * result + (authorities?.let { Arrays.hashCode(it) } ?: 0)
-        result = 31 * result + (group?.hashCode() ?: 0)
+        result = 31 * result + Arrays.hashCode(roles)
+        result = 31 * result + Arrays.hashCode(privileges)
+        result = 31 * result + Arrays.hashCode(groups)
         return result
     }
 }

@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.service;
 
-import cn.mxleader.quickdoc.entities.FsDetail;
+import cn.mxleader.quickdoc.entities.FsDescription;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import org.bson.types.ObjectId;
@@ -20,9 +20,9 @@ public interface ReactiveFileService {
      * @param directoryId 所在目录ID
      * @return
      */
-    Mono<FsDetail> getStoredFile(String filename, ObjectId directoryId);
+    Mono<FsDescription> getStoredFile(String filename, ObjectId directoryId);
 
-    Mono<FsDetail> getStoredFile(ObjectId fsDetailId);
+    Mono<FsDescription> getStoredFile(ObjectId fsDetailId);
 
     /**
      * 枚举目录内的所有文件
@@ -30,24 +30,24 @@ public interface ReactiveFileService {
      * @param directoryId 所在目录ID
      * @return
      */
-    Flux<FsDetail> getStoredFiles(ObjectId directoryId);
+    Flux<FsDescription> getStoredFiles(ObjectId directoryId);
 
     /**
      * 存储文件， 如同名文件已存在则更新文件内容
      *
-     * @param fsDetail 文件描述信息
+     * @param fsDescription 文件描述信息
      * @param file     文件二进制流
      * @return
      */
-    Mono<FsDetail> storeFile(FsDetail fsDetail, InputStream file);
+    Mono<FsDescription> storeFile(FsDescription fsDescription, InputStream file);
 
     /**
      * 删除Mongo库内文件
      *
-     * @param fsDetail 文件信息
+     * @param fsDescription 文件信息
      * @return
      */
-    Mono<Void> deleteFile(FsDetail fsDetail);
+    Mono<Void> deleteFile(FsDescription fsDescription);
 
     /**
      * 删除Mongo库内文件

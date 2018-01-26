@@ -39,7 +39,7 @@ public class WebAuthenticationProvider
                 .block();
         return new UsernamePasswordAuthenticationToken(userEntity.getUsername(),
                 userEntity.getPassword(),
-                Stream.of(userEntity.getAuthorities())
+                Stream.of(userEntity.getPrivileges())
                         .map(v -> new WebAuthority(v))
                         .collect(Collectors.toList()));
     }

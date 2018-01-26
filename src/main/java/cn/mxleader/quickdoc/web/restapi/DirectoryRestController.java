@@ -1,13 +1,9 @@
-package cn.mxleader.quickdoc.web.restcontroller;
+package cn.mxleader.quickdoc.web.restapi;
 
-import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.entities.RestResponse;
-import cn.mxleader.quickdoc.entities.FsCategory;
 import cn.mxleader.quickdoc.entities.FsDirectory;
-import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.service.ReactiveQuickDocConfigService;
-import cn.mxleader.quickdoc.web.domain.RenameCategory;
 import cn.mxleader.quickdoc.web.domain.WebDirectory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -117,24 +113,6 @@ public class DirectoryRestController {
                     RestResponse.CODE.FAIL,
                     "目录转移失败, 请检查新目录ID是否有误！"));
         }
-    }
-
-    @PostMapping(value = "/updateFsOwners/{directoryId}",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "更新目录权限")
-    public Mono<FsDirectory> updateDirectoryFsOwners
-            (@PathVariable("directoryId") ObjectId directoryId,
-             @RequestBody FsOwner[] fsOwners) {
-        return reactiveDirectoryService.updateFsOwners(directoryId, fsOwners);
-    }
-
-    @PostMapping(value = "/updatePublicVisible/{directoryId}",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "更新目录公共访问权限")
-    public Mono<FsDirectory> updateDirectoryPublicVisible
-            (@PathVariable("directoryId") ObjectId directoryId,
-             @RequestBody Boolean publicVisible) {
-        return reactiveDirectoryService.updatePublicVisible(directoryId, publicVisible);
     }
 
     @DeleteMapping(value = "/delete/{directoryId}",

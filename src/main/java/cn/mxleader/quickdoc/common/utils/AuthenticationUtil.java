@@ -33,10 +33,10 @@ public class AuthenticationUtil {
                 if ((owner.getPrivilege() & privilege) > 0) {
                     switch (owner.getType()) {
                         case TYPE_GROUP:
-                            if (owner.getName().equalsIgnoreCase(activeUser.getGroup())) {
-                                return true;
-                            } else {
-                                break;
+                            for (String group : activeUser.getGroups()) {
+                                if (owner.getName().equalsIgnoreCase(group)) {
+                                    return true;
+                                }
                             }
                         case TYPE_PRIVATE:
                             if (owner.getName().equalsIgnoreCase(activeUser.getUsername())) {

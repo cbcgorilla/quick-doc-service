@@ -19,7 +19,7 @@ public class ActiveUser implements HttpSessionBindingListener {
 
     private String username;
     private Boolean admin;
-    private String group;
+    private String[] groups;
 
     private Collection<? extends GrantedAuthority> authorities;
 
@@ -39,12 +39,12 @@ public class ActiveUser implements HttpSessionBindingListener {
         this.admin = admin;
     }
 
-    public String getGroup() {
-        return group;
+    public String[] getGroups() {
+        return groups;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
+    public void setGroups(String[] groups) {
+        this.groups = groups;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -55,9 +55,9 @@ public class ActiveUser implements HttpSessionBindingListener {
         this.authorities = authorities;
     }
 
-    public ActiveUser(String username, String group, Collection<? extends GrantedAuthority> authorities) {
+    public ActiveUser(String username, String[] groups, Collection<? extends GrantedAuthority> authorities) {
         this.username = username;
-        this.group = group;
+        this.groups = groups;
         this.authorities = authorities;
         Iterator<? extends GrantedAuthority> it = authorities.iterator();
         while (it.hasNext()) {
