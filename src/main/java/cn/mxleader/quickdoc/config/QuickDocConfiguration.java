@@ -56,7 +56,7 @@ public class QuickDocConfiguration {
                             reactiveUserService
                                     .saveUser(new UserEntity(ObjectId.get(), "root",
                                             "chenbichao",
-                                            new String[]{"ADMIN"},
+                                            new String[]{AUTHORITY_ADMIN},
                                             new String[]{AUTHORITY_ADMIN, AUTHORITY_USER},
                                             new String[]{"administrators"})).subscribe();
 

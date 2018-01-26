@@ -17,10 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
-import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_ADMIN;
-import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_USER;
 
 @Controller
 @RequestMapping("/admin")
@@ -40,19 +37,9 @@ public class AdminController {
      *
      * @return
      */
-    @ModelAttribute("title")
-    public String pageTitle() {
-        return HOME_TITLE;
-    }
-
-    /**
-     * 获取系统标题
-     *
-     * @return
-     */
     @ModelAttribute("userTypeMap")
     public Map<String, String> getUserTypeMap() {
-        Map<String, String> userTypeMap = new HashMap<String, String>();
+        Map<String, String> userTypeMap = new HashMap<>();
         userTypeMap.put("USER", "普通用户");
         userTypeMap.put("ADMIN", "系统管理员");
         return userTypeMap;
@@ -73,20 +60,16 @@ public class AdminController {
     }
 
     @PostMapping("/addUser")
-    public String uploadFile(@RequestParam("username") String username,
+    public String addUser(@RequestParam("username") String username,
                              @RequestParam("password") String password,
                              @RequestParam("userGroup") String userGroup,
                              @RequestParam("userType") String userType,
                              RedirectAttributes redirectAttributes,
                              Model model,
                              HttpSession session) {
-        String[] authorities;
-        if (userType.equalsIgnoreCase(AUTHORITY_ADMIN)) {
-            authorities = new String[]{AUTHORITY_ADMIN, AUTHORITY_USER};
-        } else {
-            authorities = new String[]{AUTHORITY_USER};
-        }
-        UserEntity userEntity = new UserEntity(ObjectId.get(), username, password, new String[]{},authorities, new String[]{userGroup});
+        String[] authorities = new String[]{userType};
+        UserEntity userEntity = new UserEntity(ObjectId.get(), username, password,
+                authorities, authorities, new String[]{userGroup});
         reactiveUserService.saveUser(userEntity).subscribe();
 
         redirectAttributes.addFlashAttribute("message",

@@ -68,7 +68,7 @@
 
                 <!-- 模态框主体 -->
                 <div class="modal-body">
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="text-align: center">
                         <form method="POST" enctype="multipart/form-data" th:action="@{'/uploadFile'}">
                             <table class="table table-hover">
                                 <tr>
@@ -100,7 +100,7 @@
                                    th:value="${currentdirectory.id}"/>
                             <input type="hidden" th:name="${_csrf.parameterName}"
                                    th:value="${_csrf.token}"/>
-                            <input type="submit" value="上传文件" class="btn btn-success"/>
+                            <input type="submit" value="上传" class="btn btn-success"/>
                         </form>
                     </div>
                 </div>
@@ -140,9 +140,9 @@
             <td>
                 <ul>
                     <li th:each="owner:${directory.owners}">
-                        <span th:text="${owner.type}"></span>||
-                        <span th:text="${owner.name}"></span>||
-                        <span th:text="${owner.privilege}"></span>
+                        <span th:text="${owner.name}"></span>[
+                        <span th:text="${ownerTypeMap[owner.type]}"></span>:
+                        <span th:text="${privilegeMap[owner.privilege]}"></span>]
                     </li>
                 </ul>
             </td>
@@ -284,9 +284,9 @@
                 <td>
                     <ul>
                         <li th:each="owner:${file.owners}">
-                            <span th:text="${owner.type}"></span>||
-                            <span th:text="${owner.name}"></span>||
-                            <span th:text="${owner.privilege}"></span>
+                            <span th:text="${owner.name}"></span>[
+                            <span th:text="${ownerTypeMap[owner.type]}"></span>:
+                            <span th:text="${privilegeMap[owner.privilege]}"></span>]
                         </li>
                     </ul>
                 </td>

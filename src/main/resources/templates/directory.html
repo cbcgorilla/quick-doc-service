@@ -76,9 +76,9 @@
                 <td>
                     <ul>
                         <li th:each="owner:${directory.owners}">
-                            <span th:text="${owner.type}"></span>||
-                            <span th:text="${owner.name}"></span>||
-                            <span th:text="${owner.privilege}"></span>
+                            <span th:text="${owner.name}"></span>[
+                            <span th:text="${ownerTypeMap[owner.type]}"></span>:
+                            <span th:text="${privilegeMap[owner.privilege]}"></span>]
                         </li>
                     </ul>
                 </td>

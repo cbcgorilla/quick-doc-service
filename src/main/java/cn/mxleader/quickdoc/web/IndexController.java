@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.*;
 
@@ -59,11 +58,6 @@ public class IndexController {
         this.reactiveQuickDocConfigService = reactiveQuickDocConfigService;
     }
 
-    /**
-     * 获取所有文件分类清单
-     *
-     * @return
-     */
     @ModelAttribute("categoryMap")
     public Map<ObjectId, String> getCategoryMap() {
         return reactiveCategoryService.findAll()
@@ -71,16 +65,6 @@ public class IndexController {
                         fsCategory -> fsCategory.getId(),
                         fsCategory -> fsCategory.getType())
                 .block();
-    }
-
-    /**
-     * 获取系统标题
-     *
-     * @return
-     */
-    @ModelAttribute("title")
-    public String pageTitle() {
-        return HOME_TITLE;
     }
 
     /**
