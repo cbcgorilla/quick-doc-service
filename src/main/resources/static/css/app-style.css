@@ -18,12 +18,7 @@
     vertical-align: middle;
 }
 .template-input-icon-container { position: relative; }
-.template-input-icon-container .fa {
-    color: gray;
-    position: absolute;
-    left: 10px;
-    top: 10px;
-}
+.template-input-icon-container .fa,
 .template-input-icon-container .fas {
     color: gray;
     position: absolute;
