@@ -1,4 +1,40 @@
 
+.form-horizontal .control-label { padding-top: 0; }
+.form-horizontal.radio {	padding-top: 0; }
+.control-wrapper {
+    position: relative;
+    padding-left: 30px;
+}
+.control-wrapper label.fa-label {
+    position: absolute;
+    left: 4px;
+    top: 6px;
+}
+.form-group:last-child { margin-bottom: 0; }
+.form-horizontal .control-label { margin-bottom: 10px; }
+.table { margin-bottom: 0; }
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th,
+.table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
+    vertical-align: middle;
+}
+.template-input-icon-container { position: relative; }
+.template-input-icon-container .fa {
+    color: gray;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+.template-input-icon-container .fas {
+    color: gray;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+.template-input-icon-container input,
+.template-input-icon-container textarea {
+    padding-left: 30px;
+}
+
 footer{
     display:flex;
     flex-direction:column;
