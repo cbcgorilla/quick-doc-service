@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.common;
 
 import cn.mxleader.quickdoc.entities.FsOwner;
-import cn.mxleader.quickdoc.security.session.ActiveUser;
+import cn.mxleader.quickdoc.security.entities.ActiveUser;
 
 public class AuthenticationHandler {
 

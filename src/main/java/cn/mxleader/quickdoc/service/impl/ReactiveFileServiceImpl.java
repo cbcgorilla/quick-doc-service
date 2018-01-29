@@ -4,7 +4,7 @@ import cn.mxleader.quickdoc.dao.ReactiveFsDetailRepository;
 import cn.mxleader.quickdoc.dao.utils.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.FsDescription;
 import cn.mxleader.quickdoc.entities.FsDirectory;
-import cn.mxleader.quickdoc.security.session.ActiveUser;
+import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveFileService;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import org.bson.types.ObjectId;

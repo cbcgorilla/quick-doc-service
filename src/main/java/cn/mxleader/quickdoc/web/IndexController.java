@@ -4,7 +4,7 @@ import cn.mxleader.quickdoc.common.utils.StringUtil;
 import cn.mxleader.quickdoc.entities.FsDescription;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
-import cn.mxleader.quickdoc.security.session.ActiveUser;
+import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.service.*;
 import cn.mxleader.quickdoc.web.domain.WebDirectory;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
@@ -42,19 +42,19 @@ public class IndexController {
     private final ReactiveCategoryService reactiveCategoryService;
     private final ReactiveDirectoryService reactiveDirectoryFsService;
     private final ReactiveFileService reactiveFileService;
-    private final ReactiveQuickDocConfigService reactiveQuickDocConfigService;
+    private final QuickDocConfigService quickDocConfigService;
     private final StreamService streamService;
 
     @Autowired
     public IndexController(ReactiveCategoryService reactiveCategoryService,
                            ReactiveDirectoryService reactiveDirectoryFsService,
                            ReactiveFileService reactiveFileService,
-                           ReactiveQuickDocConfigService reactiveQuickDocConfigService,
+                           QuickDocConfigService quickDocConfigService,
                            StreamService streamService) {
         this.reactiveCategoryService = reactiveCategoryService;
         this.reactiveDirectoryFsService = reactiveDirectoryFsService;
         this.reactiveFileService = reactiveFileService;
-        this.reactiveQuickDocConfigService = reactiveQuickDocConfigService;
+        this.quickDocConfigService = quickDocConfigService;
         this.streamService = streamService;
     }
 
@@ -75,7 +75,7 @@ public class IndexController {
      */
     @GetMapping()
     public String index(Model model, HttpSession session) {
-        ObjectId rootParentId = reactiveQuickDocConfigService.getQuickDocConfig().block().getId();
+        ObjectId rootParentId = quickDocConfigService.getQuickDocConfig().getId();
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
         if (activeUser.isAdmin()) {

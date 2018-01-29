@@ -1,6 +1,4 @@
-package cn.mxleader.quickdoc.security.session;
-
-import org.springframework.beans.factory.annotation.Autowired;
+package cn.mxleader.quickdoc.security.entities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +7,8 @@ public class ActiveUserStore {
 
     public List<String> users;
 
-    @Autowired
     public ActiveUserStore() {
-        users = new ArrayList<String>();
+        users = new ArrayList<>();
     }
 
     public List<String> getUsers() {

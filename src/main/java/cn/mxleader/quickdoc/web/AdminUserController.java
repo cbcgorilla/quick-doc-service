@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.entities.UserEntity;
-import cn.mxleader.quickdoc.security.session.ActiveUser;
+import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +33,12 @@ public class AdminUserController {
      *
      * @return
      */
-    @ModelAttribute("userTypeMap")
-    public Map<String, String> getUserTypeMap() {
-        Map<String, String> userTypeMap = new HashMap<>();
-        userTypeMap.put("USER", "普通用户");
-        userTypeMap.put("ADMIN", "系统管理员");
-        return userTypeMap;
+    @ModelAttribute("userAuthorityMap")
+    public Map<UserEntity.Authorities, String> getUserAuthorityMap() {
+        Map<UserEntity.Authorities, String> userAuthorityMap = new HashMap<>();
+        userAuthorityMap.put(UserEntity.Authorities.USER, "普通用户");
+        userAuthorityMap.put(UserEntity.Authorities.ADMIN, "系统管理员");
+        return userAuthorityMap;
     }
 
     /**
@@ -57,15 +57,15 @@ public class AdminUserController {
 
     @PostMapping("/addUser")
     public String addUser(@RequestParam("username") String username,
-                             @RequestParam("password") String password,
-                             @RequestParam("userGroup") String userGroup,
-                             @RequestParam("userType") String userType,
-                             RedirectAttributes redirectAttributes,
-                             Model model,
-                             HttpSession session) {
-        String[] authorities = new String[]{userType};
+                          @RequestParam("password") String password,
+                          @RequestParam("userGroup") String userGroup,
+                          @RequestParam("userType") UserEntity.Authorities userType,
+                          RedirectAttributes redirectAttributes,
+                          Model model,
+                          HttpSession session) {
+        UserEntity.Authorities[] authorities = new UserEntity.Authorities[]{userType};
         UserEntity userEntity = new UserEntity(ObjectId.get(), username, password,
-                authorities, authorities, new String[]{userGroup});
+                authorities, new String[]{userGroup});
         reactiveUserService.saveUser(userEntity).subscribe();
 
         redirectAttributes.addFlashAttribute("message",

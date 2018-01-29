@@ -3,7 +3,7 @@ package cn.mxleader.quickdoc.web.restapi;
 import cn.mxleader.quickdoc.entities.RestResponse;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
-import cn.mxleader.quickdoc.service.ReactiveQuickDocConfigService;
+import cn.mxleader.quickdoc.service.QuickDocConfigService;
 import cn.mxleader.quickdoc.web.domain.WebDirectory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,28 +20,27 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/rest/directory-api")
+@RequestMapping("/api/directory")
 @Api(value = "Directory Configuration API", description = "目录配置修改接口")
 public class DirectoryRestController {
 
     private final ReactiveDirectoryService reactiveDirectoryService;
-    private final ReactiveQuickDocConfigService reactiveQuickDocConfigService;
+    private final QuickDocConfigService quickDocConfigService;
 
     private final Logger log = LoggerFactory.getLogger(DirectoryRestController.class);
 
     @Autowired
     DirectoryRestController(ReactiveDirectoryService reactiveDirectoryService,
-                            ReactiveQuickDocConfigService reactiveQuickDocConfigService) {
+                            QuickDocConfigService quickDocConfigService) {
         this.reactiveDirectoryService = reactiveDirectoryService;
-        this.reactiveQuickDocConfigService = reactiveQuickDocConfigService;
+        this.quickDocConfigService = quickDocConfigService;
     }
 
     @GetMapping("/list")
     @ApiOperation(value = "获取根目录列表")
     public Flux<WebDirectory> getDirectories() {
         return reactiveDirectoryService.findAllByParentIdInWebFormat(
-                reactiveQuickDocConfigService.getQuickDocConfig()
-                        .block().getId());
+                quickDocConfigService.getQuickDocConfig().getId());
     }
 
     @GetMapping("/list/{parentId}")

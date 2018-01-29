@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/rest/user-api")
+@RequestMapping("/api/user")
 @Api(value = "User API",description = "用户信息变更接口")
 public class UserRestController {
 
@@ -37,13 +37,13 @@ public class UserRestController {
 
     // -------------------Retrieve Single User------------------------------------------
 
-    @RequestMapping(value = "/get-user/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "/get/{username}", method = RequestMethod.GET)
     @ApiOperation(value = "根据用户名返回用户信息详情")
     public Mono<UserEntity> getUser(@PathVariable("username") String username) {
         return reactiveUserService.findUser(username);
     }
 
-    @PostMapping(value = "/save-user",
+    @PostMapping(value = "/save",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "新增或保存系统用户")
     public Mono<RestResponse<UserEntity>> addUser(
@@ -55,7 +55,7 @@ public class UserRestController {
                         RestResponse.CODE.SUCCESS, user));
     }
 
-    @DeleteMapping(value = "/delete-user/{username}")
+    @DeleteMapping(value = "/delete/{username}")
     @ApiOperation(value = "删除系统用户")
     public Mono<RestResponse> deleteUser(@PathVariable String username){
         reactiveUserService.deleteUserByUsername(username).subscribe();

@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.web;
 
-import cn.mxleader.quickdoc.security.session.ActiveUser;
+import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;

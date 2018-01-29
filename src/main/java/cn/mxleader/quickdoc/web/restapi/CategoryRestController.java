@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 
 @RestController
-@RequestMapping("/rest/category-api")
+@RequestMapping("/api/category")
 @Api(value = "File Category Configuration API", description = "文件分类配置修改接口")
 public class CategoryRestController {
 

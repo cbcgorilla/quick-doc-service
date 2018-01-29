@@ -257,13 +257,19 @@
                         </li>
                         <li th:case="zip">
                             <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-zip"></i>
+                                <i class="far fa-file-archive"></i>
                                 <span th:text="${file.filename}"></span>
                             </a>
                         </li>
                         <li th:case="rar">
                             <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-zip"></i>
+                                <i class="far fa-file-archive"></i>
+                                <span th:text="${file.filename}"></span>
+                            </a>
+                        </li>
+                        <li th:case="*">
+                            <a th:href="@{'/download/'+${file.storedId}}">
+                                <i class="far fa-file"></i>
                                 <span th:text="${file.filename}"></span>
                             </a>
                         </li>

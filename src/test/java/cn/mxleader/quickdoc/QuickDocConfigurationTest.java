@@ -42,7 +42,7 @@ public class QuickDocConfigurationTest {
     @Test
     @DisplayName("Kafka Service Topic Test")
     public void kafkaServiceTopicTest() {
-        streamService.sendMessage("active-session", "Hello Message from JUnit........");
+        streamService.sendMessage("active-entities", "Hello Message from JUnit........");
         log.info("Hello Message has benn sent out...");
     }
 

@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.security.authprovider;
 
 import cn.mxleader.quickdoc.entities.UserEntity;
-import cn.mxleader.quickdoc.security.session.WebAuthority;
+import cn.mxleader.quickdoc.security.entities.WebAuthority;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -28,19 +28,11 @@ public class WebAuthenticationProvider
         String password = authentication.getCredentials().toString();
         UserEntity userEntity = reactiveUserService
                 .validateUser(name, password)
-                /*.onErrorMap(v -> {
-                    if (v.getClass().equals(UsernameNotFoundException.class)) {
-                        throw new UsernameNotFoundException(v.getMessage());
-                    } else if (v.getClass().equals(BadCredentialsException.class)) {
-                        throw new BadCredentialsException(v.getMessage());
-                    }
-                    return v;
-                })*/
                 .block();
         return new UsernamePasswordAuthenticationToken(userEntity.getUsername(),
                 userEntity.getPassword(),
-                Stream.of(userEntity.getPrivileges())
-                        .map(v -> new WebAuthority(v))
+                Stream.of(userEntity.getAuthorities())
+                        .map(authority -> new WebAuthority(authority.name()))
                         .collect(Collectors.toList()));
     }
 

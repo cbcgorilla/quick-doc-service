@@ -109,12 +109,12 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="right">用户分类:</td>
+                                    <td align="right">用户类别:</td>
                                     <td>
                                         <select id="userType" name="userType" class="select custom-select">
                                             <option th:each="entry : ${userTypeMap}"
                                                     th:value="${entry.key}"
-                                                    th:text="${entry.value}">用户分类
+                                                    th:text="${entry.value}">用户类别
                                             </option>
                                         </select>
                                     </td>
@@ -140,13 +140,12 @@
         <tr>
             <th>用户名</th>
             <th>分组</th>
-            <th>授权</th>
-            <th width="100"></th>
-            <th width="100"></th>
+            <th>用户类别</th>
+            <th>操作</th>
         </tr>
         </thead>
-        <tbody>
 
+        <tbody>
         <tr th:each="user : ${users}">
             <form th:action="@{/admin/deleteUser}" th:method="DELETE">
                 <td>
@@ -154,20 +153,20 @@
                 </td>
                 <td>
                     <ul class="custom-list">
-                        <li th:each="authority:${user.groups}">
-                            <span th:text="${authority}"></span>
+                        <li th:each="usergroup:${user.groups}">
+                            <span th:text="${usergroup}"></span>
                         </li>
                     </ul>
                 </td>
                 <td>
                     <ul class="custom-list">
-                        <li th:each="privilege:${user.privileges}">
+                        <li th:each="userAuthority:${user.authorities}">
                             <select id="authority" name="authority" class="select custom-select"
                                     readonly="true" disabled="disabled">
-                                <option th:each="entry : ${userTypeMap}"
+                                <option th:each="entry : ${userAuthorityMap}"
                                         th:value="${entry.key}"
                                         th:text="${entry.value}"
-                                        th:selected="(${entry.key} == ${privilege})">用户类别
+                                        th:selected="(${entry.key} == ${userAuthority})">用户类别
                                 </option>
                             </select>
                         </li>
@@ -176,15 +175,9 @@
                 <td>
                     <div class="input-group">
                         <a th:href="@{'/admin/editUser/'+${user.id}}"
-                           class="btn btn-warning"><i class="fas fa-edit"></i></a>
-                    </div>
-                </td>
-                <td>
-                    <div class="input-group">
-                        <input type="hidden" id="userId" name="userId"
-                               th:value="${user.id}"/>
-                        <input type="hidden" th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}"/>
+                           class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                        <input type="hidden" id="userId" name="userId" th:value="${user.id}"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                         <input type="submit" value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
                     </div>
                 </td>

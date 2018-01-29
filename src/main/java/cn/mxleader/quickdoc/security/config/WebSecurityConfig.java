@@ -1,5 +1,6 @@
 package cn.mxleader.quickdoc.security.config;
 
+import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.security.authprovider.WebAuthenticationProvider;
 import cn.mxleader.quickdoc.security.handler.ApiAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +28,17 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    public static final String AUTHORITY_USER = "USER";
-    public static final String AUTHORITY_ADMIN = "ADMIN";
-
     @Autowired
     private WebAuthenticationProvider authProvider;
 
     @Override
     protected void configure(
-            AuthenticationManagerBuilder auth) throws Exception {
+            AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authProvider);
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         // 针对 css 和 images 资源忽略认证
         web.ignoring()
                 .antMatchers(HttpMethod.GET, "/css/**/*")
@@ -59,7 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
             // @TODO 删除.csrf().disable() 可屏蔽 /management 路径下的POST提交，仅支持GET方法交互
             http.csrf().disable().antMatcher("/management/**").authorizeRequests()
-                    .anyRequest().hasAuthority(AUTHORITY_ADMIN)
+                    .anyRequest().hasAuthority(UserEntity.Authorities.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -86,8 +84,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
             //http.antMatcher("/guest/**").authorizeRequests().anyRequest().permitAll();
 
-            http.antMatcher("/rest/**").authorizeRequests()
-                    .anyRequest().hasAuthority(AUTHORITY_ADMIN)
+            http.antMatcher("/api/**").authorizeRequests()
+                    .anyRequest().hasAuthority(UserEntity.Authorities.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -143,8 +141,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/login*", "/login*", "/signin/**", "/signup/**").permitAll()
                     //.antMatchers("/invalidSession*").anonymous()
                     .antMatchers(SWAGGER_AUTH_WHITELIST).permitAll()
-                    .antMatchers("/admin*", "/admin/**", "/swagger-ui.html").hasAuthority(AUTHORITY_ADMIN)
-                    .anyRequest().hasAnyAuthority(AUTHORITY_ADMIN,AUTHORITY_USER)
+                    .antMatchers("/admin*", "/admin/**", "/swagger-ui.html")
+                    .hasAuthority(UserEntity.Authorities.ADMIN.name())
+                    .anyRequest().hasAnyAuthority(UserEntity.Authorities.ADMIN.name(), UserEntity.Authorities.USER.name())
                     .and()
                     .formLogin()
                     .loginPage("/login")

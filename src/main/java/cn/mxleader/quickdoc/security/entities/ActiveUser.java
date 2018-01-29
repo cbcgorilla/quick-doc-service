@@ -1,5 +1,6 @@
-package cn.mxleader.quickdoc.security.session;
+package cn.mxleader.quickdoc.security.entities;
 
+import cn.mxleader.quickdoc.entities.UserEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -10,7 +11,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 import java.util.Collection;
 import java.util.Iterator;
 
-import static cn.mxleader.quickdoc.security.config.WebSecurityConfig.AUTHORITY_ADMIN;
 
 @Document
 public class ActiveUser implements HttpSessionBindingListener {
@@ -62,7 +62,7 @@ public class ActiveUser implements HttpSessionBindingListener {
         Iterator<? extends GrantedAuthority> it = authorities.iterator();
         while (it.hasNext()) {
             GrantedAuthority entry = it.next();
-            if (entry.getAuthority().equalsIgnoreCase(AUTHORITY_ADMIN)) {
+            if (entry.getAuthority().equalsIgnoreCase(UserEntity.Authorities.ADMIN.name())) {
                 this.admin = true;
                 break;
             } else {

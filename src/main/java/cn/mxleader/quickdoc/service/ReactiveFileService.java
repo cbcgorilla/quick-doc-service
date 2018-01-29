@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.entities.FsDescription;
-import cn.mxleader.quickdoc.security.session.ActiveUser;
+import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import org.bson.types.ObjectId;
 import reactor.core.publisher.Flux;

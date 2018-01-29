@@ -25,8 +25,7 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
                 .defaultIfEmpty(userEntity)
                 .flatMap(entity -> {
                     entity.setPassword(PasswordUtil.getEncryptedPwd(userEntity.getPassword()));
-                    entity.setRoles(userEntity.getRoles());
-                    entity.setPrivileges(userEntity.getPrivileges());
+                    entity.setAuthorities(userEntity.getAuthorities());
                     entity.setGroups(userEntity.getGroups());
                     return reactiveUserRepository.save(entity);
                 });
