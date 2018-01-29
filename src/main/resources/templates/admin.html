@@ -112,7 +112,7 @@
                                     <td align="right">用户类别:</td>
                                     <td>
                                         <select id="userType" name="userType" class="select custom-select">
-                                            <option th:each="entry : ${userTypeMap}"
+                                            <option th:each="entry : ${userAuthorityMap}"
                                                     th:value="${entry.key}"
                                                     th:text="${entry.value}">用户类别
                                             </option>
