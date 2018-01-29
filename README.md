@@ -47,10 +47,10 @@ Lombok 在 Java 9 环境导致编译异常
 分离后端存储与前端web界面为2个独立工程, 后端存储可配合多项工程作共享存储用。
 
 ## 界面截图
-![文件访问界面](https://github.com/cbcgorilla/quick-doc-service/blob/master/src/main/resources/static/images/page1.png)
+![文件访问界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page1.png)
 
-![文件夹配置界面](https://github.com/cbcgorilla/quick-doc-service/blob/master/src/main/resources/static/images/page2.png)
+![文件夹配置界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page2.png)
 
-![系统用户配置界面](https://github.com/cbcgorilla/quick-doc-service/blob/master/src/main/resources/static/images/page3.png)
+![系统用户配置界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page3.png)
 
-![REST API接口](https://github.com/cbcgorilla/quick-doc-service/blob/master/src/main/resources/static/images/restapi.png)
+![REST API接口](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/restapi.png)
