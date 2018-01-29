@@ -74,7 +74,7 @@
                     <span th:if="${directory.publicVisible}"><i class="fas fa-check"></i></span>
                 </td>
                 <td>
-                    <ul>
+                    <ul class="custom-list">
                         <li th:each="owner:${directory.owners}">
                             <span th:text="${owner.name}"></span>[
                             <span th:text="${ownerTypeMap[owner.type]}"></span>:

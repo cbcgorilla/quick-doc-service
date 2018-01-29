@@ -50,7 +50,8 @@
         <a th:href="@{'/path@'+${currentdirectory.parentId}}"
            th:text="@{'返回上级目录'}"></a>
 
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">上传文件
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">
+            <i class="fas fa-cloud-upload-alt"></i>上传文件
         </button>
 
     </div>
@@ -138,7 +139,7 @@
                 <span th:if="${directory.publicVisible}"><i class="fas fa-check"></i></span>
             </td>
             <td>
-                <ul>
+                <ul class="custom-list">
                     <li th:each="owner:${directory.owners}">
                         <span th:text="${owner.name}"></span>[
                         <span th:text="${ownerTypeMap[owner.type]}"></span>:
@@ -157,7 +158,7 @@
         <tr th:each="file : ${files}">
             <form th:action="@{/deleteFile}" th:method="DELETE">
                 <td>
-                    <ul th:switch="${file.type}">
+                    <ul th:switch="${file.type}" class="custom-list">
                         <li th:case="pdf">
                             <a th:href="@{'/view-pdf/'+${file.storedId}}">
                                 <i class="far fa-file-pdf"></i>
@@ -285,7 +286,7 @@
                     <span th:if="${file.openVisible}"><i class="fas fa-check"></i></span>
                 </td>
                 <td>
-                    <ul>
+                    <ul class="custom-list">
                         <li th:each="owner:${file.owners}">
                             <span th:text="${owner.name}"></span>[
                             <span th:text="${ownerTypeMap[owner.type]}"></span>:

@@ -153,18 +153,17 @@
                     <span th:text="${user.username}"></span>
                 </td>
                 <td>
-                    <ul>
+                    <ul class="custom-list">
                         <li th:each="authority:${user.groups}">
                             <span th:text="${authority}"></span>
                         </li>
                     </ul>
                 </td>
                 <td>
-                    <ul>
+                    <ul class="custom-list">
                         <li th:each="privilege:${user.privileges}">
-                            <span th:text="${userTypeMap[privilege]}"></span>
                             <select id="authority" name="authority" class="select custom-select"
-                                    readonly="true">
+                                    readonly="true" disabled="disabled">
                                 <option th:each="entry : ${userTypeMap}"
                                         th:value="${entry.key}"
                                         th:text="${entry.value}"

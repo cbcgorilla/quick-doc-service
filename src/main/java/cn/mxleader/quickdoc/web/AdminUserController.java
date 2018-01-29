@@ -4,8 +4,6 @@ import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,14 +19,12 @@ import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
 @Controller
 @RequestMapping("/admin")
-public class AdminController {
-
-    private final Logger log = LoggerFactory.getLogger(AdminController.class);
+public class AdminUserController {
 
     private final ReactiveUserService reactiveUserService;
 
     @Autowired
-    public AdminController(ReactiveUserService reactiveUserService) {
+    public AdminUserController(ReactiveUserService reactiveUserService) {
         this.reactiveUserService = reactiveUserService;
     }
 

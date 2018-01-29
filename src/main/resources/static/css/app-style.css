@@ -30,6 +30,21 @@
     padding-left: 30px;
 }
 
+ul.custom-list {
+    margin: 0 auto;
+    padding-left: 0;
+}
+ul.custom-list li {
+    display: inline-block;
+    height: 2em;
+    line-height: 2em;
+    list-style: none;
+}
+ul.custom-list a {
+    display: block;
+    line-height: 2em;
+}
+
 footer{
     display:flex;
     flex-direction:column;

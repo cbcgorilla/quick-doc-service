@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
-import static cn.mxleader.quickdoc.common.utils.AuthenticationUtil.*;
+import static cn.mxleader.quickdoc.common.AuthenticationHandler.*;
 
 @Controller
 @RequestMapping("/")

@@ -1,9 +1,9 @@
-package cn.mxleader.quickdoc.common.utils;
+package cn.mxleader.quickdoc.common;
 
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.security.session.ActiveUser;
 
-public class AuthenticationUtil {
+public class AuthenticationHandler {
 
     public static final Integer READ_PRIVILEGE = 1;
     public static final Integer WRITE_PRIVILEGE = 2;

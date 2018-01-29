@@ -3,7 +3,7 @@ package cn.mxleader.quickdoc.service.impl;
 import cn.mxleader.quickdoc.common.utils.MessageUtil;
 import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.dao.ReactiveUserRepository;
-import cn.mxleader.quickdoc.common.utils.MD5Util;
+import cn.mxleader.quickdoc.common.utils.PasswordUtil;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
         return reactiveUserRepository.findByUsername(userEntity.getUsername())
                 .defaultIfEmpty(userEntity)
                 .flatMap(entity -> {
-                    entity.setPassword(MD5Util.getEncryptedPwd(userEntity.getPassword()));
+                    entity.setPassword(PasswordUtil.getEncryptedPwd(userEntity.getPassword()));
                     entity.setRoles(userEntity.getRoles());
                     entity.setPrivileges(userEntity.getPrivileges());
                     entity.setGroups(userEntity.getGroups());
@@ -51,7 +51,7 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
         return findUser(username)
                 .switchIfEmpty(MessageUtil.userNotFoundMsg(username))
                 .flatMap(user -> {
-                    if (!MD5Util.validPassword(password, user.getPassword())) {
+                    if (!PasswordUtil.validPassword(password, user.getPassword())) {
                         return MessageUtil.invalidPasswordMsg(password);
                     }
                     return Mono.just(user);

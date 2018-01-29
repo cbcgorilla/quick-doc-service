@@ -21,14 +21,14 @@ import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
 @Controller
 @RequestMapping("/directory")
-public class DirectoryController {
+public class AdminDirectoryController {
 
-    private final Logger log = LoggerFactory.getLogger(DirectoryController.class);
+    private final Logger log = LoggerFactory.getLogger(AdminDirectoryController.class);
 
     private final ReactiveDirectoryService reactiveDirectoryService;
 
     @Autowired
-    public DirectoryController(ReactiveDirectoryService reactiveDirectoryService) {
+    public AdminDirectoryController(ReactiveDirectoryService reactiveDirectoryService) {
         this.reactiveDirectoryService = reactiveDirectoryService;
     }
 

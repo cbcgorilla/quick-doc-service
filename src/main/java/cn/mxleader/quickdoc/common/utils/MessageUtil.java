@@ -1,6 +1,5 @@
 package cn.mxleader.quickdoc.common.utils;
 
-import cn.mxleader.quickdoc.common.exception.QuickDocException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import reactor.core.publisher.Mono;
