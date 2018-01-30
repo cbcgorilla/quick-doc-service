@@ -181,7 +181,7 @@
                         </li>
                     </ul>
                 </td>
-                <td th:text="${file.size}">文件大小</td>
+                <td th:text="${#numbers.formatInteger(file.size,3,'COMMA')}">文件大小</td>
                 <td th:text="${#dates.format(file.uploadTime,'yyyy-MM-dd HH:mm:ss')}">上传日期
                 </td>
                 <td th:text="${categoryMap[file.categoryId]}">

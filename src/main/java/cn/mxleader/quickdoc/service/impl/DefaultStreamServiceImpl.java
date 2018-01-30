@@ -1,18 +1,21 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.service.StreamService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DefaultStreamServiceImpl implements StreamService {
+    private final Logger log = LoggerFactory.getLogger(DefaultStreamServiceImpl.class);
 
     @Override
-    public void sendMessage(String message){
-        // @TODO Do nothing here.
+    public void sendMessage(String message) {
+        log.info("DefaultStreamServiceImpl sending message: " + message);
     }
 
     @Override
     public void sendMessage(String topic, String message) {
-        // @TODO Do nothing here.
+        log.info("DefaultStreamServiceImpl sending topic: " + topic + ", message: " + message);
     }
 }
