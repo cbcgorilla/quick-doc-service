@@ -3,25 +3,30 @@
 
 功能说明：
 
-1. 用户登录，鉴权，目录分权限管理，共享设置，文件上传，下载，分类管理，文件夹管理，批量下载。
+1. 用户登录，鉴权，目录分权限管理，共享设置，文件上传，下载，分类管理。
 
-2. 批量打包下载仅下载权限可访问的资源。
+2. 文件夹管理，批量下载, 账号及权限组管理。
 
-3. 异步发送登录信息到Kafka消息平台，监控用户登录状态.
+2. 批量打包下载仅下载权限可访问的资源, PDF及图片格式文件预览功能。
 
-4. Swagger UI文档化REST API接口
+3. 异步消息发送到Kafka中间件平台，监控用户登录状态，文件上传及下载信息。.
+
+4. Swagger UI文档化REST API接口。
+
 
 架构组成： 
 
 存储（MongoDB 3.6.2）
 
-服务端：Spring Framework 5.0.2.RELEASE
+服务端：Spring Framework 5.0.3.RELEASE
 
 Spring Boot 2.0 Actuator 提供MongoDB状态及系统配置信息监控点
 
 Spring Security 5.0.0.RELEASE
 
 Kotlin 1.2 实现实体映射Bean
+
+Kafka消息中间件，同步登录信息及文件上传下载记录
 
 Web层： BootStrap 4.0， + font-awesome.css 5.0 + Thymeleaf
 
@@ -44,7 +49,8 @@ Lombok 在 Java 9 环境导致编译异常
 含Kotlin与Java代码的工程在MAVEN脚本编译过程会频繁出现找不到Kotlin类的错误，原因还未排查到。
 目前可通过在Gradle环境下实现完整编译和打包不出错。
 
-分离后端存储与前端web界面为2个独立工程, 后端存储可配合多项工程作共享存储用。
+分离后端存储与前端web界面为2个独立工程, 后端存储可配合多项工程作共享存储用;
+继续完善该文件服务器的其他功能，包括文件批量转储，移动端APP，文件自动同步功能等
 
 ## 界面截图
 ![文件访问界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page1.png)
