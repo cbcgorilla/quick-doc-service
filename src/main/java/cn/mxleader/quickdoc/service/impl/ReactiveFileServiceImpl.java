@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.dao.ReactiveFsDetailRepository;
+import cn.mxleader.quickdoc.dao.ReactiveFileRepository;
 import cn.mxleader.quickdoc.dao.utils.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.FsDescription;
 import cn.mxleader.quickdoc.entities.FsDirectory;
@@ -35,16 +35,16 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
     private final GridFsAssistant gridFsAssistant;
     private final GridFsTemplate gridFsTemplate;
     private final MongoTemplate mongoTemplate;
-    private final ReactiveFsDetailRepository reactiveFsDetailRepository;
+    private final ReactiveFileRepository reactiveFileRepository;
 
     ReactiveFileServiceImpl(GridFsAssistant gridFsAssistant,
                             GridFsTemplate gridFsTemplate,
                             MongoTemplate mongoTemplate,
-                            ReactiveFsDetailRepository reactiveFsDetailRepository) {
+                            ReactiveFileRepository reactiveFileRepository) {
         this.gridFsAssistant = gridFsAssistant;
         this.gridFsTemplate = gridFsTemplate;
         this.mongoTemplate = mongoTemplate;
-        this.reactiveFsDetailRepository = reactiveFsDetailRepository;
+        this.reactiveFileRepository = reactiveFileRepository;
     }
 
     /**
@@ -56,11 +56,11 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      */
     public Mono<FsDescription> getStoredFile(String filename,
                                              ObjectId directoryId) {
-        return reactiveFsDetailRepository.findByFilenameAndDirectoryId(filename, directoryId);
+        return reactiveFileRepository.findByFilenameAndDirectoryId(filename, directoryId);
     }
 
     public Mono<FsDescription> getStoredFile(ObjectId fsDetailId) {
-        return reactiveFsDetailRepository.findById(fsDetailId);
+        return reactiveFileRepository.findById(fsDetailId);
     }
 
     /**
@@ -70,7 +70,17 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @return
      */
     public Flux<FsDescription> getStoredFiles(ObjectId directoryId) {
-        return reactiveFsDetailRepository.findAllByDirectoryId(directoryId);
+        return reactiveFileRepository.findAllByDirectoryId(directoryId);
+    }
+
+    /**
+     * 根据文件名进行模糊查询
+     *
+     * @param filename
+     * @return
+     */
+    public Flux<FsDescription> getStoredFilesNameContaining(String filename){
+        return reactiveFileRepository.findAllByFilenameContaining(filename);
     }
 
     /**
@@ -95,7 +105,7 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
                                             fsDescription.getType()
                                     )
                             );
-                            return reactiveFsDetailRepository.save(fsDescription);
+                            return reactiveFileRepository.save(fsDescription);
                         }
                 );
     }
@@ -114,7 +124,7 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
                 )
                 .flatMap(entity -> {
                     gridFsTemplate.delete(keyQuery(entity.getStoredId()));
-                    return reactiveFsDetailRepository.delete(entity);
+                    return reactiveFileRepository.delete(entity);
                 });
     }
 
@@ -125,13 +135,13 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
      * @return
      */
     public Mono<Void> deleteFile(ObjectId fsDetailId) {
-        return reactiveFsDetailRepository.findById(fsDetailId)
+        return reactiveFileRepository.findById(fsDetailId)
                 .switchIfEmpty(
                         fileNotExistMsg(fsDetailId)
                 )
                 .flatMap(entity -> {
                     gridFsTemplate.delete(keyQuery(entity.getStoredId()));
-                    return reactiveFsDetailRepository.delete(entity);
+                    return reactiveFileRepository.delete(entity);
                 });
     }
 
@@ -199,14 +209,14 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
         Flux<FsDescription> fsDetailFlux;
         if (categoryId == null) {
             // 压缩所有分类
-            fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryId(
+            fsDetailFlux = reactiveFileRepository.findAllByDirectoryId(
                     directory.getId())
                     .filter(fsDetail -> checkAuthentication(fsDetail.getOpenVisible(),
                             fsDetail.getOwners(),
                             activeUser, READ_PRIVILEGE));
         } else {
             // 压缩指定分类文件
-            fsDetailFlux = reactiveFsDetailRepository.findAllByDirectoryIdAndCategoryId(
+            fsDetailFlux = reactiveFileRepository.findAllByDirectoryIdAndCategoryId(
                     directory.getId(), categoryId)
                     .filter(fsDetail -> checkAuthentication(fsDetail.getOpenVisible(),
                             fsDetail.getOwners(),

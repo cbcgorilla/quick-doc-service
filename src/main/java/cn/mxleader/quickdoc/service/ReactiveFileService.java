@@ -33,10 +33,18 @@ public interface ReactiveFileService {
     Flux<FsDescription> getStoredFiles(ObjectId directoryId);
 
     /**
+     * 根据文件名进行模糊查询
+     *
+     * @param filename
+     * @return
+     */
+    Flux<FsDescription> getStoredFilesNameContaining(String filename);
+
+    /**
      * 存储文件， 如同名文件已存在则更新文件内容
      *
      * @param fsDescription 文件描述信息
-     * @param file     文件二进制流
+     * @param file          文件二进制流
      * @return
      */
     Mono<FsDescription> storeFile(FsDescription fsDescription, InputStream file);

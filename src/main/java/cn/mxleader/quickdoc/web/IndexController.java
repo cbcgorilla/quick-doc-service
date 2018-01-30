@@ -113,6 +113,21 @@ public class IndexController {
         return "index";
     }
 
+    @RequestMapping("/search")
+    public String searchFiles(@RequestParam("filename") String filename,
+                              Model model, HttpSession session) {
+        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        model.addAttribute("isAdmin", activeUser.isAdmin());
+
+        model.addAttribute("files",
+                reactiveFileService.getStoredFilesNameContaining(filename)
+                        .filter(fsDetail -> checkAuthentication(fsDetail.getOpenVisible(), fsDetail.getOwners(),
+                                activeUser, READ_PRIVILEGE))
+                        .toStream()
+                        .collect(Collectors.toList()));
+        return "search";
+    }
+
     /**
      * 打包下载指定文件夹内的所有内容
      *
