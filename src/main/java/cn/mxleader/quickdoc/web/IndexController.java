@@ -42,7 +42,7 @@ import static cn.mxleader.quickdoc.common.AuthenticationHandler.*;
 public class IndexController {
 
     private final ReactiveCategoryService reactiveCategoryService;
-    private final ReactiveDirectoryService reactiveDirectoryFsService;
+    private final ReactiveDirectoryService reactiveDirectoryService;
     private final ReactiveFileService reactiveFileService;
     private final QuickDocConfigService quickDocConfigService;
     private final StreamService streamService;
@@ -56,7 +56,7 @@ public class IndexController {
                            StreamService streamService,
                            TensorFlowService tensorFlowService) {
         this.reactiveCategoryService = reactiveCategoryService;
-        this.reactiveDirectoryFsService = reactiveDirectoryFsService;
+        this.reactiveDirectoryService = reactiveDirectoryFsService;
         this.reactiveFileService = reactiveFileService;
         this.quickDocConfigService = quickDocConfigService;
         this.streamService = streamService;
@@ -86,7 +86,7 @@ public class IndexController {
         if (activeUser.isAdmin()) {
             refreshDirList(model, rootParentId, session);
         } else {
-            List<WebDirectory> directories = reactiveDirectoryFsService.findAllByParentIdInWebFormat(rootParentId)
+            List<WebDirectory> directories = reactiveDirectoryService.findAllByParentIdInWebFormat(rootParentId)
                     .filter(webDirectory -> webDirectory.getPath().equalsIgnoreCase("root"))
                     .toStream()
                     .collect(Collectors.toList());
@@ -109,7 +109,7 @@ public class IndexController {
      */
     @GetMapping("/path@{directoryId}")
     public String index(@PathVariable ObjectId directoryId, Model model, HttpSession session) {
-        FsDirectory fsDirectory = reactiveDirectoryFsService.findById(directoryId).block();
+        FsDirectory fsDirectory = reactiveDirectoryService.findById(directoryId).block();
         model.addAttribute("currentdirectory", fsDirectory);
         refreshDirList(model, directoryId, session);
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
@@ -261,7 +261,7 @@ public class IndexController {
                              Model model,
                              HttpSession session) throws IOException {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
-        FsDirectory fsDirectory = reactiveDirectoryFsService.findById(directoryId).block();
+        FsDirectory fsDirectory = reactiveDirectoryService.findById(directoryId).block();
         // 鉴权检查
         if (checkAuthentication(fsDirectory.getPublicVisible(), fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
             FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 7);
@@ -353,7 +353,7 @@ public class IndexController {
                                 HttpSession session) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("directories",
-                reactiveDirectoryFsService.findAllByParentIdInWebFormat(directoryId)
+                reactiveDirectoryService.findAllByParentIdInWebFormat(directoryId)
                         .filter(webDirectory -> checkAuthentication(webDirectory.getPublicVisible(), webDirectory.getOwners(),
                                 activeUser, READ_PRIVILEGE))
                         .toStream()
