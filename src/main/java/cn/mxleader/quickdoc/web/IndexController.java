@@ -297,7 +297,8 @@ public class IndexController {
             reactiveFileService.storeFile(
                     fsDescription,
                     file.getInputStream())
-                    .filter(fsDescription1 -> fsDescription1.getType().equalsIgnoreCase("jpg"))
+                    .filter(fsDescription1 -> fsDescription1.getType().equalsIgnoreCase("jpg") ||
+                            fsDescription1.getType().equalsIgnoreCase("png"))
                     .flatMap(fsDescription1 -> {
                         tensorFlowService.updateImageLabel(fsDescription1);
                         return Mono.just(fsDescription1);
