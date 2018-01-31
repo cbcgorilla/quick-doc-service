@@ -110,6 +110,10 @@ public class ReactiveFileServiceImpl implements ReactiveFileService {
                 );
     }
 
+    public Mono<FsDescription> updateFsDescription(FsDescription fsDescription){
+        return reactiveFileRepository.save(fsDescription);
+    }
+
     /**
      * 删除Mongo库内文件
      *

@@ -95,7 +95,8 @@ public class QuickDocTaskExecutorTestConfig {
                                                 new ObjectId("5a6966f7ae3e442518745836"),
                                                 ObjectId.get(),
                                                 false,
-                                                getRandomOwners());
+                                                getRandomOwners(),
+                                                null);
                                         reactiveFileService.storeFile(
                                                 fsDescription,
                                                 new FileInputStream(file))

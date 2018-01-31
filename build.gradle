@@ -1,7 +1,7 @@
 buildscript {
 	ext.kotlin_version = '1.2.21'
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.RC1'
 		swagger_version='2.8.0'
 		swagger_bootstrap_version = '1.7.2'
 		spring_kafka_version='2.1.2.RELEASE'
@@ -46,6 +46,7 @@ repositories {
 
 dependencies {
 	optional "org.springframework.boot:spring-boot-configuration-processor"
+	compile("org.tensorflow:tensorflow:1.5.0")
 	compile("org.springframework.boot:spring-boot-starter-actuator")
 	compile("org.springframework.boot:spring-boot-starter-hateoas")
 	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
@@ -55,7 +56,7 @@ dependencies {
 	compile("org.springframework.boot:spring-boot-starter-webflux")
 	compile("io.springfox:springfox-swagger2:$swagger_version")
 	compile("io.springfox:springfox-swagger-ui:$swagger_version")
-	compile ("com.github.xiaoymin:swagger-bootstrap-ui:$swagger_bootstrap_version")
+	compile("com.github.xiaoymin:swagger-bootstrap-ui:$swagger_bootstrap_version")
 	compile("org.springframework.kafka:spring-kafka:$spring_kafka_version")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")

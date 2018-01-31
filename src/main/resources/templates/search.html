@@ -54,6 +54,7 @@
             <th>文件长度</th>
             <th>上传日期</th>
             <th>文件分类</th>
+            <td>标签</td>
             <th>公开访问</th>
             <th>权限</th>
             <th>操作</th>
@@ -185,6 +186,13 @@
                 <td th:text="${#dates.format(file.uploadTime,'yyyy-MM-dd HH:mm:ss')}">上传日期
                 </td>
                 <td th:text="${categoryMap[file.categoryId]}">
+                </td>
+                <td>
+                    <ul class="custom-list">
+                        <li th:each="filelabel:${file.labels}">
+                            <span th:text="${filelabel}"></span>.
+                        </li>
+                    </ul>
                 </td>
                 <td>
                     <span th:if="${file.openVisible}"><i class="fas fa-check"></i></span>

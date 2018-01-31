@@ -4,6 +4,7 @@ import cn.mxleader.quickdoc.common.utils.StringUtil;
 import cn.mxleader.quickdoc.entities.FsDescription;
 import cn.mxleader.quickdoc.entities.FsDirectory;
 import cn.mxleader.quickdoc.entities.FsOwner;
+import cn.mxleader.quickdoc.entities.TfMatch;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.service.*;
 import cn.mxleader.quickdoc.web.domain.WebDirectory;
@@ -21,6 +22,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -44,18 +46,21 @@ public class IndexController {
     private final ReactiveFileService reactiveFileService;
     private final QuickDocConfigService quickDocConfigService;
     private final StreamService streamService;
+    private final TensorFlowService tensorFlowService;
 
     @Autowired
     public IndexController(ReactiveCategoryService reactiveCategoryService,
                            ReactiveDirectoryService reactiveDirectoryFsService,
                            ReactiveFileService reactiveFileService,
                            QuickDocConfigService quickDocConfigService,
-                           StreamService streamService) {
+                           StreamService streamService,
+                           TensorFlowService tensorFlowService) {
         this.reactiveCategoryService = reactiveCategoryService;
         this.reactiveDirectoryFsService = reactiveDirectoryFsService;
         this.reactiveFileService = reactiveFileService;
         this.quickDocConfigService = quickDocConfigService;
         this.streamService = streamService;
+        this.tensorFlowService = tensorFlowService;
     }
 
     @ModelAttribute("categoryMap")
@@ -286,12 +291,19 @@ public class IndexController {
                     directoryId,
                     ObjectId.get(),
                     publicVisible,
-                    fsOwnerList.toArray(fsOwnerDesc));
+                    fsOwnerList.toArray(fsOwnerDesc),
+                    null);
 
             reactiveFileService.storeFile(
                     fsDescription,
                     file.getInputStream())
+                    .filter(fsDescription1 -> fsDescription1.getType().equalsIgnoreCase("jpg"))
+                    .flatMap(fsDescription1 -> {
+                        tensorFlowService.updateImageLabel(fsDescription1);
+                        return Mono.just(fsDescription1);
+                    })
                     .subscribe();
+
             refreshDirList(model, directoryId, session);
             // 发送MQ消息
             streamService.sendMessage("用户" + activeUser.getUsername() +

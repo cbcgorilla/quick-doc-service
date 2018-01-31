@@ -5,18 +5,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 
-public class KafkaServiceImpl implements StreamService {
+public class KafkaStreamServiceImpl implements StreamService {
 
     private KafkaTemplate<String, String> kafkaTemplate;
 
     private final String defaultTopic;
 
     @Autowired
-    public KafkaServiceImpl(KafkaTemplate<String, String> kafkaTemplate) {
+    public KafkaStreamServiceImpl(KafkaTemplate<String, String> kafkaTemplate) {
         this(kafkaTemplate, null);
     }
 
-    public KafkaServiceImpl(KafkaTemplate<String, String> kafkaTemplate, String defaultTopic) {
+    public KafkaStreamServiceImpl(KafkaTemplate<String, String> kafkaTemplate, String defaultTopic) {
         this.kafkaTemplate = kafkaTemplate;
         this.defaultTopic = (defaultTopic != null ? defaultTopic : "quick-doc-stream");
     }

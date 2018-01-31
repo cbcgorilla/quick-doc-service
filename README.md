@@ -1,5 +1,5 @@
 # quick-doc-service 快速文档共享服务
-概要： 该服务是研究 Spring Framework 5.0 / Spring Boot 2.0 / Kotlin / MongoDB 期间探索代码功能实现的一个简单文件共享服务系统。
+概要： 该服务是研究 Spring Framework 5.0 / Spring Boot 2.0 / Kotlin / MongoDB / TensorFlow 期间探索代码功能实现的一个简单文件共享服务系统。
 
 功能说明：
 
@@ -12,6 +12,8 @@
 3. 异步消息发送到Kafka中间件平台，监控用户登录状态，文件上传及下载信息。.
 
 4. Swagger UI文档化REST API接口。
+
+5. 引入TensorFlow引擎自动分析图片，增加图片标签
 
 
 架构组成： 
@@ -31,6 +33,8 @@ Kafka消息中间件，同步登录信息及文件上传下载记录
 Web层： BootStrap 4.0， + font-awesome.css 5.0 + Thymeleaf
 
 Springfox Swagger 2.8.0 实现REST API文档化交付界面
+
+TensorFlow for Java 1.5.0 分析上传的图片文件，自动添加识别内容的标签 
 
 ## 待办：
 
@@ -58,5 +62,7 @@ Lombok 在 Java 9 环境导致编译异常
 ![文件夹配置界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page2.png)
 
 ![系统用户配置界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page3.png)
+
+![TensorFlow识别图像标签界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page-tensorflow.png)
 
 ![REST API接口](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/restapi.png)

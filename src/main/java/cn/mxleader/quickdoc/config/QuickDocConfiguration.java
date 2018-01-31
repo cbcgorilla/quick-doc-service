@@ -8,7 +8,7 @@ import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.service.StreamService;
 import cn.mxleader.quickdoc.service.impl.DefaultStreamServiceImpl;
-import cn.mxleader.quickdoc.service.impl.KafkaServiceImpl;
+import cn.mxleader.quickdoc.service.impl.KafkaStreamServiceImpl;
 import cn.mxleader.quickdoc.service.impl.ReactiveUserServiceImpl;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +28,7 @@ import static cn.mxleader.quickdoc.common.AuthenticationHandler.SYSTEM_ADMIN_GRO
 
 @SpringBootConfiguration
 @ConditionalOnClass(StreamService.class)
-@EnableConfigurationProperties(QuickDocProperties.class)
+@EnableConfigurationProperties(QuickDocStreamProperties.class)
 public class QuickDocConfiguration {
 
     @Value("${server.port}")
@@ -42,17 +42,17 @@ public class QuickDocConfiguration {
         }
     }
 
-    private final QuickDocProperties quickDocProperties;
+    private final QuickDocStreamProperties quickDocStreamProperties;
 
-    public QuickDocConfiguration(QuickDocProperties quickDocProperties) {
-        this.quickDocProperties = quickDocProperties;
+    public QuickDocConfiguration(QuickDocStreamProperties quickDocStreamProperties) {
+        this.quickDocStreamProperties = quickDocStreamProperties;
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "quickdoc", value = "stream-enabled")
+    @ConditionalOnProperty(prefix = "quickdoc.stream", value = "enabled")
     public StreamService streamService(KafkaTemplate<String, String> kafkaTemplate) {
-        if (quickDocProperties.getStreamEnabled())
-            return new KafkaServiceImpl(kafkaTemplate, quickDocProperties.getStreamTopic());
+        if (quickDocStreamProperties.getEnabled())
+            return new KafkaStreamServiceImpl(kafkaTemplate, quickDocStreamProperties.getTopic());
         else
             return new DefaultStreamServiceImpl();
     }

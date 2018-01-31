@@ -121,6 +121,7 @@
             <th>文件长度</th>
             <th>上传日期</th>
             <th>文件分类</th>
+            <th>标签</th>
             <th>公开访问</th>
             <th>权限</th>
             <th>操作</th>
@@ -134,7 +135,7 @@
                 <i th:if="${directory.childrenCount==0}" class="far fa-folder"></i>
                 <a th:href="@{'/path@'+${directory.id}}" th:text="${directory.path}"/>
             </td>
-            <td th:text="@{'文件夹'}" colspan="3"></td>
+            <td th:text="@{'文件夹'}" colspan="4"></td>
             <td>
                 <span th:if="${directory.publicVisible}"><i class="fas fa-check"></i></span>
             </td>
@@ -287,6 +288,13 @@
                                 th:selected="(${entry.key} == ${file.categoryId})">文件分类
                         </option>
                     </select>-->
+                </td>
+                <td>
+                    <ul class="custom-list">
+                        <li th:each="filelabel:${file.labels}">
+                            <span th:text="${filelabel}"></span>.
+                        </li>
+                    </ul>
                 </td>
                 <td>
                     <span th:if="${file.openVisible}"><i class="fas fa-check"></i></span>

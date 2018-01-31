@@ -48,6 +48,7 @@ public interface ReactiveFileService {
      * @return
      */
     Mono<FsDescription> storeFile(FsDescription fsDescription, InputStream file);
+    Mono<FsDescription> updateFsDescription(FsDescription fsDescription);
 
     /**
      * 删除Mongo库内文件

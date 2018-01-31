@@ -15,7 +15,8 @@ data class FsDescription(@Id var id: ObjectId,
                          var directoryId: ObjectId,
                          var storedId: ObjectId,
                          var openVisible:Boolean = false,
-                         var owners: Array<FsOwner>? = null) {
+                         var owners: Array<FsOwner>? = null,
+                         var labels:Array<String>? = null) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -32,6 +33,7 @@ data class FsDescription(@Id var id: ObjectId,
         if (storedId != other.storedId) return false
         if (openVisible != other.openVisible) return false
         if (!Arrays.equals(owners, other.owners)) return false
+        if (!Arrays.equals(labels, other.labels)) return false
 
         return true
     }
@@ -47,6 +49,7 @@ data class FsDescription(@Id var id: ObjectId,
         result = 31 * result + storedId.hashCode()
         result = 31 * result + openVisible.hashCode()
         result = 31 * result + (owners?.let { Arrays.hashCode(it) } ?: 0)
+        result = 31 * result + (labels?.let { Arrays.hashCode(it) } ?: 0)
         return result
     }
 }
