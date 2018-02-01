@@ -266,7 +266,6 @@ public class IndexController {
         if (checkAuthentication(fsDirectory.getPublicVisible(), fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
             FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 7);
             List<FsOwner> fsOwnerList = new ArrayList<FsOwner>();
-            FsOwner[] fsOwnerDesc = new FsOwner[]{};
             fsOwnerList.add(owner);
             Boolean publicVisible = false;
             if (ownersRequest != null && ownersRequest.length > 0) {
@@ -281,11 +280,14 @@ public class IndexController {
                     }
                 }
             }
+            FsOwner[] fsOwnerDesc = new FsOwner[fsOwnerList.size()];
             String filename = StringUtil.getFilename(file.getOriginalFilename());
+            String fileType = StringUtils.getFilenameExtension(filename) != null ?
+                    StringUtils.getFilenameExtension(filename) : "No Extension";
             FsDescription fsDescription = new FsDescription(ObjectId.get(),
                     filename,
                     file.getSize(),
-                    StringUtils.getFilenameExtension(filename).toLowerCase(),
+                    fileType,
                     new Date(),
                     categoryId,
                     directoryId,

@@ -86,10 +86,12 @@ public class QuickDocTaskExecutorTestConfig {
                         .map(
                                 file -> {
                                     try {
+                                        String fileType = StringUtils.getFilenameExtension(file.getName()) != null ?
+                                                StringUtils.getFilenameExtension(file.getName()) : "No Extension";
                                         FsDescription fsDescription = new FsDescription(ObjectId.get(),
                                                 file.getName(),
                                                 file.length(),
-                                                StringUtils.getFilenameExtension(file.getName()).toLowerCase(),
+                                                fileType,
                                                 new Date(),
                                                 new ObjectId("5a6966f7ae3e442518745833"),
                                                 new ObjectId("5a6966f7ae3e442518745836"),
