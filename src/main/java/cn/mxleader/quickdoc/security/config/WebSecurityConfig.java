@@ -4,6 +4,7 @@ import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.security.authprovider.WebAuthenticationProvider;
 import cn.mxleader.quickdoc.security.handler.ApiAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -23,6 +24,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 
 @Configuration
 @EnableWebSecurity
@@ -56,7 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             // @TODO 删除.csrf().disable() 可屏蔽 /management 路径下的POST提交，仅支持GET方法交互
-            http.csrf().disable().antMatcher("/management/**").authorizeRequests()
+            http.csrf().disable().requestMatcher(
+                    EndpointRequest.to("mongo-status", "quick-doc-config")).authorizeRequests()
                     .anyRequest().hasAuthority(UserEntity.Authorities.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())

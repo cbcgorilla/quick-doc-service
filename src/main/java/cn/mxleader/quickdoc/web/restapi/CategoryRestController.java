@@ -2,6 +2,7 @@ package cn.mxleader.quickdoc.web.restapi;
 
 import cn.mxleader.quickdoc.entities.FsCategory;
 import cn.mxleader.quickdoc.entities.RestResponse;
+import cn.mxleader.quickdoc.entities.SuccessResponse;
 import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.web.domain.RenameCategory;
 import io.swagger.annotations.Api;
@@ -37,46 +38,32 @@ public class CategoryRestController {
 
     @PostMapping("/add/{type}")
     @ApiOperation(value = "新增文件分类信息")
-    public Mono<RestResponse<FsCategory>> addCategory(@PathVariable String type) {
+    public Mono<RestResponse> addCategory(@PathVariable String type) {
         return reactiveCategoryService.addCategory(type)
-                .map(fsCategory -> new RestResponse<>(
-                        "新增文件分类信息",
-                        RestResponse.CODE.SUCCESS,
-                        fsCategory));
+                .map(fsCategory -> new SuccessResponse<>(fsCategory));
     }
 
     @PostMapping(value = "/rename",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "更改文件分类名称")
-    public Mono<RestResponse<String>> renameCategory(@RequestBody RenameCategory replaceModel) {
+    public Mono<RestResponse> renameCategory(@RequestBody RenameCategory replaceModel) {
         return reactiveCategoryService.renameCategory(
                 replaceModel.getOldType(), replaceModel.getNewType())
-                .flatMap(fsCategory -> Mono.just(
-                        new RestResponse<>(
-                                "更改文件分类名称",
-                                RestResponse.CODE.SUCCESS,
-                                "文件分类改名成功！")))
-                .doOnError(v -> log.warn(v.getMessage()))
-                .onErrorReturn(new RestResponse<>(
-                        "更改文件分类名称",
-                        RestResponse.CODE.FAIL,
-                        "文件分类重命名失败, 请检查新文件分类名是否有误！"));
+                .map(fsCategory -> new SuccessResponse<>("文件分类改名成功！"));
+                /*.doOnError(v -> log.warn(v.getMessage()))
+                *//*.onErrorReturn(new Error(0,
+                        "文件分类重命名失败, 请检查新文件分类名是否有误！"));*/
     }
 
     @DeleteMapping(value = "/delete/{type}",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "删除文件分类")
-    public Mono<RestResponse<String>> deleteCategory(@PathVariable String type) {
+    public Mono<RestResponse> deleteCategory(@PathVariable String type) {
         return reactiveCategoryService.deleteCategory(type)
-                .flatMap(v -> Mono.just(new RestResponse<>(
-                        "删除文件分类",
-                        RestResponse.CODE.SUCCESS,
-                        "删除文件分类成功！")))
-                .doOnError(v -> log.warn(v.getMessage()))
-                .onErrorReturn(new RestResponse<>(
-                        "删除文件分类",
-                        RestResponse.CODE.FAIL,
-                        "删除文件分类失败, 请检查文件分类名是否有误！"));
+                .map(v -> new SuccessResponse<>("删除文件分类成功！"));
+                /*.doOnError(v -> log.warn(v.getMessage()))
+                .onErrorReturn(new Error(0,
+                        "删除文件分类失败, 请检查文件分类名是否有误！"));*/
     }
 
 }

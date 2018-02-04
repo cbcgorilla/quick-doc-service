@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.web.restapi;
 
 import cn.mxleader.quickdoc.entities.RestResponse;
+import cn.mxleader.quickdoc.entities.SuccessResponse;
 import cn.mxleader.quickdoc.entities.UserEntity;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import io.swagger.annotations.Api;
@@ -13,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/user")
-@Api(value = "User API",description = "用户信息变更接口")
+@Api(value = "User API", description = "用户信息变更接口")
 public class UserRestController {
 
     private final ReactiveUserService reactiveUserService;
@@ -27,12 +28,7 @@ public class UserRestController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value = "返回所有用户信息清单")
     public Flux<UserEntity> listAllUsers() {
-        return reactiveUserService.findAllUsers();/*
-        if (users.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-            // You many decide to return HttpStatus.NOT_FOUND
-        }
-        return new ResponseEntity<List<User>>(users, HttpStatus.OK);*/
+        return reactiveUserService.findAllUsers();
     }
 
     // -------------------Retrieve Single User------------------------------------------
@@ -46,20 +42,17 @@ public class UserRestController {
     @PostMapping(value = "/save",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "新增或保存系统用户")
-    public Mono<RestResponse<UserEntity>> addUser(
+    public Mono<RestResponse> addUser(
             @RequestBody UserEntity userEntity) {
-        return reactiveUserService
-                .saveUser(userEntity)
-                .map(user -> new RestResponse<>(
-                        "新增或保存系统用户",
-                        RestResponse.CODE.SUCCESS, user));
+        return reactiveUserService.saveUser(userEntity)
+                .map(SuccessResponse::new);
     }
 
     @DeleteMapping(value = "/delete/{username}")
     @ApiOperation(value = "删除系统用户")
-    public Mono<RestResponse> deleteUser(@PathVariable String username){
+    public Mono<RestResponse> deleteUser(@PathVariable String username) {
         reactiveUserService.deleteUserByUsername(username).subscribe();
-        return Mono.just(new RestResponse("删除系统用户", RestResponse.CODE.SUCCESS,null));
+        return Mono.just(new SuccessResponse<>("成功删除系统用户：" + username));
     }
 
 }

@@ -2,6 +2,8 @@ package cn.mxleader.quickdoc.web.restapi;
 
 import cn.mxleader.quickdoc.entities.RestResponse;
 import cn.mxleader.quickdoc.entities.FsDirectory;
+import cn.mxleader.quickdoc.entities.SuccessResponse;
+import cn.mxleader.quickdoc.entities.ErrorResponse;
 import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.service.QuickDocConfigService;
 import cn.mxleader.quickdoc.web.domain.WebDirectory;
@@ -52,82 +54,47 @@ public class DirectoryRestController {
     @PostMapping(value = "/save",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "保存目录信息")
-    public Mono<RestResponse<FsDirectory>> saveDirectory(@RequestBody FsDirectory directory) {
+    public Mono<RestResponse> saveDirectory(@RequestBody FsDirectory directory) {
         return reactiveDirectoryService.saveDirectory(directory)
-                .map(fsDirectory -> (new RestResponse<>(
-                        "保存目录信息",
-                        RestResponse.CODE.SUCCESS,
-                        fsDirectory)));
+                .map(SuccessResponse::new);
     }
 
     @PostMapping(value = "/rename/{directoryId}",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "更改目录名称")
-    public Mono<RestResponse<String>> renameDirectory
+    public Mono<RestResponse> renameDirectory
             (@PathVariable("directoryId") ObjectId directoryId,
              @RequestBody String newPath) {
-        Optional<FsDirectory> fsDirectoryMono = reactiveDirectoryService.findById(directoryId).blockOptional();
-        if (fsDirectoryMono.isPresent()) {
-            return reactiveDirectoryService.renameDirectory(fsDirectoryMono.get(), newPath)
-                    .flatMap(fsCategory -> Mono.just(
-                            new RestResponse<>(
-                                    "更改目录名称",
-                                    RestResponse.CODE.SUCCESS,
-                                    "目录改名成功！")))
-                    .doOnError(v -> log.warn(v.getMessage()))
-                    .onErrorReturn(new RestResponse<>(
-                            "更改目录名称",
-                            RestResponse.CODE.FAIL,
-                            "目录重命名失败, 请检查新目录名是否有误！"));
+        Optional<FsDirectory> fsDirectoryOptional = reactiveDirectoryService.findById(directoryId).blockOptional();
+        if (fsDirectoryOptional.isPresent()) {
+            return reactiveDirectoryService.renameDirectory(fsDirectoryOptional.get(), newPath)
+                    .map(fsCategory -> new SuccessResponse<>("目录改名成功！"));
         } else {
-            return Mono.just(new RestResponse<>(
-                    "更改目录名称",
-                    RestResponse.CODE.FAIL,
-                    "目录重命名失败, 请检查新目录名是否有误！"));
+            return Mono.just(new ErrorResponse(0, "目录重命名失败, 请检查新目录名是否有误！"));
         }
     }
 
     @PostMapping(value = "/move/{directoryId}",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "移动目录位置")
-    public Mono<RestResponse<String>> moveDirectory
+    public Mono<RestResponse> moveDirectory
             (@PathVariable("directoryId") ObjectId directoryId,
              @RequestBody String newDirectoryId) {
-        Optional<FsDirectory> fsDirectoryMono = reactiveDirectoryService.findById(directoryId).blockOptional();
-        if (fsDirectoryMono.isPresent()) {
+        Optional<FsDirectory> fsDirectoryOptional = reactiveDirectoryService.findById(directoryId).blockOptional();
+        if (fsDirectoryOptional.isPresent()) {
             return reactiveDirectoryService.moveDirectory(directoryId, new ObjectId(newDirectoryId))
-                    .flatMap(fsCategory -> Mono.just(
-                            new RestResponse<>(
-                                    "移动目录位置",
-                                    RestResponse.CODE.SUCCESS,
-                                    "目录转移成功！")))
-                    .doOnError(v -> log.warn(v.getMessage()))
-                    .onErrorReturn(new RestResponse<>(
-                            "移动目录位置",
-                            RestResponse.CODE.FAIL,
-                            "目录转移失败, 请检查新目录ID是否有误！"));
+                    .map(fsCategory -> new SuccessResponse<>("目录转移成功！"));
         } else {
-            return Mono.just(new RestResponse<>(
-                    "移动目录位置",
-                    RestResponse.CODE.FAIL,
-                    "目录转移失败, 请检查新目录ID是否有误！"));
+            return Mono.just(new ErrorResponse(0, "目录转移失败, 请检查新目录ID是否有误！"));
         }
     }
 
     @DeleteMapping(value = "/delete/{directoryId}",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "删除文件夹")
-    public Mono<RestResponse<String>> deleteCategory(@PathVariable ObjectId directoryId) {
+    public Mono<RestResponse> deleteCategory(@PathVariable ObjectId directoryId) {
         return reactiveDirectoryService.deleteDirectory(directoryId)
-                .flatMap(v -> Mono.just(new RestResponse<>(
-                        "删除文件夹",
-                        RestResponse.CODE.SUCCESS,
-                        "删除文件夹成功！")))
-                .doOnError(v -> log.warn(v.getMessage()))
-                .onErrorReturn(new RestResponse<>(
-                        "删除文件夹",
-                        RestResponse.CODE.FAIL,
-                        "删除文件夹失败, 请检查目录名是否有误！"));
+                .map(v -> new SuccessResponse<>("删除文件夹成功！"));
     }
 
 }

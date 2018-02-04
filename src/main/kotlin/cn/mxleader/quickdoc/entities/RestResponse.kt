@@ -1,9 +1,5 @@
 package cn.mxleader.quickdoc.entities
 
-data class RestResponse<T>(val action: String,
-                           val code: CODE,
-                           val result: T? = null) {
-    enum class CODE {
-        SUCCESS, FAIL, ERROR
-    }
-}
+sealed class RestResponse
+data class SuccessResponse<out T>(val content: T) : RestResponse()
+data class ErrorResponse(val code: Int, val message: String) : RestResponse()
