@@ -41,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        // 针对 css 和 images 资源忽略认证
+        // 针对静态资源忽略访问认证
         web.ignoring()
                 .antMatchers(HttpMethod.GET, "/css/**/*")
                 .antMatchers(HttpMethod.GET, "/images/**/*")

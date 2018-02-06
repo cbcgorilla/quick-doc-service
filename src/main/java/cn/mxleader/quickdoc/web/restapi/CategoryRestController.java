@@ -7,8 +7,6 @@ import cn.mxleader.quickdoc.service.ReactiveCategoryService;
 import cn.mxleader.quickdoc.web.domain.RenameCategory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +20,6 @@ import reactor.core.publisher.Mono;
 public class CategoryRestController {
 
     private final ReactiveCategoryService reactiveCategoryService;
-
-    private final Logger log = LoggerFactory.getLogger(CategoryRestController.class);
 
     @Autowired
     CategoryRestController(ReactiveCategoryService reactiveCategoryService) {
@@ -40,7 +36,7 @@ public class CategoryRestController {
     @ApiOperation(value = "新增文件分类信息")
     public Mono<RestResponse> addCategory(@PathVariable String type) {
         return reactiveCategoryService.addCategory(type)
-                .map(fsCategory -> new SuccessResponse<>(fsCategory));
+                .map(SuccessResponse::new);
     }
 
     @PostMapping(value = "/rename",
@@ -50,9 +46,6 @@ public class CategoryRestController {
         return reactiveCategoryService.renameCategory(
                 replaceModel.getOldType(), replaceModel.getNewType())
                 .map(fsCategory -> new SuccessResponse<>("文件分类改名成功！"));
-                /*.doOnError(v -> log.warn(v.getMessage()))
-                *//*.onErrorReturn(new Error(0,
-                        "文件分类重命名失败, 请检查新文件分类名是否有误！"));*/
     }
 
     @DeleteMapping(value = "/delete/{type}",
@@ -61,9 +54,6 @@ public class CategoryRestController {
     public Mono<RestResponse> deleteCategory(@PathVariable String type) {
         return reactiveCategoryService.deleteCategory(type)
                 .map(v -> new SuccessResponse<>("删除文件分类成功！"));
-                /*.doOnError(v -> log.warn(v.getMessage()))
-                .onErrorReturn(new Error(0,
-                        "删除文件分类失败, 请检查文件分类名是否有误！"));*/
     }
 
 }

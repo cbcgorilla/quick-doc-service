@@ -1,17 +1,15 @@
 package cn.mxleader.quickdoc.web.restapi;
 
-import cn.mxleader.quickdoc.entities.RestResponse;
-import cn.mxleader.quickdoc.entities.FsDirectory;
-import cn.mxleader.quickdoc.entities.SuccessResponse;
 import cn.mxleader.quickdoc.entities.ErrorResponse;
-import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
+import cn.mxleader.quickdoc.entities.FsDirectory;
+import cn.mxleader.quickdoc.entities.RestResponse;
+import cn.mxleader.quickdoc.entities.SuccessResponse;
 import cn.mxleader.quickdoc.service.QuickDocConfigService;
+import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
 import cn.mxleader.quickdoc.web.domain.WebDirectory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +26,6 @@ public class DirectoryRestController {
 
     private final ReactiveDirectoryService reactiveDirectoryService;
     private final QuickDocConfigService quickDocConfigService;
-
-    private final Logger log = LoggerFactory.getLogger(DirectoryRestController.class);
 
     @Autowired
     DirectoryRestController(ReactiveDirectoryService reactiveDirectoryService,
