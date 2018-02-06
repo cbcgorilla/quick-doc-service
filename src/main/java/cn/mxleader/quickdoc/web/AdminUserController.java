@@ -55,8 +55,8 @@ public class AdminUserController {
         return "admin";
     }
 
-    @PostMapping("/addUser")
-    public String addUser(@RequestParam("username") String username,
+    @PostMapping("/saveUser")
+    public String saveUser(@RequestParam("username") String username,
                           @RequestParam("password") String password,
                           @RequestParam("userGroup") String userGroup,
                           @RequestParam("userType") UserEntity.Authorities userType,
@@ -69,7 +69,7 @@ public class AdminUserController {
         reactiveUserService.saveUser(userEntity).subscribe();
 
         redirectAttributes.addFlashAttribute("message",
-                "成功添加用户： " + username);
+                "保存用户信息成功： " + username);
         return "redirect:/admin";
     }
 

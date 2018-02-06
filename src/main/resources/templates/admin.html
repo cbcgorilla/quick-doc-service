@@ -15,6 +15,19 @@
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/popper.js/1.13.0/umd/popper.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        //<![CDATA[
+        $(document).on("click", ".addMemberDialogModal", function () {
+            $(".template-input-icon-container #username").val("");
+        });
+        $(document).on("click", ".editMemberDialogModal", function () {
+            var $td = $(this).parents('tr').children('td');
+            $(".template-input-icon-container #username").val($td.eq(0).text());
+            $(".template-input-icon-container #userGroup").val($td.eq(1).find("ul.custom-list > li").text().trim());
+            $(".template-input-icon-container #userType").val($td.eq(2).find("select").get(0).val());
+        });
+        //]]>
+    </script>
 
 </head>
 <body>
@@ -53,7 +66,7 @@
         <div class="box-head">
             <strong class="box-title"> 成员管理</strong>
             <!-- 管理员 0  才可以添加用户 -->
-            <button type="button" class="btn btn-success btn-sm pull-right" data-toggle="modal"
+            <button type="button" class="addMemberDialogModal btn btn-success btn-sm pull-right" data-toggle="modal"
                     data-target="#addMemberDialogModal"><i class="fa fa-user-plus" aria-hidden="true"></i> 添加成员
             </button>
         </div>
@@ -66,14 +79,14 @@
 
                 <!-- 模态框头部 -->
                 <div class="modal-header">
-                    <h4 class="modal-title">新增人员</h4>
+                    <h4 class="modal-title" id="modal-title">人员信息</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
                 <!-- 模态框主体 -->
                 <div class="modal-body">
                     <div class="table-responsive" style="text-align: center">
-                        <form class="form-horizontal" method="POST" th:action="@{'admin/addUser'}">
+                        <form class="form-horizontal" method="POST" th:action="@{'admin/saveUser'}">
                             <table class="table table-hover">
                                 <tr>
                                     <td align="right">用户名:</td>
@@ -148,9 +161,7 @@
         <tbody>
         <tr th:each="user : ${users}">
             <form th:action="@{/admin/deleteUser}" th:method="DELETE">
-                <td>
-                    <span th:text="${user.username}"></span>
-                </td>
+                <td th:text="${user.username}"></td>
                 <td>
                     <ul class="custom-list">
                         <li th:each="usergroup:${user.groups}">
@@ -174,8 +185,9 @@
                 </td>
                 <td>
                     <div class="input-group">
-                        <a th:href="@{'/admin/editUser/'+${user.id}}"
-                           class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                        <a data-toggle="modal" title="Add this item"
+                           class="editMemberDialogModal btn btn-primary"
+                           href="#addMemberDialogModal"><i class="fas fa-edit"></i></a>
                         <input type="hidden" id="userId" name="userId" th:value="${user.id}"/>
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                         <input type="submit" value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
