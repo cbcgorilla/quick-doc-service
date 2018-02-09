@@ -3,6 +3,9 @@ package cn.mxleader.quickdoc.common;
 import cn.mxleader.quickdoc.entities.FsOwner;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AuthenticationHandler {
 
     public static final Integer READ_PRIVILEGE = 1;
@@ -51,5 +54,33 @@ public class AuthenticationHandler {
             }
         }
         return false;
+    }
+
+    public static Boolean getPublicVisibleFromOwnerRequest(String[] ownersRequest) {
+        if (ownersRequest != null && ownersRequest.length > 0) {
+            for (String item : ownersRequest) {
+                if (item.equalsIgnoreCase("PublicMode")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static FsOwner[] translateOwnerRequest(ActiveUser activeUser, String[] ownersRequest) {
+        FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 7);
+        List<FsOwner> fsOwnerList = new ArrayList<FsOwner>();
+        fsOwnerList.add(owner);
+        if (ownersRequest != null && ownersRequest.length > 0) {
+            for (String item : ownersRequest) {
+                if (item.equalsIgnoreCase("GroupMode")) {
+                    for (String group : activeUser.getGroups()) {
+                        fsOwnerList.add(new FsOwner(group, FsOwner.Type.TYPE_GROUP, 3));
+                    }
+                }
+            }
+        }
+        FsOwner[] fsOwnerDesc = new FsOwner[fsOwnerList.size()];
+        return fsOwnerList.toArray(fsOwnerDesc);
     }
 }

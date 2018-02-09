@@ -264,23 +264,6 @@ public class IndexController {
         FsDirectory fsDirectory = reactiveDirectoryService.findById(directoryId).block();
         // 鉴权检查
         if (checkAuthentication(fsDirectory.getPublicVisible(), fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
-            FsOwner owner = new FsOwner(activeUser.getUsername(), FsOwner.Type.TYPE_PRIVATE, 7);
-            List<FsOwner> fsOwnerList = new ArrayList<FsOwner>();
-            fsOwnerList.add(owner);
-            Boolean publicVisible = false;
-            if (ownersRequest != null && ownersRequest.length > 0) {
-                for (String item : ownersRequest) {
-                    if (item.equalsIgnoreCase("PublicMode")) {
-                        //fsOwnerList.add(new FsOwner("public", FsOwner.Type.TYPE_PUBLIC, 1));
-                        publicVisible = true;
-                    } else if (item.equalsIgnoreCase("GroupMode")) {
-                        for (String group : activeUser.getGroups()) {
-                            fsOwnerList.add(new FsOwner(group, FsOwner.Type.TYPE_GROUP, 3));
-                        }
-                    }
-                }
-            }
-            FsOwner[] fsOwnerDesc = new FsOwner[fsOwnerList.size()];
             String filename = StringUtil.getFilename(file.getOriginalFilename());
             String fileType = StringUtils.getFilenameExtension(filename) != null ?
                     StringUtils.getFilenameExtension(filename) : "No Extension";
@@ -292,8 +275,8 @@ public class IndexController {
                     categoryId,
                     directoryId,
                     ObjectId.get(),
-                    publicVisible,
-                    fsOwnerList.toArray(fsOwnerDesc),
+                    getPublicVisibleFromOwnerRequest(ownersRequest),
+                    translateOwnerRequest(activeUser, ownersRequest),
                     null);
 
             reactiveFileService.storeFile(
