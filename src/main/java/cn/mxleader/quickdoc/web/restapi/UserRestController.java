@@ -2,7 +2,7 @@ package cn.mxleader.quickdoc.web.restapi;
 
 import cn.mxleader.quickdoc.entities.RestResponse;
 import cn.mxleader.quickdoc.entities.SuccessResponse;
-import cn.mxleader.quickdoc.entities.UserEntity;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +27,7 @@ public class UserRestController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value = "返回所有用户信息清单")
-    public Flux<UserEntity> listAllUsers() {
+    public Flux<QuickDocUser> listAllUsers() {
         return reactiveUserService.findAllUsers();
     }
 
@@ -35,7 +35,7 @@ public class UserRestController {
 
     @RequestMapping(value = "/get/{username}", method = RequestMethod.GET)
     @ApiOperation(value = "根据用户名返回用户信息详情")
-    public Mono<UserEntity> getUser(@PathVariable("username") String username) {
+    public Mono<QuickDocUser> getUser(@PathVariable("username") String username) {
         return reactiveUserService.findUser(username);
     }
 
@@ -43,8 +43,8 @@ public class UserRestController {
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "新增或保存系统用户")
     public Mono<RestResponse> addUser(
-            @RequestBody UserEntity userEntity) {
-        return reactiveUserService.saveUser(userEntity)
+            @RequestBody QuickDocUser quickDocUser) {
+        return reactiveUserService.saveUser(quickDocUser)
                 .map(SuccessResponse::new);
     }
 

@@ -6,11 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
 @Document
-data class UserEntity(@Id var id: ObjectId,
-                      var username:String,
-                      var password:String,
-                      var authorities:Array<Authorities>,
-                      var groups:Array<String>) {
+data class QuickDocUser(@Id var id: ObjectId,
+                        var username:String,
+                        var password:String,
+                        var authorities:Array<Authorities>,
+                        var groups:Array<String>) {
 
     enum class Authorities {
         ADMIN, USER
@@ -20,7 +20,7 @@ data class UserEntity(@Id var id: ObjectId,
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as UserEntity
+        other as QuickDocUser
 
         if (id != other.id) return false
         if (username != other.username) return false

@@ -1,11 +1,8 @@
 package cn.mxleader.quickdoc.web;
 
-import cn.mxleader.quickdoc.common.utils.StringUtil;
-import cn.mxleader.quickdoc.entities.FsDescription;
-import cn.mxleader.quickdoc.entities.FsDirectory;
-import cn.mxleader.quickdoc.entities.FsOwner;
+import cn.mxleader.quickdoc.entities.QuickDocFolder;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;
-import cn.mxleader.quickdoc.service.ReactiveDirectoryService;
+import cn.mxleader.quickdoc.service.ReactiveFolderService;
 import cn.mxleader.quickdoc.service.StreamService;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -13,35 +10,30 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
 import java.util.stream.Collectors;
 
-import static cn.mxleader.quickdoc.common.AuthenticationHandler.*;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
+import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.*;
+import static cn.mxleader.quickdoc.web.config.WebHandlerInterceptor.FOLDERS_ATTRIBUTE;
 
 @Controller
-@RequestMapping("/directory")
-public class AdminDirectoryController {
+@RequestMapping("/folders")
+public class FolderController {
 
-    private final Logger log = LoggerFactory.getLogger(AdminDirectoryController.class);
+    private final Logger log = LoggerFactory.getLogger(FolderController.class);
 
-    private final ReactiveDirectoryService reactiveDirectoryService;
+    private final ReactiveFolderService reactiveFolderService;
     private final StreamService streamService;
 
     @Autowired
-    public AdminDirectoryController(ReactiveDirectoryService reactiveDirectoryService,
-                                    StreamService streamService) {
-        this.reactiveDirectoryService = reactiveDirectoryService;
+    public FolderController(ReactiveFolderService reactiveFolderService,
+                            StreamService streamService) {
+        this.reactiveFolderService = reactiveFolderService;
         this.streamService = streamService;
     }
 
@@ -53,10 +45,9 @@ public class AdminDirectoryController {
      */
     @GetMapping()
     public String index(Model model) {
-        model.addAttribute("directories", reactiveDirectoryService.findAllInWebFormat()
-                .toStream()
-                .collect(Collectors.toList()));
-        return "directory";
+        model.addAttribute(FOLDERS_ATTRIBUTE, reactiveFolderService.findAllInWebFormat()
+                .toStream().collect(Collectors.toList()));
+        return "folders";
     }
 
     /**
@@ -66,7 +57,6 @@ public class AdminDirectoryController {
      * @param path
      * @param ownersRequest
      * @param redirectAttributes
-     * @param model
      * @param session
      * @return
      */
@@ -75,15 +65,16 @@ public class AdminDirectoryController {
                        @RequestParam("path") String path,
                        @RequestParam(value = "owners", required = false) String[] ownersRequest,
                        RedirectAttributes redirectAttributes,
-                       Model model,
                        HttpSession session) {
 
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
-        FsDirectory fsDirectory = reactiveDirectoryService.findById(new ObjectId(parentId)).block();
+        QuickDocFolder quickDocFolder = reactiveFolderService.findById(new ObjectId(parentId)).block();
         // 鉴权检查
-        if (checkAuthentication(fsDirectory.getPublicVisible(), fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
-            reactiveDirectoryService.saveDirectory(path, new ObjectId(parentId),
-                    getPublicVisibleFromOwnerRequest(ownersRequest),
+        if (checkAuthentication(quickDocFolder.getOpenAccess(),
+                quickDocFolder.getAuthorizations(),
+                activeUser, WRITE_PRIVILEGE)) {
+            reactiveFolderService.save(path, new ObjectId(parentId),
+                    getOpenAccessFromOwnerRequest(ownersRequest),
                     translateOwnerRequest(activeUser, ownersRequest)).subscribe();
 
             // 发送MQ消息
@@ -93,38 +84,38 @@ public class AdminDirectoryController {
                     "成功添加目录： " + path);
         } else {
             redirectAttributes.addFlashAttribute("message",
-                    "您无此目录的权限： " + fsDirectory.getPath() + "，请联系管理员获取！");
+                    "您无此目录的权限： " + quickDocFolder.getPath() + "，请联系管理员获取！");
         }
-        return "redirect:/directory";
+        return "redirect:/folders";
     }
 
     /**
      * 删除文件夹
      *
-     * @param directoryId
+     * @param folderId
      * @param session
      * @param redirectAttributes
      * @return
      */
-    @DeleteMapping("/deleteDirectory")
-    public String deleteDirectory(@RequestParam("directoryId") ObjectId directoryId,
-                                  HttpSession session,
-                                  RedirectAttributes redirectAttributes) {
+    @DeleteMapping("/delete")
+    public String delete(@RequestParam("folderId") ObjectId folderId,
+                         HttpSession session,
+                         RedirectAttributes redirectAttributes) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         if (activeUser.isAdmin()) {
-            reactiveDirectoryService.deleteDirectory(directoryId)
+            reactiveFolderService.delete(folderId)
                     .onErrorMap(v -> {
                         log.warn(v.getMessage());
                         return v;
                     })
                     .subscribe();
             redirectAttributes.addFlashAttribute("message",
-                    "成功删除文件夹： " + directoryId);
+                    "成功删除文件夹： " + folderId);
         } else {
             redirectAttributes.addFlashAttribute("message",
                     "您无删除文件夹的权限，请联系管理员获取！");
         }
-        return "redirect:/directory";
+        return "redirect:/folders";
     }
 
 }

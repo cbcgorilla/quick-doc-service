@@ -1,10 +1,7 @@
 package cn.mxleader.quickdoc;
 
-import cn.mxleader.quickdoc.entities.FsDescription;
-import cn.mxleader.quickdoc.entities.FsOwner;
-import cn.mxleader.quickdoc.service.ReactiveCategoryService;
-import cn.mxleader.quickdoc.service.ReactiveFileService;
-import org.bson.types.ObjectId;
+import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,6 @@ import reactor.core.publisher.Flux;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -48,61 +44,24 @@ public class QuickDocTaskExecutorTestConfig {
         return executor;
     }
 
-
-    //@Bean
-    CommandLineRunner initCategory(ReactiveCategoryService reactiveCategoryService) {
-        return args -> {
-            for (int i = 0; i < 10; i++) {
-                Thread.sleep(280);
-                reactiveCategoryService.addCategory("科技").subscribe();
-            }
-            reactiveCategoryService.findByType("科技").subscribe(System.out::println);
-
-            // 更改分类名
-            reactiveCategoryService.renameCategory("科技", "人文")
-                    .onErrorMap(v -> {
-                        log.warn(v.getMessage());
-                        return v;
-                    })
-                    .subscribe(System.out::println);
-
-            // 删除分类
-            reactiveCategoryService.deleteCategory("人文俩hi")
-                    .onErrorMap(v -> {
-                        log.warn(v.getMessage());
-                        return v;
-                    })
-                    .subscribe(System.out::println);
-        };
-    }
-
     @Bean
-    CommandLineRunner uploadLocalFiles(ReactiveFileService reactiveFileService) {
+    CommandLineRunner uploadLocalFiles(FileService fileService) {
         return args -> {
-            File directory = new File("E:\\IT服务台管理\\报告材料\\排班");
-            if (directory.exists() && directory.isDirectory()) {
-                Flux.just(directory.listFiles())
+            File folder = new File("E:\\IT服务台管理\\报告材料\\排班");
+            if (folder.exists() && folder.isDirectory()) {
+                Flux.just(folder.listFiles())
                         .filter(file -> file.getName().toLowerCase().endsWith(".xlsx"))
                         .map(
                                 file -> {
                                     try {
                                         String fileType = StringUtils.getFilenameExtension(file.getName()) != null ?
                                                 StringUtils.getFilenameExtension(file.getName()) : "No Extension";
-                                        FsDescription fsDescription = new FsDescription(ObjectId.get(),
-                                                file.getName(),
-                                                file.length(),
-                                                fileType,
-                                                new Date(),
-                                                new ObjectId("5a6966f7ae3e442518745833"),
+                                       /* FileMetadata metadata = new FileMetadata("音乐",
                                                 new ObjectId("5a6966f7ae3e442518745836"),
-                                                ObjectId.get(),
                                                 false,
-                                                getRandomOwners(),
-                                                null);
-                                        reactiveFileService.storeFile(
-                                                fsDescription,
-                                                new FileInputStream(file))
-                                                .subscribe();
+                                                getRandomOwners(), null);
+*/
+                                        fileService.store(new FileInputStream(file), file.getName(), fileType);
                                     } catch (IOException exp) {
                                         exp.printStackTrace();
                                     }
@@ -113,11 +72,11 @@ public class QuickDocTaskExecutorTestConfig {
         };
     }
 
-    private FsOwner[] getRandomOwners() {
-        FsOwner owners[] = new FsOwner[3];
-        owners[0] = new FsOwner("chenbichao", FsOwner.Type.TYPE_PRIVATE, 7);
-        owners[1] = new FsOwner("陈毕超", FsOwner.Type.TYPE_PRIVATE, 7);
-        owners[2] = new FsOwner("administrators", FsOwner.Type.TYPE_GROUP, 7);
+    private AccessAuthorization[] getRandomOwners() {
+        AccessAuthorization owners[] = new AccessAuthorization[3];
+        owners[0] = new AccessAuthorization("chenbichao", AccessAuthorization.Type.TYPE_PRIVATE, 7);
+        owners[1] = new AccessAuthorization("陈毕超", AccessAuthorization.Type.TYPE_PRIVATE, 7);
+        owners[2] = new AccessAuthorization("administrators", AccessAuthorization.Type.TYPE_GROUP, 7);
         return owners;
     }
 

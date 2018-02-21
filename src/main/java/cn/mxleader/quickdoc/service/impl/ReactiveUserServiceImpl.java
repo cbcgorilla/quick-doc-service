@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.common.utils.MessageUtil;
-import cn.mxleader.quickdoc.entities.UserEntity;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.dao.ReactiveUserRepository;
 import cn.mxleader.quickdoc.common.utils.PasswordUtil;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
@@ -19,23 +19,23 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
         this.reactiveUserRepository = reactiveUserRepository;
     }
 
-    public Mono<UserEntity> saveUser(UserEntity userEntity) {
-        userEntity.setId(ObjectId.get());
-        return reactiveUserRepository.findByUsername(userEntity.getUsername())
-                .defaultIfEmpty(userEntity)
+    public Mono<QuickDocUser> saveUser(QuickDocUser quickDocUser) {
+        quickDocUser.setId(ObjectId.get());
+        return reactiveUserRepository.findByUsername(quickDocUser.getUsername())
+                .defaultIfEmpty(quickDocUser)
                 .flatMap(entity -> {
-                    entity.setPassword(PasswordUtil.getEncryptedPwd(userEntity.getPassword()));
-                    entity.setAuthorities(userEntity.getAuthorities());
-                    entity.setGroups(userEntity.getGroups());
+                    entity.setPassword(PasswordUtil.getEncryptedPwd(quickDocUser.getPassword()));
+                    entity.setAuthorities(quickDocUser.getAuthorities());
+                    entity.setGroups(quickDocUser.getGroups());
                     return reactiveUserRepository.save(entity);
                 });
     }
 
-    public Flux<UserEntity> findAllUsers() {
+    public Flux<QuickDocUser> findAllUsers() {
         return reactiveUserRepository.findAll();
     }
 
-    public Mono<UserEntity> findUser(String username) {
+    public Mono<QuickDocUser> findUser(String username) {
         return reactiveUserRepository.findByUsername(username);
     }
 
@@ -46,7 +46,7 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
      * @param password 输入密码（明文）
      * @return
      */
-    public Mono<UserEntity> validateUser(String username, String password) {
+    public Mono<QuickDocUser> validateUser(String username, String password) {
         return findUser(username)
                 .switchIfEmpty(MessageUtil.userNotFoundMsg(username))
                 .flatMap(user -> {

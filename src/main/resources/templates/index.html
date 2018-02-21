@@ -23,10 +23,10 @@
                 <a class="nav-link" href="/">文件管理</a>
             </li>
             <li class="nav-item" th:if="${isAdmin}">
-                <a class="nav-link" href="/directory">目录管理</a>
+                <a class="nav-link" href="/folders">目录管理</a>
             </li>
             <li class="nav-item" th:if="${isAdmin}">
-                <a class="nav-link" href="/admin">账号管理</a>
+                <a class="nav-link" href="/users">账号管理</a>
             </li>
             <li class="nav-item" th:if="${isAdmin}">
                 <a class="nav-link disabled" href="/swagger-ui.html" target="_blank">REST API 调用接口</a>
@@ -46,8 +46,8 @@
 </div>
 
 <div class="table-responsive">
-    <div th:if="${currentdirectory}">
-        <a th:href="@{'/path@'+${currentdirectory.parentId}}"
+    <div th:if="${currentFolder}">
+        <a th:href="@{'/folder@'+${currentFolder.parentId}}"
            th:text="@{'返回上级目录'}"></a>
 
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">
@@ -57,7 +57,7 @@
     </div>
 
     <!-- 模态框 -->
-    <div class="modal fade" id="uploadModal" th:if="${currentdirectory}">
+    <div class="modal fade" id="uploadModal" th:if="${currentFolder}">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
 
@@ -70,19 +70,8 @@
                 <!-- 模态框主体 -->
                 <div class="modal-body">
                     <div class="table-responsive" style="text-align: center">
-                        <form method="POST" enctype="multipart/form-data" th:action="@{'/uploadFile'}">
+                        <form method="POST" enctype="multipart/form-data" th:action="@{'/upload'}">
                             <table class="table table-hover">
-                                <tr>
-                                    <td align="right">文件分类:</td>
-                                    <td>
-                                        <select id="categoryId" name="categoryId" class="select custom-select">
-                                            <option th:each="entry : ${categoryMap}"
-                                                    th:value="${entry.key}"
-                                                    th:text="${entry.value}">文件分类
-                                            </option>
-                                        </select>
-                                    </td>
-                                </tr>
                                 <tr>
                                     <td align="right">需要上传的文件:</td>
                                     <td><input type="file" name="file" class="input custom-file"/></td>
@@ -97,8 +86,8 @@
                                     </td>
                                 </tr>
                             </table>
-                            <input type="hidden" id="directoryId" name="directoryId"
-                                   th:value="${currentdirectory.id}"/>
+                            <input type="hidden" id="folderId" name="folderId"
+                                   th:value="${currentFolder.id}"/>
                             <input type="hidden" th:name="${_csrf.parameterName}"
                                    th:value="${_csrf.token}"/>
                             <input type="submit" value="上传" class="btn btn-success"/>
@@ -118,9 +107,9 @@
         <thead class="thead-light">
         <tr>
             <th>文件名</th>
+            <th>文件类型</th>
             <th>文件长度</th>
             <th>上传日期</th>
-            <th>文件分类</th>
             <th>标签</th>
             <th>公开访问</th>
             <th>权限</th>
@@ -129,28 +118,28 @@
         </thead>
 
         <tbody>
-        <tr th:each="directory : ${directories}">
+        <tr th:each="folder : ${folders}">
             <td>
-                <i th:if="${directory.childrenCount>0}" class="fas fa-folder"></i>
-                <i th:if="${directory.childrenCount==0}" class="far fa-folder"></i>
-                <a th:href="@{'/path@'+${directory.id}}" th:text="${directory.path}"/>
+                <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
+                <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
+                <a th:href="@{'/folder@'+${folder.id}}" th:text="${folder.path}"/>
             </td>
             <td th:text="@{'文件夹'}" colspan="4"></td>
             <td>
-                <span th:if="${directory.publicVisible}"><i class="fas fa-check"></i></span>
+                <span th:if="${folder.openAccess}"><i class="fas fa-check"></i></span>
             </td>
             <td>
                 <ul class="custom-list">
-                    <li th:each="owner:${directory.owners}">
-                        <span th:text="${owner.name}"></span>[
-                        <span th:text="${ownerTypeMap[owner.type]}"></span>:
-                        <span th:text="${privilegeMap[owner.privilege]}"></span>]
+                    <li th:each="authorization:${folder.authorizations}">
+                        <span th:text="${authorization.name}"></span>[
+                        <span th:text="${ownerTypeMap[authorization.type]}"></span>:
+                        <span th:text="${privilegeMap[authorization.privilege]}"></span>]
                     </li>
                 </ul>
             </td>
             <td>
                 <div class="input-group">
-                    <a th:href="@{'/zip-resource/'+${directory.id}}" class="btn btn-dark">
+                    <a th:href="@{'/zip-resource/'+${folder.id}}" class="btn btn-dark">
                         <i class="fas fa-cloud-download-alt"></i>
                     </a>
                 </div>
@@ -159,136 +148,14 @@
         <tr th:each="file : ${files}">
             <form th:action="@{/deleteFile}" th:method="DELETE">
                 <td>
-                    <ul th:switch="${file.type}" class="custom-list">
-                        <li th:case="pdf">
-                            <a th:href="@{'/view-pdf/'+${file.storedId}}">
-                                <i class="far fa-file-pdf"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="gif">
-                            <a th:href="@{'/view-gif/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="jpg">
-                            <a th:href="@{'/view-jpeg/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="jpeg">
-                            <a th:href="@{'/view-jpeg/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="png">
-                            <a th:href="@{'/view-png/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="bmp">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="tif">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="tiff">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="xls">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-excel"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="xlsx">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-excel"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="doc">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-word"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="docx">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-word"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="ppt">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-powerpoint"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="pptx">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-powerpoint"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="txt">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-text"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="mp3">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-audio"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="zip">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-archive"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="rar">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-archive"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="*">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                    </ul>
+                    <a th:href="@{${file.linkPrefix}+${file.id}}">
+                        <i th:class="${file.iconClass}"></i>
+                        <span th:text="${file.filename}"></span>
+                    </a>
                 </td>
-                <td th:text="${#numbers.formatInteger(file.size,3,'COMMA')}">文件大小</td>
-                <td th:text="${#dates.format(file.uploadTime,'yyyy-MM-dd HH:mm:ss')}">上传日期
-                </td>
-                <td th:text="${categoryMap[file.categoryId]}">
-                    <!--<select id="fileCategory" name="fileCategory" class="select custom-select"
-                            readonly="true">
-                        <option th:each="entry : ${categoryMap}"
-                                th:value="${entry.key}"
-                                th:text="${entry.value}"
-                                th:selected="(${entry.key} == ${file.categoryId})">文件分类
-                        </option>
-                    </select>-->
-                </td>
+                <td th:text="${file.type}">文件类型</td>
+                <td th:text="${#numbers.formatInteger(file.length,3,'COMMA')}">文件大小</td>
+                <td th:text="${#dates.format(file.uploadDate,'yyyy-MM-dd HH:mm:ss')}">上传日期</td>
                 <td>
                     <ul class="custom-list">
                         <li th:each="filelabel:${file.labels}">
@@ -297,28 +164,27 @@
                     </ul>
                 </td>
                 <td>
-                    <span th:if="${file.openVisible}"><i class="fas fa-check"></i></span>
+                    <span th:if="${file.openAccess}"><i class="fas fa-check"></i></span>
                 </td>
                 <td>
                     <ul class="custom-list">
-                        <li th:each="owner:${file.owners}">
-                            <span th:text="${owner.name}"></span>[
-                            <span th:text="${ownerTypeMap[owner.type]}"></span>:
-                            <span th:text="${privilegeMap[owner.privilege]}"></span>]
+                        <li th:each="authorization:${file.authorizations}">
+                            <span th:text="${authorization.name}"></span>[
+                            <span th:text="${ownerTypeMap[authorization.type]}"></span>:
+                            <span th:text="${privilegeMap[authorization.privilege]}"></span>]
                         </li>
                     </ul>
                 </td>
                 <td>
                     <div class="input-group">
-                        <input type="hidden" id="fsDetailId" name="fsDetailId"
+                        <input type="hidden" id="fileId" name="fileId"
                                th:value="${file.id}"/>
-                        <input type="hidden" id="directoryId" name="directoryId"
-                               th:value="${currentdirectory.id}"/>
+                        <input type="hidden" id="folderId" name="folderId"
+                               th:value="${currentFolder.id}"/>
                         <input type="hidden" th:name="${_csrf.parameterName}"
                                th:value="${_csrf.token}"/>
                         <input type="submit" value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
-                        <a th:href="@{'/download/'+${file.storedId}}"
-                           class="btn btn-dark">
+                        <a th:href="@{'/download/'+${file.id}}" class="btn btn-dark">
                             <i class="fas fa-cloud-download-alt"></i>
                         </a>
                     </div>

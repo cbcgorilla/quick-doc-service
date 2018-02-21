@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
 @Document
-data class QuickDocConfig(@Id val id: ObjectId,
+data class QuickDocHealth(@Id val id: ObjectId,
                           var serviceAddress: String,
                           var initialized: Boolean,
                           var setupTime: Date,

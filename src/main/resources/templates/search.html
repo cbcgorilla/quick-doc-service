@@ -23,10 +23,10 @@
                 <a class="nav-link" href="/">文件管理</a>
             </li>
             <li class="nav-item" th:if="${isAdmin}">
-                <a class="nav-link" href="/directory">目录管理</a>
+                <a class="nav-link" href="/folders">目录管理</a>
             </li>
             <li class="nav-item" th:if="${isAdmin}">
-                <a class="nav-link" href="/admin">账号管理</a>
+                <a class="nav-link" href="/users">账号管理</a>
             </li>
             <li class="nav-item" th:if="${isAdmin}">
                 <a class="nav-link disabled" href="/swagger-ui.html" target="_blank">REST API 调用接口</a>
@@ -51,12 +51,11 @@
         <thead class="thead-light">
         <tr>
             <th>文件名</th>
+            <th>文件类型</th>
             <th>文件长度</th>
             <th>上传日期</th>
-            <th>文件分类</th>
             <td>标签</td>
             <th>公开访问</th>
-            <th>权限</th>
             <th>操作</th>
         </tr>
         </thead>
@@ -65,128 +64,14 @@
         <tr th:each="file : ${files}">
             <form th:action="@{/deleteFile}" th:method="DELETE">
                 <td>
-                    <ul th:switch="${file.type}" class="custom-list">
-                        <li th:case="pdf">
-                            <a th:href="@{'/view-pdf/'+${file.storedId}}">
-                                <i class="far fa-file-pdf"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="gif">
-                            <a th:href="@{'/view-gif/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="jpg">
-                            <a th:href="@{'/view-jpeg/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="jpeg">
-                            <a th:href="@{'/view-jpeg/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="png">
-                            <a th:href="@{'/view-png/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="bmp">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="tif">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="tiff">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-image"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="xls">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-excel"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="xlsx">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-excel"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="doc">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-word"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="docx">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-word"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="ppt">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-powerpoint"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="pptx">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-powerpoint"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="txt">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-text"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="mp3">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-audio"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="zip">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-archive"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="rar">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file-archive"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                        <li th:case="*">
-                            <a th:href="@{'/download/'+${file.storedId}}">
-                                <i class="far fa-file"></i>
-                                <span th:text="${file.filename}"></span>
-                            </a>
-                        </li>
-                    </ul>
+                    <a th:href="@{${file.linkPrefix}+${file.id}}">
+                        <i th:class="${file.iconClass}"></i>
+                        <span th:text="${file.filename}"></span>
+                    </a>
                 </td>
-                <td th:text="${#numbers.formatInteger(file.size,3,'COMMA')}">文件大小</td>
-                <td th:text="${#dates.format(file.uploadTime,'yyyy-MM-dd HH:mm:ss')}">上传日期
-                </td>
-                <td th:text="${categoryMap[file.categoryId]}">
-                </td>
+                <td th:text="${file.type}">文件类型</td>
+                <td th:text="${#numbers.formatInteger(file.length,3,'COMMA')}">文件大小</td>
+                <td th:text="${#dates.format(file.uploadDate,'yyyy-MM-dd HH:mm:ss')}">上传日期</td>
                 <td>
                     <ul class="custom-list">
                         <li th:each="filelabel:${file.labels}">
@@ -195,26 +80,16 @@
                     </ul>
                 </td>
                 <td>
-                    <span th:if="${file.openVisible}"><i class="fas fa-check"></i></span>
-                </td>
-                <td>
-                    <ul class="custom-list">
-                        <li th:each="owner:${file.owners}">
-                            <span th:text="${owner.name}"></span>[
-                            <span th:text="${ownerTypeMap[owner.type]}"></span>:
-                            <span th:text="${privilegeMap[owner.privilege]}"></span>]
-                        </li>
-                    </ul>
+                    <span th:if="${file.openAccess}"><i class="fas fa-check"></i></span>
                 </td>
                 <td>
                     <div class="input-group">
-                        <input type="hidden" id="fsDetailId" name="fsDetailId"
+                        <input type="hidden" id="fileId" name="fileId"
                                th:value="${file.id}"/>
                         <input type="hidden" th:name="${_csrf.parameterName}"
                                th:value="${_csrf.token}"/>
                         <input type="submit" value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
-                        <a th:href="@{'/download/'+${file.storedId}}"
-                           class="btn btn-dark">
+                        <a th:href="@{'/download/'+${file.id}}" class="btn btn-dark">
                             <i class="fas fa-cloud-download-alt"></i>
                         </a>
                     </div>

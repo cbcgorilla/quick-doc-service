@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.security.handler;
 
-import cn.mxleader.quickdoc.entities.UserEntity;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import cn.mxleader.quickdoc.service.StreamService;
@@ -67,17 +67,17 @@ public class WebAuthenticationSuccessHandler implements
         Collection<? extends GrantedAuthority> authorities = authentication
                 .getAuthorities();
         for (GrantedAuthority grantedAuthority : authorities) {
-            if (grantedAuthority.getAuthority().equals(UserEntity.Authorities.ADMIN.name())) {
+            if (grantedAuthority.getAuthority().equals(QuickDocUser.Authorities.ADMIN.name())) {
                 isAdmin = true;
                 break;
             }
-            if (grantedAuthority.getAuthority().equals(UserEntity.Authorities.USER.name())) {
+            if (grantedAuthority.getAuthority().equals(QuickDocUser.Authorities.USER.name())) {
                 isUser = true;
                 break;
             }
         }
         if (isAdmin) {
-            return "/admin";
+            return "/users";
         } else if (isUser) {
             return "/";
         } else {

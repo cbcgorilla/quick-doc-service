@@ -39,10 +39,10 @@
                 <a class="nav-link" href="/">文件管理</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/directory">目录管理</a>
+                <a class="nav-link" href="/folders">目录管理</a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" href="/admin">账号管理</a>
+                <a class="nav-link" href="/users">账号管理</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link disabled" href="/swagger-ui.html" target="_blank">REST API 调用接口</a>
@@ -87,7 +87,7 @@
                 <!-- 模态框主体 -->
                 <div class="modal-body">
                     <div class="table-responsive" style="text-align: center">
-                        <form class="form-horizontal" method="POST" th:action="@{'admin/saveUser'}">
+                        <form class="form-horizontal" method="POST" th:action="@{'users/save'}">
                             <table class="table table-hover">
                                 <tr>
                                     <td align="right">用户名:</td>
@@ -161,7 +161,7 @@
 
         <tbody>
         <tr th:each="user : ${users}">
-            <form th:action="@{/admin/deleteUser}" th:method="DELETE">
+            <form th:action="@{/users/delete}" th:method="DELETE">
                 <td th:text="${user.username}"></td>
                 <td>
                     <ul class="custom-list">

@@ -1,13 +1,12 @@
 package cn.mxleader.quickdoc.web;
 
-import cn.mxleader.quickdoc.common.utils.StringUtil;
-import cn.mxleader.quickdoc.entities.FsDescription;
-import cn.mxleader.quickdoc.entities.FsDirectory;
-import cn.mxleader.quickdoc.entities.FsOwner;
-import cn.mxleader.quickdoc.entities.TfMatch;
+import cn.mxleader.quickdoc.common.utils.FileUtils;
+import cn.mxleader.quickdoc.entities.FileMetadata;
+import cn.mxleader.quickdoc.entities.QuickDocFolder;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.service.*;
-import cn.mxleader.quickdoc.web.domain.WebDirectory;
+import cn.mxleader.quickdoc.web.domain.WebFile;
+import cn.mxleader.quickdoc.web.domain.WebFolder;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
@@ -18,58 +17,44 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
-import static cn.mxleader.quickdoc.common.AuthenticationHandler.*;
+import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.*;
+import static cn.mxleader.quickdoc.web.config.WebHandlerInterceptor.FILES_ATTRIBUTE;
+import static cn.mxleader.quickdoc.web.config.WebHandlerInterceptor.FOLDERS_ATTRIBUTE;
 
 @Controller
 @RequestMapping("/")
 @SessionAttributes("ActiveUser")
 public class IndexController {
 
-    private final ReactiveCategoryService reactiveCategoryService;
-    private final ReactiveDirectoryService reactiveDirectoryService;
-    private final ReactiveFileService reactiveFileService;
-    private final QuickDocConfigService quickDocConfigService;
+    private final ReactiveFolderService reactiveFolderService;
+    private final FileService fileService;
+    private final ConfigService configService;
     private final StreamService streamService;
     private final TensorFlowService tensorFlowService;
 
     @Autowired
-    public IndexController(ReactiveCategoryService reactiveCategoryService,
-                           ReactiveDirectoryService reactiveDirectoryFsService,
-                           ReactiveFileService reactiveFileService,
-                           QuickDocConfigService quickDocConfigService,
+    public IndexController(ReactiveFolderService reactiveFolderService,
+                           FileService fileService,
+                           ConfigService configService,
                            StreamService streamService,
                            TensorFlowService tensorFlowService) {
-        this.reactiveCategoryService = reactiveCategoryService;
-        this.reactiveDirectoryService = reactiveDirectoryFsService;
-        this.reactiveFileService = reactiveFileService;
-        this.quickDocConfigService = quickDocConfigService;
+        this.reactiveFolderService = reactiveFolderService;
+        this.fileService = fileService;
+        this.configService = configService;
         this.streamService = streamService;
         this.tensorFlowService = tensorFlowService;
-    }
-
-    @ModelAttribute("categoryMap")
-    public Map<ObjectId, String> getCategoryMap() {
-        return reactiveCategoryService.findAll()
-                .collectMap(
-                        fsCategory -> fsCategory.getId(),
-                        fsCategory -> fsCategory.getType())
-                .block();
     }
 
     /**
@@ -80,20 +65,20 @@ public class IndexController {
      */
     @GetMapping()
     public String index(Model model, HttpSession session) {
-        ObjectId rootParentId = quickDocConfigService.getQuickDocConfig().getId();
+        ObjectId rootParentId = configService.getQuickDocHealth().getId();
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
         if (activeUser.isAdmin()) {
-            refreshDirList(model, rootParentId, session);
+            refreshDirList(model, rootParentId);
         } else {
-            List<WebDirectory> directories = reactiveDirectoryService.findAllByParentIdInWebFormat(rootParentId)
-                    .filter(webDirectory -> webDirectory.getPath().equalsIgnoreCase("root"))
+            List<WebFolder> webFolders = reactiveFolderService.findAllByParentIdInWebFormat(rootParentId)
+                    .filter(webFolder -> webFolder.getPath().equalsIgnoreCase("root"))
                     .toStream()
                     .collect(Collectors.toList());
-            if (directories != null && directories.size() > 0) {
-                for (WebDirectory subdirectory : directories) {
-                    model.addAttribute("currentdirectory", subdirectory);
-                    refreshDirList(model, subdirectory.getId(), session);
+            if (webFolders != null && webFolders.size() > 0) {
+                for (WebFolder subFolder : webFolders) {
+                    model.addAttribute("currentFolder", subFolder);
+                    refreshDirList(model, subFolder.getId());
                 }
             }
         }
@@ -103,19 +88,33 @@ public class IndexController {
     /**
      * 刷新显示指定文件夹内的所有内容
      *
-     * @param directoryId
+     * @param folderId
      * @param model
      * @return
      */
-    @GetMapping("/path@{directoryId}")
-    public String index(@PathVariable ObjectId directoryId, Model model, HttpSession session) {
-        FsDirectory fsDirectory = reactiveDirectoryService.findById(directoryId).block();
-        model.addAttribute("currentdirectory", fsDirectory);
-        refreshDirList(model, directoryId, session);
+    @GetMapping("/folder@{folderId}")
+    public String index(@PathVariable ObjectId folderId, Model model, HttpSession session) {
+        QuickDocFolder quickDocFolder = reactiveFolderService.findById(folderId).block();
+        model.addAttribute("currentFolder", quickDocFolder);
+        refreshDirList(model, folderId);
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
 
         return "index";
+    }
+
+    /**
+     * 刷新文件夹目录内容
+     *
+     * @param model
+     * @param folderId
+     */
+    private void refreshDirList(Model model, ObjectId folderId) {
+        model.addAttribute(FOLDERS_ATTRIBUTE,
+                reactiveFolderService.findAllByParentIdInWebFormat(folderId)
+                        .toStream().collect(Collectors.toList()));
+        model.addAttribute(FILES_ATTRIBUTE, fileService.getWebFiles(folderId)
+                .collect(Collectors.toList()));
     }
 
     @RequestMapping("/search")
@@ -123,13 +122,8 @@ public class IndexController {
                               Model model, HttpSession session) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
-
-        model.addAttribute("files",
-                reactiveFileService.getStoredFilesNameContaining(filename)
-                        .filter(fsDetail -> checkAuthentication(fsDetail.getOpenVisible(), fsDetail.getOwners(),
-                                activeUser, READ_PRIVILEGE))
-                        .toStream()
-                        .collect(Collectors.toList()));
+        model.addAttribute(FILES_ATTRIBUTE, fileService.searchFilesContaining(filename)
+                .collect(Collectors.toList()));
         return "search";
     }
 
@@ -137,35 +131,36 @@ public class IndexController {
      * 打包下载指定文件夹内的所有内容
      *
      * @param response
-     * @param directoryId
+     * @param folderId
      * @throws IOException
      */
-    @GetMapping(value = "/zip-resource/{directoryId}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping(value = "/zip-resource/{folderId}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public @ResponseBody
     void downloadDocument(HttpServletResponse response,
-                          @PathVariable ObjectId directoryId,
+                          @PathVariable ObjectId folderId,
                           HttpSession session) throws IOException {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader("Content-Disposition",
-                "attachment; filename=" + directoryId + ".zip");
-        //response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
+                "attachment; filename=" + folderId + ".zip");
+        // @TODO 压缩包文件大小在文件下载完毕前无法获取
+        // response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
 
-        reactiveFileService.createZip(directoryId, response.getOutputStream(), null, activeUser);
+        fileService.createZip(folderId, response.getOutputStream(), activeUser);
     }
 
     /**
      * 文件下载： 提供文件ID , 下载文件名默认编码为GB2312.
      *
      * @param response
-     * @param storedId 文件存储ID号
+     * @param fileId   文件存储ID号
      * @throws IOException
      */
-    @GetMapping(value = "/download/{storedId}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping(value = "/download/{fileId}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public @ResponseBody
     void downloadDocument(HttpServletResponse response,
-                          @PathVariable String storedId) throws IOException {
-        GridFSDownloadStream fs = reactiveFileService.getFileStream(new ObjectId(storedId));
+                          @PathVariable String fileId) throws IOException {
+        GridFSDownloadStream fs = fileService.getFileStream(new ObjectId(fileId));
         GridFSFile gridFSFile = fs.getGridFSFile();
 
         response.setContentType(MediaType.MULTIPART_FORM_DATA_VALUE);
@@ -177,59 +172,15 @@ public class IndexController {
     }
 
     /**
-     * PDF格式文件预览功能
+     * 预览文件共用方法
      *
-     * @param storedId
+     * @param returnType
+     * @param fileId
      * @return
      * @throws IOException
      */
-    @GetMapping(value = "/view-pdf/{storedId}", produces = MediaType.APPLICATION_PDF_VALUE)
-    public @ResponseBody
-    HttpEntity<byte[]> openPdfEntity(@PathVariable String storedId) throws IOException {
-        return openDocumentEntity(MediaType.APPLICATION_PDF, storedId);
-    }
-
-    /**
-     * GIF预览功能
-     *
-     * @param storedId
-     * @return
-     * @throws IOException
-     */
-    @GetMapping(value = "/view-gif/{storedId}", produces = MediaType.IMAGE_GIF_VALUE)
-    public @ResponseBody
-    HttpEntity<byte[]> openImageGifEntity(@PathVariable String storedId) throws IOException {
-        return openDocumentEntity(MediaType.IMAGE_GIF, storedId);
-    }
-
-    /**
-     * JPEG预览功能
-     *
-     * @param storedId
-     * @return
-     * @throws IOException
-     */
-    @GetMapping(value = "/view-jpeg/{storedId}", produces = MediaType.IMAGE_JPEG_VALUE)
-    public @ResponseBody
-    HttpEntity<byte[]> openImageJpegEntity(@PathVariable String storedId) throws IOException {
-        return openDocumentEntity(MediaType.IMAGE_JPEG, storedId);
-    }
-
-    /**
-     * PNG预览功能
-     *
-     * @param storedId
-     * @return
-     * @throws IOException
-     */
-    @GetMapping(value = "/view-png/{storedId}", produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody
-    HttpEntity<byte[]> openImageEntity(@PathVariable String storedId) throws IOException {
-        return openDocumentEntity(MediaType.IMAGE_PNG, storedId);
-    }
-
-    private HttpEntity<byte[]> openDocumentEntity(MediaType returnType, String storedId) throws IOException {
-        GridFSDownloadStream fs = reactiveFileService.getFileStream(new ObjectId(storedId));
+    private HttpEntity<byte[]> openDocumentEntity(MediaType returnType, String fileId) throws IOException {
+        GridFSDownloadStream fs = fileService.getFileStream(new ObjectId(fileId));
         byte[] document = FileCopyUtils.copyToByteArray(fs);
 
         HttpHeaders header = new HttpHeaders();
@@ -241,152 +192,154 @@ public class IndexController {
     }
 
     /**
+     * PDF格式文件预览功能
+     *
+     * @param fileId
+     * @return
+     * @throws IOException
+     */
+    @GetMapping(value = "/view-pdf/{fileId}", produces = MediaType.APPLICATION_PDF_VALUE)
+    public @ResponseBody
+    HttpEntity<byte[]> openPdfEntity(@PathVariable String fileId) throws IOException {
+        return openDocumentEntity(MediaType.APPLICATION_PDF, fileId);
+    }
+
+    /**
+     * GIF预览功能
+     *
+     * @param fileId
+     * @return
+     * @throws IOException
+     */
+    @GetMapping(value = "/view-gif/{fileId}", produces = MediaType.IMAGE_GIF_VALUE)
+    public @ResponseBody
+    HttpEntity<byte[]> openImageGifEntity(@PathVariable String fileId) throws IOException {
+        return openDocumentEntity(MediaType.IMAGE_GIF, fileId);
+    }
+
+    /**
+     * JPEG预览功能
+     *
+     * @param fileId
+     * @return
+     * @throws IOException
+     */
+    @GetMapping(value = "/view-jpeg/{fileId}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public @ResponseBody
+    HttpEntity<byte[]> openImageJpegEntity(@PathVariable String fileId) throws IOException {
+        return openDocumentEntity(MediaType.IMAGE_JPEG, fileId);
+    }
+
+    /**
+     * PNG预览功能
+     *
+     * @param fileId
+     * @return
+     * @throws IOException
+     */
+    @GetMapping(value = "/view-png/{fileId}", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody
+    HttpEntity<byte[]> openImageEntity(@PathVariable String fileId) throws IOException {
+        return openDocumentEntity(MediaType.IMAGE_PNG, fileId);
+    }
+
+    /**
+     * 文本文件预览功能
+     * @param fileId
+     * @return
+     * @throws IOException
+     */
+    @GetMapping(value = "/view-text/{fileId}", produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody
+    HttpEntity<String> openTextEntity(@PathVariable String fileId) throws IOException {
+        GridFSDownloadStream fs = fileService.getFileStream(new ObjectId(fileId));
+        String fileType = fs.getGridFSFile().getMetadata().getString("_contentType");
+
+        HttpHeaders header = new HttpHeaders();
+        header.set("Content-Disposition", "inline; filename=" + fs.getGridFSFile().getFilename());
+        if(fileType.equalsIgnoreCase("text/html")) {
+            header.add("Content-Type", "text/html; charset=utf-8");
+            String document = FileUtils.read(fs);
+            return new HttpEntity<>(document, header);
+        }else{
+            header.add("Content-Type", "text/plain; charset=gb2312");
+            String document = FileUtils.read(fs, Charset.forName("GBK"));
+            return new HttpEntity<>(document, header);
+        }
+    }
+
+    /**
      * 上传文件到指定目录和文件分类
      *
      * @param file
-     * @param directoryId
-     * @param categoryId
+     * @param folderId
      * @param redirectAttributes
      * @param model
      * @param session
      * @return
      * @throws IOException
      */
-    @PostMapping("/uploadFile")
-    public String uploadFile(@RequestParam("file") MultipartFile file,
-                             @RequestParam("directoryId") ObjectId directoryId,
-                             @RequestParam("categoryId") ObjectId categoryId,
-                             @RequestParam(value = "owners", required = false) String[] ownersRequest,
-                             RedirectAttributes redirectAttributes,
-                             Model model,
-                             HttpSession session) throws IOException {
+    @PostMapping("/upload")
+    public String upload(@RequestParam("file") MultipartFile file,
+                         @RequestParam("folderId") ObjectId folderId,
+                         @RequestParam(value = "owners", required = false) String[] ownersRequest,
+                         RedirectAttributes redirectAttributes,
+                         Model model,
+                         HttpSession session) throws IOException {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
-        FsDirectory fsDirectory = reactiveDirectoryService.findById(directoryId).block();
+        QuickDocFolder quickDocFolder = reactiveFolderService.findById(folderId).block();
         // 鉴权检查
-        if (checkAuthentication(fsDirectory.getPublicVisible(), fsDirectory.getOwners(), activeUser, WRITE_PRIVILEGE)) {
-            String filename = StringUtil.getFilename(file.getOriginalFilename());
-            String fileType = StringUtils.getFilenameExtension(filename) != null ?
-                    StringUtils.getFilenameExtension(filename) : "No Extension";
-            FsDescription fsDescription = new FsDescription(ObjectId.get(),
-                    filename,
-                    file.getSize(),
-                    fileType,
-                    new Date(),
-                    categoryId,
-                    directoryId,
-                    ObjectId.get(),
-                    getPublicVisibleFromOwnerRequest(ownersRequest),
-                    translateOwnerRequest(activeUser, ownersRequest),
-                    null);
+        if (checkAuthentication(quickDocFolder.getOpenAccess(),
+                quickDocFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
+            String filename = FileUtils.getFilename(file.getOriginalFilename());
+            String fileType = FileUtils.guessMimeType(filename);
 
-            reactiveFileService.storeFile(
-                    fsDescription,
-                    file.getInputStream())
-                    .filter(fsDescription1 -> fsDescription1.getType().equalsIgnoreCase("jpg") ||
-                            fsDescription1.getType().equalsIgnoreCase("png"))
-                    .flatMap(fsDescription1 -> {
-                        tensorFlowService.updateImageLabel(fsDescription1);
-                        return Mono.just(fsDescription1);
-                    })
-                    .subscribe();
+            FileMetadata metadata = new FileMetadata(fileType, folderId,
+                    getOpenAccessFromOwnerRequest(ownersRequest),
+                    translateOwnerRequest(activeUser, ownersRequest), null);
 
-            refreshDirList(model, directoryId, session);
+            // 启动TensorFlow 线程分析图片内容
+            ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
+            if (fileType.startsWith("image/")) {
+                tensorFlowService.updateImageMetadata(fileId, metadata);
+            }
+
+            refreshDirList(model, folderId);
             // 发送MQ消息
             streamService.sendMessage("用户" + activeUser.getUsername() +
-                    "成功上传文件： " + filename + "到目录：" + directoryId);
+                    "成功上传文件： " + filename + "到目录：" + folderId);
             redirectAttributes.addFlashAttribute("message",
                     "成功上传文件： " + filename);
         } else {
             redirectAttributes.addFlashAttribute("message",
-                    "您无此目录的上传权限： " + fsDirectory.getPath() + "，请联系管理员获取！");
+                    "您无此目录的上传权限： " + quickDocFolder.getPath() + "，请联系管理员获取！");
         }
-        return "redirect:/path@" + directoryId;
+        return "redirect:/folder@" + folderId;
     }
 
     /**
      * 删除文件
      *
-     * @param directoryId
-     * @param fsDetailId
+     * @param folderId
+     * @param fileId
      * @return
      */
     @DeleteMapping("/deleteFile")
-    public String deleteFile(@RequestParam("directoryId") ObjectId directoryId,
-                             @RequestParam ObjectId fsDetailId,
+    public String deleteFile(@RequestParam("folderId") ObjectId folderId,
+                             @RequestParam("fileId") ObjectId fileId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
-        FsDescription fsDescription = reactiveFileService.getStoredFile(fsDetailId).block();
-        if (checkAuthentication(fsDescription.getOpenVisible(), fsDescription.getOwners(), activeUser, DELETE_PRIVILEGE)) {
-            reactiveFileService.deleteFile(fsDetailId).subscribe();
+        WebFile file = fileService.getStoredFile(fileId);
+        if (checkAuthentication(file.getOpenAccess(), file.getAuthorizations(), activeUser, DELETE_PRIVILEGE)) {
+            fileService.delete(fileId);
             redirectAttributes.addFlashAttribute("message",
-                    "成功删除文件： " + fsDetailId);
+                    "成功删除文件： " + file.getFilename());
         } else {
             redirectAttributes.addFlashAttribute("message",
-                    "您无删除此文件的权限： " + fsDescription.getFilename() + "，请联系管理员获取！");
+                    "您无删除此文件的权限： " + file.getFilename() + "，请联系管理员获取！");
         }
-        return "redirect:/path@" + directoryId;
+        return "redirect:/folder@" + folderId;
     }
-
-    /**
-     * 刷新文件夹目录内容
-     *
-     * @param model
-     * @param directoryId
-     */
-    private void refreshDirList(Model model, ObjectId directoryId,
-                                HttpSession session) {
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
-        model.addAttribute("directories",
-                reactiveDirectoryService.findAllByParentIdInWebFormat(directoryId)
-                        .filter(webDirectory -> checkAuthentication(webDirectory.getPublicVisible(), webDirectory.getOwners(),
-                                activeUser, READ_PRIVILEGE))
-                        .toStream()
-                        .collect(Collectors.toList()));
-        model.addAttribute("files",
-                reactiveFileService.getStoredFiles(directoryId)
-                        .filter(fsDetail -> checkAuthentication(fsDetail.getOpenVisible(), fsDetail.getOwners(),
-                                activeUser, READ_PRIVILEGE))
-                        .toStream()
-                        .collect(Collectors.toList()));
-    }
-
-
-    /**
-     * 同名文件多并发请求时有冲突可能, 占用服务端本地缓存目录，需要定期清理Web服务器缓存目录
-     *
-     * @param response
-     * @param filename
-     * @return
-     * @throws IOException
-     *//*
-    @GetMapping(value = "/resource/{filename:.+}", produces = MediaType.APPLICATION_PDF_VALUE)
-    public @ResponseBody
-    Resource resourceDownload(HttpServletResponse response,
-                              @PathVariable("filename") String filename) throws IOException {
-        GridFsResource fsResource = reactiveFileService.getFileStream(new ObjectId(filename));
-        InputStream in = fsResource.getInputStream();
-
-        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
-        response.setHeader("Content-Disposition", "inline; filename=" + filename);
-        response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
-        return new FileSystemResource(getTempResourceFile(in, LOCAL_TEMP_DIR + filename));
-    }
-    *//*
-    private File getTempResourceFile(InputStream in, String tempFilename) {
-        try {
-            File f = new File(tempFilename);
-            FileOutputStream out = new FileOutputStream(f);
-            byte buf[] = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0)
-                out.write(buf, 0, len);
-            out.close();
-            in.close();
-            return f;
-        } catch (IOException e) {
-            return null;
-        }
-    }*/
 
 }

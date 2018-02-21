@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.security.entities;
 
-import cn.mxleader.quickdoc.entities.UserEntity;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -62,7 +62,7 @@ public class ActiveUser implements HttpSessionBindingListener {
         Iterator<? extends GrantedAuthority> it = authorities.iterator();
         while (it.hasNext()) {
             GrantedAuthority entry = it.next();
-            if (entry.getAuthority().equalsIgnoreCase(UserEntity.Authorities.ADMIN.name())) {
+            if (entry.getAuthority().equalsIgnoreCase(QuickDocUser.Authorities.ADMIN.name())) {
                 this.admin = true;
                 break;
             } else {
@@ -70,7 +70,7 @@ public class ActiveUser implements HttpSessionBindingListener {
             }
         }
         // 以下代码判断无效
-        //this.isAdmin = authorities.contains(new WebAuthority("ADMIN"));
+        //this.isAdmin = authorizations.contains(new WebAuthority("ADMIN"));
     }
 
     @Override

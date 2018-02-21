@@ -18,10 +18,10 @@
 
     <script type="text/javascript">
         //<![CDATA[
-        $(document).on("click", ".addDirectory", function () {
+        $(document).on("click", ".addFolder", function () {
             var $td = $(this).parents('tr').children('td');
             $(".template-input-icon-container #path").val("");
-            $(".template-input-icon-container #parentId").val($td.eq(4).find(".input-group #directoryId").val());
+            $(".template-input-icon-container #parentId").val($td.eq(4).find(".input-group #folderId").val());
         });
         //]]>
     </script>
@@ -35,10 +35,10 @@
                 <a class="nav-link" href="/">文件管理</a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" href="/directory">目录管理</a>
+                <a class="nav-link" href="/folders">目录管理</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/admin">账号管理</a>
+                <a class="nav-link" href="/users">账号管理</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link disabled" href="/swagger-ui.html" target="_blank">REST API 调用接口</a>
@@ -57,7 +57,7 @@
 <div class="table-responsive">
 
     <!-- 模态框 -->
-    <div class="modal fade" id="addDirectoryDialogModal">
+    <div class="modal fade" id="addFolderDialogModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
 
@@ -70,7 +70,7 @@
                 <!-- 模态框主体 -->
                 <div class="modal-body">
                     <div class="table-responsive" style="text-align: center">
-                        <form class="form-horizontal" method="POST" th:action="@{'directory/save'}">
+                        <form class="form-horizontal" method="POST" th:action="@{'folders/save'}">
                             <table class="table table-hover">
                                 <tr>
                                     <td align="right">目录名:</td>
@@ -125,36 +125,36 @@
         </thead>
         <tbody>
 
-        <tr th:each="directory : ${directories}">
-            <form th:action="@{/directory/deleteDirectory}" th:method="DELETE">
+        <tr th:each="folder : ${folders}">
+            <form th:action="@{/folders/delete}" th:method="DELETE">
                 <td>
-                    <i th:if="${directory.childrenCount>0}" class="fas fa-folder"></i>
-                    <i th:if="${directory.childrenCount==0}" class="far fa-folder"></i>
-                    <a th:href="@{'/path@'+${directory.id}}" th:text="${directory.path}"/>
+                    <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
+                    <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
+                    <a th:href="@{'/folder@'+${folder.id}}" th:text="${folder.path}"/>
                 </td>
-                <td th:text="${directory.childrenCount}"></td>
+                <td th:text="${folder.childrenCount}"></td>
                 <td>
-                    <span th:if="${directory.publicVisible}"><i class="fas fa-check"></i></span>
+                    <span th:if="${folder.openAccess}"><i class="fas fa-check"></i></span>
                 </td>
                 <td>
                     <ul class="custom-list">
-                        <li th:each="owner:${directory.owners}">
-                            <span th:text="${owner.name}"></span>[
-                            <span th:text="${ownerTypeMap[owner.type]}"></span>:
-                            <span th:text="${privilegeMap[owner.privilege]}"></span>]
+                        <li th:each="authorization:${folder.authorizations}">
+                            <span th:text="${authorization.name}"></span>[
+                            <span th:text="${ownerTypeMap[authorization.type]}"></span>:
+                            <span th:text="${privilegeMap[authorization.privilege]}"></span>]
                         </li>
                     </ul>
                 </td>
                 <td>
                     <div class="input-group">
                         <a data-toggle="modal" title="新增目录"
-                           class="addDirectory btn btn-primary"
-                           href="#addDirectoryDialogModal"><i class="fas fa-plus"></i></a>
-                        <a th:href="@{'/zip-resource/'+${directory.id}}" title="打包下载目录" class="btn btn-dark">
+                           class="addFolder btn btn-primary"
+                           href="#addFolderDialogModal"><i class="fas fa-plus"></i></a>
+                        <a th:href="@{'/zip-resource/'+${folder.id}}" title="打包下载目录" class="btn btn-dark">
                             <i class="fas fa-cloud-download-alt"></i>
                         </a>
-                        <input type="hidden" id="directoryId" name="directoryId"
-                               th:value="${directory.id}"/>
+                        <input type="hidden" id="folderId" name="folderId"
+                               th:value="${folder.id}"/>
                         <input type="hidden" th:name="${_csrf.parameterName}"
                                th:value="${_csrf.token}"/>
                         <input type="submit" value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>

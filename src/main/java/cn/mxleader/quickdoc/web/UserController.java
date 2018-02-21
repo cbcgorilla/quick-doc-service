@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.web;
 
-import cn.mxleader.quickdoc.entities.UserEntity;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.bson.types.ObjectId;
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
 @Controller
-@RequestMapping("/admin")
-public class AdminUserController {
+@RequestMapping("/users")
+public class UserController {
 
     private final ReactiveUserService reactiveUserService;
 
     @Autowired
-    public AdminUserController(ReactiveUserService reactiveUserService) {
+    public UserController(ReactiveUserService reactiveUserService) {
         this.reactiveUserService = reactiveUserService;
     }
 
@@ -34,10 +34,10 @@ public class AdminUserController {
      * @return
      */
     @ModelAttribute("userAuthorityMap")
-    public Map<UserEntity.Authorities, String> getUserAuthorityMap() {
-        Map<UserEntity.Authorities, String> userAuthorityMap = new HashMap<>();
-        userAuthorityMap.put(UserEntity.Authorities.USER, "普通用户");
-        userAuthorityMap.put(UserEntity.Authorities.ADMIN, "系统管理员");
+    public Map<QuickDocUser.Authorities, String> getUserAuthorityMap() {
+        Map<QuickDocUser.Authorities, String> userAuthorityMap = new HashMap<>();
+        userAuthorityMap.put(QuickDocUser.Authorities.USER, "普通用户");
+        userAuthorityMap.put(QuickDocUser.Authorities.ADMIN, "系统管理员");
         return userAuthorityMap;
     }
 
@@ -52,25 +52,25 @@ public class AdminUserController {
         model.addAttribute("users", reactiveUserService.findAllUsers()
                 .toStream()
                 .collect(Collectors.toList()));
-        return "admin";
+        return "users";
     }
 
-    @PostMapping("/saveUser")
-    public String saveUser(@RequestParam("username") String username,
+    @PostMapping("/save")
+    public String save(@RequestParam("username") String username,
                           @RequestParam("password") String password,
                           @RequestParam("userGroup") String userGroup,
-                          @RequestParam("userType") UserEntity.Authorities userType,
+                          @RequestParam("userType") QuickDocUser.Authorities userType,
                           RedirectAttributes redirectAttributes,
                           Model model,
                           HttpSession session) {
-        UserEntity.Authorities[] authorities = new UserEntity.Authorities[]{userType};
-        UserEntity userEntity = new UserEntity(ObjectId.get(), username, password,
+        QuickDocUser.Authorities[] authorities = new QuickDocUser.Authorities[]{userType};
+        QuickDocUser quickDocUser = new QuickDocUser(ObjectId.get(), username, password,
                 authorities, new String[]{userGroup});
-        reactiveUserService.saveUser(userEntity).subscribe();
+        reactiveUserService.saveUser(quickDocUser).subscribe();
 
         redirectAttributes.addFlashAttribute("message",
                 "保存用户信息成功： " + username);
-        return "redirect:/admin";
+        return "redirect:/users";
     }
 
     /**
@@ -81,8 +81,8 @@ public class AdminUserController {
      * @param redirectAttributes
      * @return
      */
-    @DeleteMapping("/deleteUser")
-    public String deleteUser(@RequestParam("userId") ObjectId userId,
+    @DeleteMapping("/delete")
+    public String delete(@RequestParam("userId") ObjectId userId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
@@ -94,7 +94,7 @@ public class AdminUserController {
             redirectAttributes.addFlashAttribute("message",
                     "您无删除用户的权限，请联系管理员获取！");
         }
-        return "redirect:/admin";
+        return "redirect:/users";
     }
 
 }

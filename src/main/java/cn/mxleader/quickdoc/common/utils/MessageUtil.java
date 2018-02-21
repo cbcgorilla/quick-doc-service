@@ -1,5 +1,6 @@
 package cn.mxleader.quickdoc.common.utils;
 
+import cn.mxleader.quickdoc.common.QuickDocException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import reactor.core.publisher.Mono;
@@ -9,9 +10,6 @@ import java.text.MessageFormat;
 import java.util.NoSuchElementException;
 
 public class MessageUtil {
-
-    private static final String MSG_NO_CATEGORY = "[Exception class: {0}] 找不到文件分类：{1}";
-    private static final String MSG_CATEGORY_CONFLICT = "[Exception class: {0}] 与已有文件分类冲突：{1}";
 
     private static final String MSG_NO_DIRECTORY = "[Exception class: {0}] 找不到文件目录：{1}";
     private static final String MSG_DIRECTORY_CONFLICT = "[Exception class: {0}] 与已有文件目录冲突：{1}";
@@ -23,14 +21,6 @@ public class MessageUtil {
     private static final String USER_NOT_FOUND = "用户名（{0}）不存在";
 
     private static final String INVALID_PASSWORD = "密码（{0}）无效";
-
-    public static <T> Mono<T> noCategoryMsg(Object... args) {
-        return error(MSG_NO_CATEGORY, NoSuchElementException.class, getCallerClassName(), args);
-    }
-
-    public static <T> Mono<T> categoryConflictMsg(Object... args) {
-        return error(MSG_CATEGORY_CONFLICT, QuickDocException.class, getCallerClassName(), args);
-    }
 
     public static <T> Mono<T> noDirectoryMsg(Object... args) {
         return error(MSG_NO_DIRECTORY, NoSuchElementException.class, getCallerClassName(), args);

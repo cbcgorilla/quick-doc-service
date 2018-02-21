@@ -1,22 +1,35 @@
 package cn.mxleader.quickdoc.web.config;
 
-import cn.mxleader.quickdoc.entities.FsOwner;
+import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.security.entities.ActiveUser;
+import cn.mxleader.quickdoc.web.domain.WebFile;
+import cn.mxleader.quickdoc.web.domain.WebFolder;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
+import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
+import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.READ_PRIVILEGE;
+import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.checkAuthentication;
 
 public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
 
-    private Map<FsOwner.Type, String> getOwnerTypeMap() {
-        Map<FsOwner.Type, String> ownerTypeMap = new HashMap<>();
-        ownerTypeMap.put(FsOwner.Type.TYPE_GROUP, "组权限");
-        ownerTypeMap.put(FsOwner.Type.TYPE_PRIVATE, "个人权限");
+    public static final String FILES_ATTRIBUTE = "files";
+    public static final String FOLDERS_ATTRIBUTE = "folders";
+
+    private Map<AccessAuthorization.Type, String> getOwnerTypeMap() {
+        Map<AccessAuthorization.Type, String> ownerTypeMap = new HashMap<>();
+        ownerTypeMap.put(AccessAuthorization.Type.TYPE_GROUP, "组权限");
+        ownerTypeMap.put(AccessAuthorization.Type.TYPE_PRIVATE, "个人权限");
         return ownerTypeMap;
     }
 
@@ -42,14 +55,14 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
      * @throws Exception
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        //return super.preHandle(request, response, handler);
-        long startTime = System.currentTimeMillis();
-        request.setAttribute("startTime", startTime);
+    public boolean preHandle(HttpServletRequest request,
+                             HttpServletResponse response,
+                             Object handler) throws Exception {
+
         request.setAttribute("title", HOME_TITLE);
         request.setAttribute("ownerTypeMap", getOwnerTypeMap());
         request.setAttribute("privilegeMap", getPrivilegeMap());
-        return true;
+        return super.preHandle(request, response, handler);
     }
 
     /**
@@ -62,13 +75,37 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
      * @throws Exception
      */
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        //super.postHandle(request, response, handler, modelAndView);
-        /*
-        long startTime = (long) request.getAttribute("startTime");
-        request.removeAttribute("startTime");
-        long endTime = System.currentTimeMillis();
-        System.out.println("本次请求处理时间为：" + new Long(endTime - startTime) + "ms");
-        request.setAttribute("handlingTime", endTime - startTime);*/
+    public void postHandle(HttpServletRequest request,
+                           HttpServletResponse response,
+                           Object handler,
+                           ModelAndView modelAndView) throws Exception {
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute(SESSION_USER) != null &&
+                modelAndView != null) {
+            ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+            ModelMap model = modelAndView.getModelMap();
+
+            // 目录按授权信息进行显示
+            if (model.containsAttribute(FOLDERS_ATTRIBUTE)) {
+                List<WebFolder> folders = (List<WebFolder>) model.get(FOLDERS_ATTRIBUTE);
+                model.remove(FOLDERS_ATTRIBUTE);
+                model.addAttribute(FOLDERS_ATTRIBUTE, folders.stream()
+                        .filter(webFolder -> checkAuthentication(webFolder.getOpenAccess(),
+                                webFolder.getAuthorizations(),
+                                activeUser, READ_PRIVILEGE))
+                        .collect(Collectors.toList()));
+            }
+
+            // 文件按授权信息进行显示
+            if (model.containsAttribute(FILES_ATTRIBUTE)) {
+                List<WebFile> files = (List<WebFile>) model.get(FILES_ATTRIBUTE);
+                model.remove(FILES_ATTRIBUTE);
+                model.addAttribute(FILES_ATTRIBUTE, files.stream()
+                        .filter(file -> checkAuthentication(file.getOpenAccess(),
+                                file.getAuthorizations(),
+                                activeUser, READ_PRIVILEGE))
+                        .collect(Collectors.toList()));
+            }
+        }
     }
 }

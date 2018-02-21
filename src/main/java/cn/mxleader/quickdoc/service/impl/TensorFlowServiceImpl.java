@@ -1,9 +1,10 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.entities.FsDescription;
-import cn.mxleader.quickdoc.entities.TfMatch;
-import cn.mxleader.quickdoc.service.ReactiveFileService;
+import cn.mxleader.quickdoc.entities.FileMetadata;
+import cn.mxleader.quickdoc.entities.TFMatchValue;
+import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.service.TensorFlowService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -26,41 +27,41 @@ public class TensorFlowServiceImpl implements TensorFlowService {
 
     private final byte[] graphDef;
     private final List<String> labels;
-    private final ReactiveFileService reactiveFileService;
+    private final FileService fileService;
 
     @Autowired
-    public TensorFlowServiceImpl(ReactiveFileService reactiveFileService) {
-        this.reactiveFileService = reactiveFileService;
+    public TensorFlowServiceImpl(FileService fileService) {
+        this.fileService = fileService;
         graphDef = readAllBytesOrExit(Paths.get("D:\\inception_model", "tensorflow_inception_graph.pb"));
         labels = readAllLinesOrExit(Paths.get("D:\\inception_model", "imagenet_comp_graph_label_strings.txt"));
     }
 
-    public TensorFlowServiceImpl(ReactiveFileService reactiveFileService, String modelDir) {
-        this.reactiveFileService = reactiveFileService;
+    public TensorFlowServiceImpl(FileService fileService, String modelDir) {
+        this.fileService = fileService;
         graphDef = readAllBytesOrExit(Paths.get(modelDir, "tensorflow_inception_graph.pb"));
         labels = readAllLinesOrExit(Paths.get(modelDir, "imagenet_comp_graph_label_strings.txt"));
     }
 
     @Override
-    public TfMatch getImageMatch(byte[] imageBytes) {
+    public TFMatchValue getImageMatch(byte[] imageBytes) {
         Tensor<Float> image = constructAndExecuteGraphToNormalizeImage(imageBytes);
         float[] labelProbabilities = executeInceptionGraph(graphDef, image);
         int bestLabelIdx = maxIndex(labelProbabilities);
-        return new TfMatch(labels.get(bestLabelIdx), labelProbabilities[bestLabelIdx] * 100f);
+        return new TFMatchValue(labels.get(bestLabelIdx), labelProbabilities[bestLabelIdx] * 100f);
     }
 
     @Override
     @Async
-    public void updateImageLabel(FsDescription fsDescription) {
+    public void updateImageMetadata(ObjectId fileId, FileMetadata metadata) {
         try {
-            InputStream input = reactiveFileService.getFileStream(fsDescription.getStoredId());
+            InputStream input = fileService.getFileStream(fileId);
             byte[] imageBytes = read(input, input.available());
             Tensor<Float> image = constructAndExecuteGraphToNormalizeImage(imageBytes);
             float[] labelProbabilities = executeInceptionGraph(graphDef, image);
             int bestLabelIdx = maxIndex(labelProbabilities);
-            fsDescription.setLabels(new String[]{labels.get(bestLabelIdx)});
-            reactiveFileService.updateFsDescription(fsDescription).subscribe();
-            //return new TfMatch(labels.get(bestLabelIdx), labelProbabilities[bestLabelIdx] * 100f);
+            metadata.setLabels(new String[]{labels.get(bestLabelIdx)});
+            fileService.saveMetadata(fileId,metadata);
+            //return new TFMatchValue(labels.get(bestLabelIdx), labelProbabilities[bestLabelIdx] * 100f);
         } catch (IOException exp) {
             exp.printStackTrace();
         }

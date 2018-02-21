@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.security.config;
 
-import cn.mxleader.quickdoc.entities.UserEntity;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.security.authprovider.WebAuthenticationProvider;
 import cn.mxleader.quickdoc.security.handler.ApiAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +59,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
             // @TODO 删除.csrf().disable() 可屏蔽 /management 路径下的POST提交，仅支持GET方法交互
             http.csrf().disable().requestMatcher(
-                    EndpointRequest.to("mongo-status", "quick-doc-config")).authorizeRequests()
-                    .anyRequest().hasAuthority(UserEntity.Authorities.ADMIN.name())
+                    EndpointRequest.to("mongo-status", "quick-doc-health")).authorizeRequests()
+                    .anyRequest().hasAuthority(QuickDocUser.Authorities.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -88,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //http.antMatcher("/guest/**").authorizeRequests().anyRequest().permitAll();
 
             http.antMatcher("/api/**").authorizeRequests()
-                    .anyRequest().hasAuthority(UserEntity.Authorities.ADMIN.name())
+                    .anyRequest().hasAuthority(QuickDocUser.Authorities.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -145,8 +145,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     //.antMatchers("/invalidSession*").anonymous()
                     .antMatchers(SWAGGER_AUTH_WHITELIST).permitAll()
                     .antMatchers("/admin*", "/admin/**", "/swagger-ui.html")
-                    .hasAuthority(UserEntity.Authorities.ADMIN.name())
-                    .anyRequest().hasAnyAuthority(UserEntity.Authorities.ADMIN.name(), UserEntity.Authorities.USER.name())
+                    .hasAuthority(QuickDocUser.Authorities.ADMIN.name())
+                    .anyRequest().hasAnyAuthority(QuickDocUser.Authorities.ADMIN.name(), QuickDocUser.Authorities.USER.name())
                     .and()
                     .formLogin()
                     .loginPage("/login")

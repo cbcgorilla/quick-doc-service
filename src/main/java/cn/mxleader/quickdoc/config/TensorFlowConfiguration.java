@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.config;
 
-import cn.mxleader.quickdoc.service.ReactiveFileService;
+import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.service.TensorFlowService;
 import cn.mxleader.quickdoc.service.impl.TensorFlowServiceImpl;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class TensorFlowConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "quickdoc.tensorflow", value = "model-dir")
     @Autowired
-    public TensorFlowService tensorFlowService(ReactiveFileService reactiveFileService) {
+    public TensorFlowService tensorFlowService(FileService reactiveFileService) {
         return new TensorFlowServiceImpl(reactiveFileService, tensorFlowProperties.getModelDir());
     }
 

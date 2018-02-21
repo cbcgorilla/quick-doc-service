@@ -1,9 +1,11 @@
 package cn.mxleader.quickdoc.service;
 
-import cn.mxleader.quickdoc.entities.FsDescription;
-import cn.mxleader.quickdoc.entities.TfMatch;
+import cn.mxleader.quickdoc.entities.FileMetadata;
+import cn.mxleader.quickdoc.entities.TFMatchValue;
+import org.bson.types.ObjectId;
 
 public interface TensorFlowService {
-    TfMatch getImageMatch(byte[] imageBytes);
-    void updateImageLabel(FsDescription fsDescription) ;
+    TFMatchValue getImageMatch(byte[] imageBytes);
+
+    void updateImageMetadata(ObjectId fileId, FileMetadata metadata);
 }
