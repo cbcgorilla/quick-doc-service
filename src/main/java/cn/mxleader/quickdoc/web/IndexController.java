@@ -245,6 +245,7 @@ public class IndexController {
 
     /**
      * 文本文件预览功能
+     *
      * @param fileId
      * @return
      * @throws IOException
@@ -257,11 +258,11 @@ public class IndexController {
 
         HttpHeaders header = new HttpHeaders();
         header.set("Content-Disposition", "inline; filename=" + fs.getGridFSFile().getFilename());
-        if(fileType.equalsIgnoreCase("text/html")) {
+        if (fileType.equalsIgnoreCase("text/html")) {
             header.add("Content-Type", "text/html; charset=utf-8");
             String document = FileUtils.read(fs);
             return new HttpEntity<>(document, header);
-        }else{
+        } else {
             header.add("Content-Type", "text/plain; charset=gb2312");
             String document = FileUtils.read(fs, Charset.forName("GBK"));
             return new HttpEntity<>(document, header);
@@ -287,19 +288,24 @@ public class IndexController {
                          Model model,
                          HttpSession session) throws IOException {
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        String filename = FileUtils.getFilename(file.getOriginalFilename());
+        String fileType = FileUtils.guessMimeType(filename);
+
         QuickDocFolder quickDocFolder = reactiveFolderService.findById(folderId).block();
+        if (fileService.getStoredFile(filename, folderId) != null) {
+            redirectAttributes.addFlashAttribute("message",
+                    "该目录： " + quickDocFolder.getPath() + "中已存在同名文件，请核对文件信息是否重复！");
+            return "redirect:/folder@" + folderId;
+        }
         // 鉴权检查
         if (checkAuthentication(quickDocFolder.getOpenAccess(),
                 quickDocFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
-            String filename = FileUtils.getFilename(file.getOriginalFilename());
-            String fileType = FileUtils.guessMimeType(filename);
-
             FileMetadata metadata = new FileMetadata(fileType, folderId,
                     getOpenAccessFromOwnerRequest(ownersRequest),
                     translateOwnerRequest(activeUser, ownersRequest), null);
 
-            // 启动TensorFlow 线程分析图片内容
             ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
+            // 启动TensorFlow 线程分析图片内容
             if (fileType.startsWith("image/")) {
                 tensorFlowService.updateImageMetadata(fileId, metadata);
             }

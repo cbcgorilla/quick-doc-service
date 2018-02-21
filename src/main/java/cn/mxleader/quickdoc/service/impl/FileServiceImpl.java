@@ -10,7 +10,6 @@ import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
@@ -230,6 +229,7 @@ public class FileServiceImpl implements FileService {
      * @return Web格式文件
      */
     private WebFile switchWebFile(GridFSFile gridFSFile) {
+        if (gridFSFile == null) return null;
         FileMetadata metadata = converter.read(FileMetadata.class, gridFSFile.getMetadata());
         return new WebFile(gridFSFile.getObjectId(),
                 gridFSFile.getFilename(),
