@@ -3,7 +3,7 @@ package cn.mxleader.quickdoc.service.impl;
 import cn.mxleader.quickdoc.common.utils.MessageUtil;
 import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.dao.ReactiveUserRepository;
-import cn.mxleader.quickdoc.common.utils.PasswordUtil;
+import cn.mxleader.quickdoc.security.utils.PasswordUtil;
 import cn.mxleader.quickdoc.service.ReactiveUserService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;

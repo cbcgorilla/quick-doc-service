@@ -43,11 +43,13 @@ TensorFlow for Java 1.5.0 分析上传的图片文件，自动添加识别内容
 
 2. csrf() 在Spring Security 内默认启用CSRF，会屏蔽POST提交任务, 通过csrf().disable()关闭CSRF。
 
-3. 后台管理功能：文件夹管理，用户管理，分类管理
+3. 后台管理功能：文件夹管理，用户管理，分类管理, @TODO, 文件夹编辑，修改密码
 
 4. 前端显示优化：文件夹图标，下载用图标替换按钮
 
 5. Android客户端： 自动同步本地图片文件
+
+6. 剥离TensorFlow图像分析模块，内存消耗问题。
 
 Lombok 在 Java 9 环境导致编译异常
 

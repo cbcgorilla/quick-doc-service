@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.common.utils;
+package cn.mxleader.quickdoc.security.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

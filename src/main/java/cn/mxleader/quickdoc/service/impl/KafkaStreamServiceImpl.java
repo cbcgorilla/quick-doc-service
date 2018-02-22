@@ -11,7 +11,6 @@ public class KafkaStreamServiceImpl implements StreamService {
 
     private final String defaultTopic;
 
-    @Autowired
     public KafkaStreamServiceImpl(KafkaTemplate<String, String> kafkaTemplate) {
         this(kafkaTemplate, null);
     }
