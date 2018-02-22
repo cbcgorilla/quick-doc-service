@@ -11,6 +11,7 @@ import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -160,15 +161,14 @@ public class IndexController {
     public @ResponseBody
     void downloadDocument(HttpServletResponse response,
                           @PathVariable String fileId) throws IOException {
-        GridFSDownloadStream fs = fileService.getFileStream(new ObjectId(fileId));
-        GridFSFile gridFSFile = fs.getGridFSFile();
+        GridFsResource fs = fileService.getResource(new ObjectId(fileId));
 
         response.setContentType(MediaType.MULTIPART_FORM_DATA_VALUE);
         response.setHeader("Content-Disposition",
-                "attachment; filename=" + new String(gridFSFile.getFilename()
+                "attachment; filename=" + new String(fs.getFilename()
                         .getBytes("gb2312"), "ISO8859-1"));
-        response.setHeader("Content-Length", String.valueOf(gridFSFile.getLength()));
-        FileCopyUtils.copy(fs, response.getOutputStream());
+        response.setHeader("Content-Length", String.valueOf(fs.contentLength()));
+        FileCopyUtils.copy(fs.getInputStream(), response.getOutputStream());
     }
 
     /**
@@ -180,12 +180,12 @@ public class IndexController {
      * @throws IOException
      */
     private HttpEntity<byte[]> openDocumentEntity(MediaType returnType, String fileId) throws IOException {
-        GridFSDownloadStream fs = fileService.getFileStream(new ObjectId(fileId));
-        byte[] document = FileCopyUtils.copyToByteArray(fs);
+        GridFsResource fs = fileService.getResource(new ObjectId(fileId));
+        byte[] document = FileCopyUtils.copyToByteArray(fs.getInputStream());
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(returnType);
-        header.set("Content-Disposition", "inline; filename=" + fs.getGridFSFile().getFilename());
+        header.set("Content-Disposition", "inline; filename=" + fs.getFilename());
         header.setContentLength(document.length);
 
         return new HttpEntity<>(document, header);
@@ -253,18 +253,17 @@ public class IndexController {
     @GetMapping(value = "/view-text/{fileId}", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody
     HttpEntity<String> openTextEntity(@PathVariable String fileId) throws IOException {
-        GridFSDownloadStream fs = fileService.getFileStream(new ObjectId(fileId));
-        String fileType = fs.getGridFSFile().getMetadata().getString("_contentType");
+        GridFsResource fs = fileService.getResource(new ObjectId(fileId));
 
         HttpHeaders header = new HttpHeaders();
-        header.set("Content-Disposition", "inline; filename=" + fs.getGridFSFile().getFilename());
-        if (fileType.equalsIgnoreCase("text/html")) {
+        header.set("Content-Disposition", "inline; filename=" + fs.getFilename());
+        if (fs.getContentType().equalsIgnoreCase("text/html")) {
             header.add("Content-Type", "text/html; charset=utf-8");
-            String document = FileUtils.read(fs);
+            String document = FileUtils.read(fs.getInputStream());
             return new HttpEntity<>(document, header);
         } else {
             header.add("Content-Type", "text/plain; charset=gb2312");
-            String document = FileUtils.read(fs, Charset.forName("GBK"));
+            String document = FileUtils.read(fs.getInputStream(), Charset.forName("GBK"));
             return new HttpEntity<>(document, header);
         }
     }

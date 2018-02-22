@@ -4,9 +4,9 @@ import cn.mxleader.quickdoc.entities.FileMetadata;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
-import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,10 +49,11 @@ public interface FileService {
     /**
      * 根据输入文件ID获取二进制流
      *
-     * @param storedId 文件ID
+     * @param fileId 文件ID
      * @return
      */
-    GridFSDownloadStream getFileStream(ObjectId storedId);
+    GridFsResource getResource(ObjectId fileId);
+    GridFSDownloadStream getFSDownloadStream(ObjectId fileId);
 
     /**
      * 创建ZIP文件

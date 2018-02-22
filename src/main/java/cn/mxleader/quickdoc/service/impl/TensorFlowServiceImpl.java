@@ -54,7 +54,7 @@ public class TensorFlowServiceImpl implements TensorFlowService {
     @Async
     public void updateImageMetadata(ObjectId fileId, FileMetadata metadata) {
         try {
-            InputStream input = fileService.getFileStream(fileId);
+            InputStream input = fileService.getFSDownloadStream(fileId);
             byte[] imageBytes = read(input, input.available());
             Tensor<Float> image = constructAndExecuteGraphToNormalizeImage(imageBytes);
             float[] labelProbabilities = executeInceptionGraph(graphDef, image);

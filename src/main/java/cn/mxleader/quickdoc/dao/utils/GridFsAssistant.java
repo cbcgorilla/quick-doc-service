@@ -35,6 +35,7 @@ import java.util.Optional;
 import static com.mongodb.assertions.Assertions.notNull;
 import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 import static org.springframework.data.mongodb.gridfs.GridFsCriteria.whereFilename;
 
@@ -217,9 +218,18 @@ public class GridFsAssistant implements GridFsOperations, ResourcePatternResolve
         return dbFactory.getClass().getClassLoader();
     }
 
-    public GridFSDownloadStream getResource(ObjectId fileId) {
-        FindIterable<GridFSFile> files = filesCollection.find(eq("_id", fileId));
-        return files.first() != null ? getGridFs().openDownloadStream(fileId) : null;
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.core.io.ResourceLoader#getResource(org.bson.types.ObjectId)
+     */
+    public GridFsResource getResource(ObjectId fileId) {
+        GridFSFile file = findOne(query(where("_id").is(fileId)));
+        return file != null ? new GridFsResource(file, getGridFs().openDownloadStream(fileId)) : null;
+    }
+
+    public GridFSDownloadStream getFSDownloadStream(ObjectId fileId) {
+        GridFSFile file = findOne(query(where("_id").is(fileId)));
+        return file != null ? getGridFs().openDownloadStream(fileId) : null;
     }
 
     /*
@@ -227,7 +237,6 @@ public class GridFsAssistant implements GridFsOperations, ResourcePatternResolve
      * @see org.springframework.core.io.ResourceLoader#getResource(java.lang.String)
      */
     public GridFsResource getResource(String location) {
-
         GridFSFile file = findOne(query(whereFilename().is(location)));
         return file != null ? new GridFsResource(file, getGridFs().openDownloadStream(location)) : null;
     }
@@ -237,7 +246,6 @@ public class GridFsAssistant implements GridFsOperations, ResourcePatternResolve
      * @see org.springframework.core.io.support.ResourcePatternResolver#getResources(java.lang.String)
      */
     public GridFsResource[] getResources(String locationPattern) {
-
         if (!StringUtils.hasText(locationPattern)) {
             return new GridFsResource[0];
         }
@@ -256,7 +264,7 @@ public class GridFsAssistant implements GridFsOperations, ResourcePatternResolve
             return resources.toArray(new GridFsResource[resources.size()]);
         }
 
-        return new GridFsResource[] { getResource(locationPattern) };
+        return new GridFsResource[]{getResource(locationPattern)};
     }
 
     private Document getMappedQuery(Document query) {

@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsCriteria;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -132,11 +133,17 @@ public class FileServiceImpl implements FileService {
     /**
      * 根据输入文件ID获取二进制流
      *
-     * @param storedId 文件ID
+     * @param fileId 文件ID
      * @return
      */
-    public GridFSDownloadStream getFileStream(ObjectId storedId) {
-        return gridFsAssistant.getResource(storedId);
+    @Override
+    public GridFsResource getResource(ObjectId fileId) {
+        return gridFsAssistant.getResource(fileId);
+    }
+
+    @Override
+    public GridFSDownloadStream getFSDownloadStream(ObjectId fileId) {
+        return gridFsAssistant.getFSDownloadStream(fileId);
     }
 
     /**
@@ -191,7 +198,7 @@ public class FileServiceImpl implements FileService {
                     if (checkAuthentication(file.getOpenAccess(),
                             file.getAuthorizations(),
                             activeUser, READ_PRIVILEGE)) {
-                        compressFile(getFileStream(file.getId()), out, basedir);
+                        compressFile(getResource(file.getId()), out, basedir);
                     }
                 });
 
@@ -200,16 +207,16 @@ public class FileServiceImpl implements FileService {
     /**
      * 压缩一个文件
      *
-     * @param fsInputStream 输入文件流
-     * @param out           输出ZIP流
-     * @param basedir       当前文件所在目录
+     * @param gridFsResource 输入文件流
+     * @param out            输出ZIP流
+     * @param basedir        当前文件所在目录
      */
-    private void compressFile(GridFSDownloadStream fsInputStream,
+    private void compressFile(GridFsResource gridFsResource,
                               ZipOutputStream out,
                               String basedir) {
         try {
-            BufferedInputStream bis = new BufferedInputStream(fsInputStream);
-            ZipEntry entry = new ZipEntry(basedir + "/" + fsInputStream.getGridFSFile().getFilename());
+            BufferedInputStream bis = new BufferedInputStream(gridFsResource.getInputStream());
+            ZipEntry entry = new ZipEntry(basedir + "/" + gridFsResource.getFilename());
             out.putNextEntry(entry);
             int count;
             byte data[] = new byte[BUFFER_SIZE];
