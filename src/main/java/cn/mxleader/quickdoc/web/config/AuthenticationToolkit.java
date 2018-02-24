@@ -77,7 +77,8 @@ public class AuthenticationToolkit {
         return false;
     }
 
-    public static AccessAuthorization[] translateOwnerRequest(ActiveUser activeUser, String[] ownersRequest) {
+    public static AccessAuthorization[] translateOwnerRequest(ActiveUser activeUser,
+                                                              String[] ownersRequest) {
         AccessAuthorization owner = new AccessAuthorization(activeUser.getUsername(),
                 AccessAuthorization.Type.TYPE_PRIVATE, 7);
         List<AccessAuthorization> accessAuthorizationList = new ArrayList<AccessAuthorization>();
@@ -86,6 +87,27 @@ public class AuthenticationToolkit {
             for (String item : ownersRequest) {
                 if (item.equalsIgnoreCase("GroupMode")) {
                     for (String group : activeUser.getGroups()) {
+                        accessAuthorizationList.add(new AccessAuthorization(group,
+                                AccessAuthorization.Type.TYPE_GROUP, 3));
+                    }
+                }
+            }
+        }
+        AccessAuthorization[] accessAuthorizationDesc = new AccessAuthorization[accessAuthorizationList.size()];
+        return accessAuthorizationList.toArray(accessAuthorizationDesc);
+    }
+
+    public static AccessAuthorization[] translateOwnerRequest(ActiveUser activeUser,
+                                                              String[] ownersRequest,
+                                                              String[] shareGroups) {
+        AccessAuthorization owner = new AccessAuthorization(activeUser.getUsername(),
+                AccessAuthorization.Type.TYPE_PRIVATE, 7);
+        List<AccessAuthorization> accessAuthorizationList = new ArrayList<AccessAuthorization>();
+        accessAuthorizationList.add(owner);
+        if (ownersRequest != null && ownersRequest.length > 0) {
+            for (String item : ownersRequest) {
+                if (item.equalsIgnoreCase("GroupMode")) {
+                    for (String group : shareGroups) {
                         accessAuthorizationList.add(new AccessAuthorization(group,
                                 AccessAuthorization.Type.TYPE_GROUP, 3));
                     }

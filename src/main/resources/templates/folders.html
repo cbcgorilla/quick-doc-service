@@ -23,6 +23,11 @@
             $(".template-input-icon-container #path").val("");
             $(".template-input-icon-container #parentId").val($td.eq(4).find(".input-group #folderId").val());
         });
+        $(document).on("click", ".editFolder", function () {
+            var $td = $(this).parents('tr').children('td');
+            $(".template-input-icon-container #path").val("");
+            $(".template-input-icon-container #parentId").val($td.eq(4).find(".input-group #folderId").val());
+        });
         //]]>
     </script>
 
@@ -57,7 +62,7 @@
 <div class="table-responsive">
 
     <!-- 模态框 -->
-    <div class="modal fade" id="addFolderDialogModal">
+    <div class="modal fade" id="saveFolderDialogModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
 
@@ -91,6 +96,18 @@
                                                       value="PublicMode"/>公开访问</label>
                                         <label><input id="owners" name="owners" type="checkbox"
                                                       value="GroupMode"/>组内共享</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="right">共享组:</td>
+                                    <td>
+                                        <select id="shareGroups" name="shareGroups"
+                                                class="select custom-select" multiple="multiple">
+                                            <option th:each="entry : ${groupMap}"
+                                                    th:value="${entry.key}"
+                                                    th:text="${entry.value}">共享组
+                                            </option>
+                                        </select>
                                     </td>
                                 </tr>
                             </table>
@@ -147,9 +164,12 @@
                 </td>
                 <td>
                     <div class="input-group">
-                        <a data-toggle="modal" title="新增目录"
-                           class="addFolder btn btn-primary"
-                           href="#addFolderDialogModal"><i class="fas fa-plus"></i></a>
+                        <a data-toggle="modal" title="新增子目录"
+                           class="addFolder btn btn-light"
+                           href="#saveFolderDialogModal"><i class="fas fa-plus"></i></a>
+                        <a data-toggle="modal" title="修改目录信息"
+                           class="editFolder btn btn-primary"
+                           href="#saveFolderDialogModal"><i class="far fa-edit"></i></a>
                         <a th:href="@{'/zip-resource/'+${folder.id}}" title="打包下载目录" class="btn btn-dark">
                             <i class="fas fa-cloud-download-alt"></i>
                         </a>
@@ -157,7 +177,7 @@
                                th:value="${folder.id}"/>
                         <input type="hidden" th:name="${_csrf.parameterName}"
                                th:value="${_csrf.token}"/>
-                        <input type="submit" value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
+                        <input type="submit" value="&#xf2ed" title="删除该目录" class="btn btn-danger far fa-trash-alt"/>
                     </div>
                 </td>
             </form>

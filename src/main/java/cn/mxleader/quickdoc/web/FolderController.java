@@ -15,6 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
@@ -44,9 +46,18 @@ public class FolderController {
      * @return
      */
     @GetMapping()
-    public String index(Model model) {
+    public String index(HttpSession session, Model model) {
+        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        Map<String, String> groupMap = new HashMap<>();
+        String[] groups = activeUser.getGroups();
+        if (groups != null) {
+            for (String group : groups) {
+                groupMap.put(group, group);
+            }
+        }
         model.addAttribute(FOLDERS_ATTRIBUTE, reactiveFolderService.findAllInWebFormat()
                 .toStream().collect(Collectors.toList()));
+        model.addAttribute("groupMap", groupMap);
         return "folders";
     }
 
@@ -56,6 +67,7 @@ public class FolderController {
      * @param parentId
      * @param path
      * @param ownersRequest
+     * @param shareGroups
      * @param redirectAttributes
      * @param session
      * @return
@@ -64,6 +76,7 @@ public class FolderController {
     public String save(@RequestParam("parentId") String parentId,
                        @RequestParam("path") String path,
                        @RequestParam(value = "owners", required = false) String[] ownersRequest,
+                       @RequestParam("shareGroups") String[] shareGroups,
                        RedirectAttributes redirectAttributes,
                        HttpSession session) {
 
@@ -75,7 +88,7 @@ public class FolderController {
                 activeUser, WRITE_PRIVILEGE)) {
             reactiveFolderService.save(path, new ObjectId(parentId),
                     getOpenAccessFromOwnerRequest(ownersRequest),
-                    translateOwnerRequest(activeUser, ownersRequest)).subscribe();
+                    translateOwnerRequest(activeUser, ownersRequest, shareGroups)).subscribe();
 
             // 发送MQ消息
             streamService.sendMessage("用户" + activeUser.getUsername() +
