@@ -21,11 +21,11 @@
 
 存储（MongoDB 3.6.2）
 
-服务端：Spring Framework 5.0.3.RELEASE
+服务端：Spring Framework 5.0.4.RELEASE
 
 Spring Boot 2.0 Actuator 提供MongoDB状态及系统配置信息监控点
 
-Spring Security 5.0.0.RELEASE
+Spring Security 5.0.2.RELEASE
 
 Kotlin 1.2 实现实体映射Bean
 
@@ -35,7 +35,7 @@ Web层： BootStrap 4.0， + font-awesome.css 5.0 + Thymeleaf
 
 Springfox Swagger 2.8.0 实现REST API文档化交付界面
 
-TensorFlow for Java 1.5.0 分析上传的图片文件，自动添加识别内容的标签 
+TensorFlow for Java 1.5.0 分析上传的图片文件，自动添加识别内容的标签 **`(因资源开销较大，剥离为单独的工程)`**
 
 ## 待办：
 

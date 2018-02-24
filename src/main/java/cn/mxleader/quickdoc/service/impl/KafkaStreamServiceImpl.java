@@ -6,7 +6,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 
 public class KafkaStreamServiceImpl implements StreamService {
-
     private KafkaTemplate<String, String> kafkaTemplate;
 
     private final String defaultTopic;

@@ -50,6 +50,7 @@ public class QuickDocConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "quickdoc.stream", value = "enabled")
     public StreamService streamService(KafkaTemplate<String, String> kafkaTemplate) {
+        //return new DefaultStreamServiceImpl();
         if (quickDocStreamProperties.getEnabled())
             return new KafkaStreamServiceImpl(kafkaTemplate, quickDocStreamProperties.getTopic());
         else

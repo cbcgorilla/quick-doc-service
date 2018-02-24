@@ -17,7 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
@@ -47,7 +49,10 @@ public class WebAuthenticationSuccessHandler implements
                     userGroups,
                     authentication.getAuthorities()));
             // 发送用户登录消息到平台MQ
-            streamService.sendMessage(" [User login ] username: " + authentication.getName());
+            Date d = new Date();
+            SimpleDateFormat str = new SimpleDateFormat("yyyy年MM月dd日 KK:mm:ss");
+            streamService.sendMessage(String.format(" [User login ] username: %s login at: %s",
+                    authentication.getName(), str.format(d)));
         }
         redirectStrategy.sendRedirect(request, response, determineTargetUrl(authentication));
         clearAuthenticationAttributes(request);

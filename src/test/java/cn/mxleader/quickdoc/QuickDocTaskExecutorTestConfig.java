@@ -1,5 +1,6 @@
 package cn.mxleader.quickdoc;
 
+import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.service.FileService;
 import org.slf4j.Logger;
@@ -44,7 +45,7 @@ public class QuickDocTaskExecutorTestConfig {
         return executor;
     }
 
-    @Bean
+    //@Bean
     CommandLineRunner uploadLocalFiles(FileService fileService) {
         return args -> {
             File folder = new File("E:\\IT服务台管理\\报告材料\\排班");
@@ -54,8 +55,7 @@ public class QuickDocTaskExecutorTestConfig {
                         .map(
                                 file -> {
                                     try {
-                                        String fileType = StringUtils.getFilenameExtension(file.getName()) != null ?
-                                                StringUtils.getFilenameExtension(file.getName()) : "No Extension";
+                                        String fileType = FileUtils.guessMimeType(file.getName());
                                        /* FileMetadata metadata = new FileMetadata("音乐",
                                                 new ObjectId("5a6966f7ae3e442518745836"),
                                                 false,

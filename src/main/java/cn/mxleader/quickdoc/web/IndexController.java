@@ -4,11 +4,12 @@ import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.entities.FileMetadata;
 import cn.mxleader.quickdoc.entities.QuickDocFolder;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;
-import cn.mxleader.quickdoc.service.*;
+import cn.mxleader.quickdoc.service.ConfigService;
+import cn.mxleader.quickdoc.service.FileService;
+import cn.mxleader.quickdoc.service.ReactiveFolderService;
+import cn.mxleader.quickdoc.service.StreamService;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import cn.mxleader.quickdoc.web.domain.WebFolder;
-import com.mongodb.client.gridfs.GridFSDownloadStream;
-import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
@@ -43,19 +44,16 @@ public class IndexController {
     private final FileService fileService;
     private final ConfigService configService;
     private final StreamService streamService;
-    private final TensorFlowService tensorFlowService;
 
     @Autowired
     public IndexController(ReactiveFolderService reactiveFolderService,
                            FileService fileService,
                            ConfigService configService,
-                           StreamService streamService,
-                           TensorFlowService tensorFlowService) {
+                           StreamService streamService) {
         this.reactiveFolderService = reactiveFolderService;
         this.fileService = fileService;
         this.configService = configService;
         this.streamService = streamService;
-        this.tensorFlowService = tensorFlowService;
     }
 
     /**
@@ -305,9 +303,9 @@ public class IndexController {
 
             ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
             // 启动TensorFlow 线程分析图片内容
-            if (fileType.startsWith("image/")) {
+            /*if (fileType.startsWith("image/")) {
                 tensorFlowService.updateImageMetadata(fileId, metadata);
-            }
+            }*/
 
             refreshDirList(model, folderId);
             // 发送MQ消息
