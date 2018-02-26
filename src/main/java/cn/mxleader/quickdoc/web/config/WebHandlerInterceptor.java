@@ -18,8 +18,7 @@ import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.READ_PRIVILEGE;
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.checkAuthentication;
+import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.*;
 
 public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
 
@@ -107,22 +106,40 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
             if (model.containsAttribute(FOLDERS_ATTRIBUTE)) {
                 List<WebFolder> folders = (List<WebFolder>) model.get(FOLDERS_ATTRIBUTE);
                 model.remove(FOLDERS_ATTRIBUTE);
-                model.addAttribute(FOLDERS_ATTRIBUTE, folders.stream()
-                        .filter(webFolder -> checkAuthentication(webFolder.getOpenAccess(),
+                model.addAttribute(FOLDERS_ATTRIBUTE,
+                        folders.stream().filter(webFolder -> checkAuthentication(webFolder.getOpenAccess(),
                                 webFolder.getAuthorizations(),
                                 activeUser, READ_PRIVILEGE))
-                        .collect(Collectors.toList()));
+                                .map(webFolder -> {
+                                    webFolder.setEditAuthorization(checkAuthentication(webFolder.getOpenAccess(),
+                                            webFolder.getAuthorizations(),
+                                            activeUser, WRITE_PRIVILEGE));
+                                    webFolder.setDeleteAuthorization(checkAuthentication(webFolder.getOpenAccess(),
+                                            webFolder.getAuthorizations(),
+                                            activeUser, DELETE_PRIVILEGE));
+                                    return webFolder;
+                                })
+                                .collect(Collectors.toList()));
             }
 
             // 文件按授权信息进行显示
             if (model.containsAttribute(FILES_ATTRIBUTE)) {
                 List<WebFile> files = (List<WebFile>) model.get(FILES_ATTRIBUTE);
                 model.remove(FILES_ATTRIBUTE);
-                model.addAttribute(FILES_ATTRIBUTE, files.stream()
-                        .filter(file -> checkAuthentication(file.getOpenAccess(),
+                model.addAttribute(FILES_ATTRIBUTE,
+                        files.stream().filter(file -> checkAuthentication(file.getOpenAccess(),
                                 file.getAuthorizations(),
                                 activeUser, READ_PRIVILEGE))
-                        .collect(Collectors.toList()));
+                                .map(file -> {
+                                    file.setEditAuthorization(checkAuthentication(file.getOpenAccess(),
+                                            file.getAuthorizations(),
+                                            activeUser, WRITE_PRIVILEGE));
+                                    file.setDeleteAuthorization(checkAuthentication(file.getOpenAccess(),
+                                            file.getAuthorizations(),
+                                            activeUser, DELETE_PRIVILEGE));
+                                    return file;
+                                })
+                                .collect(Collectors.toList()));
             }
         }
     }

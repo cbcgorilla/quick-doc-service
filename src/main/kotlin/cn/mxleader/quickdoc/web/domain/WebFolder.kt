@@ -8,7 +8,9 @@ data class WebFolder(var id: ObjectId,
                      var parentId: ObjectId,
                      var openAccess:Boolean=false,
                      var authorizations: Array<AccessAuthorization>? = null,
-                     var childrenCount: Long) {
+                     var childrenCount: Long,
+                     var editAuthorization:Boolean ? = false,
+                     var deleteAuthorization: Boolean ? = false) {
     constructor() : this(ObjectId.get(), "", ObjectId.get(),
             false,null, 0L)
 }

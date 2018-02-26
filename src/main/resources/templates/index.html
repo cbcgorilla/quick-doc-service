@@ -196,7 +196,8 @@
                                th:value="${currentFolder.id}"/>
                         <input type="hidden" th:name="${_csrf.parameterName}"
                                th:value="${_csrf.token}"/>
-                        <input type="submit" value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
+                        <input th:if="${file.deleteAuthorization}" type="submit"
+                               value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
                         <a th:href="@{'/download/'+${file.id}}" class="btn btn-dark">
                             <i class="fas fa-cloud-download-alt"></i>
                         </a>

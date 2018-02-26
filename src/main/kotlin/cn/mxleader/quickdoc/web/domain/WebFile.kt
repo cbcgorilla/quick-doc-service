@@ -14,7 +14,9 @@ data class WebFile(val id: ObjectId,
                    val authorizations: Array<AccessAuthorization>? = null,
                    var labels: Array<String>? = null,
                    var linkPrefix: String? = null,
-                   var iconClass: String? = null) {
+                   var iconClass: String? = null,
+                   var editAuthorization:Boolean ? = false,
+                   var deleteAuthorization: Boolean ? = false) {
     constructor(id: ObjectId,
                 filename: String,
                 length: Long,

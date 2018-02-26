@@ -248,7 +248,9 @@ public class FileServiceImpl implements FileService {
                 metadata.getAuthorizations(),
                 metadata.getLabels(),
                 FileUtils.getLinkPrefix(metadata.get_contentType()),
-                FileUtils.getIconClass(metadata.get_contentType())
+                FileUtils.getIconClass(metadata.get_contentType()),
+                false,
+                false
         );
     }
 
