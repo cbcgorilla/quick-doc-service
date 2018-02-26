@@ -45,6 +45,18 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
         return privilegeMap;
     }
 
+    private Map<String, String> getUserGroupMap(ActiveUser activeUser) {
+
+        Map<String, String> groupMap = new HashMap<>();
+        String[] groups = activeUser.getGroups();
+        if (groups != null) {
+            for (String group : groups) {
+                groupMap.put(group, group);
+            }
+        }
+        return groupMap;
+    }
+
     /**
      * 重写preHandle方法，在请求发生之前执行
      *
@@ -62,6 +74,12 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
         request.setAttribute("title", HOME_TITLE);
         request.setAttribute("ownerTypeMap", getOwnerTypeMap());
         request.setAttribute("privilegeMap", getPrivilegeMap());
+
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute(SESSION_USER) != null) {
+            ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+            request.setAttribute("groupMap", getUserGroupMap(activeUser));
+        }
         return super.preHandle(request, response, handler);
     }
 

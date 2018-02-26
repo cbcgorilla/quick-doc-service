@@ -66,7 +66,7 @@ public class AuthenticationToolkit {
         return false;
     }
 
-    public static Boolean getOpenAccessFromOwnerRequest(String[] ownersRequest) {
+    public static Boolean getOpenAccessFromShareSetting(String[] ownersRequest) {
         if (ownersRequest != null && ownersRequest.length > 0) {
             for (String item : ownersRequest) {
                 if (item.equalsIgnoreCase("PublicMode")) {
@@ -77,14 +77,14 @@ public class AuthenticationToolkit {
         return false;
     }
 
-    public static AccessAuthorization[] translateOwnerRequest(ActiveUser activeUser,
-                                                              String[] ownersRequest) {
+    public static AccessAuthorization[] translateShareSetting(ActiveUser activeUser,
+                                                              String[] shareSetting) {
         AccessAuthorization owner = new AccessAuthorization(activeUser.getUsername(),
                 AccessAuthorization.Type.TYPE_PRIVATE, 7);
         List<AccessAuthorization> accessAuthorizationList = new ArrayList<AccessAuthorization>();
         accessAuthorizationList.add(owner);
-        if (ownersRequest != null && ownersRequest.length > 0) {
-            for (String item : ownersRequest) {
+        if (shareSetting != null && shareSetting.length > 0) {
+            for (String item : shareSetting) {
                 if (item.equalsIgnoreCase("GroupMode")) {
                     for (String group : activeUser.getGroups()) {
                         accessAuthorizationList.add(new AccessAuthorization(group,
@@ -97,7 +97,7 @@ public class AuthenticationToolkit {
         return accessAuthorizationList.toArray(accessAuthorizationDesc);
     }
 
-    public static AccessAuthorization[] translateOwnerRequest(ActiveUser activeUser,
+    public static AccessAuthorization[] translateShareSetting(ActiveUser activeUser,
                                                               String[] ownersRequest,
                                                               String[] shareGroups) {
         AccessAuthorization owner = new AccessAuthorization(activeUser.getUsername(),

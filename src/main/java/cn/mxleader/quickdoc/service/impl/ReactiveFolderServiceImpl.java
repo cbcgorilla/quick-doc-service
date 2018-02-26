@@ -48,6 +48,16 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
                 });
     }
 
+    public Mono<QuickDocFolder> save(ObjectId folderId, String path, Boolean openAccess, AccessAuthorization[] authorizations) {
+        return reactiveFolderRepository.findById(folderId)
+                .flatMap(folder -> {
+                    folder.setPath(path);
+                    folder.setOpenAccess(openAccess);
+                    folder.setAuthorizations(authorizations);
+                    return reactiveFolderRepository.save(folder);
+                });
+    }
+
     /**
      * 新增文件目录;
      *

@@ -46,58 +46,61 @@ public class FolderController {
      * @return
      */
     @GetMapping()
-    public String index(HttpSession session, Model model) {
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
-        Map<String, String> groupMap = new HashMap<>();
-        String[] groups = activeUser.getGroups();
-        if (groups != null) {
-            for (String group : groups) {
-                groupMap.put(group, group);
-            }
-        }
+    public String index(Model model) {
         model.addAttribute(FOLDERS_ATTRIBUTE, reactiveFolderService.findAllInWebFormat()
                 .toStream().collect(Collectors.toList()));
-        model.addAttribute("groupMap", groupMap);
         return "folders";
     }
 
     /**
      * 保存新增目录信息
      *
-     * @param parentId
-     * @param path
-     * @param ownersRequest
-     * @param shareGroups
+     * @param folderIdRef        待修改目录的ID
+     * @param parentId           新建子目录的上级目录
+     * @param path               目录名称
+     * @param shareSetting       共享设置选项
+     * @param shareGroups        共享组选项
      * @param redirectAttributes
      * @param session
      * @return
      */
     @PostMapping("/save")
-    public String save(@RequestParam("parentId") String parentId,
+    public String save(@RequestParam(value = "folderIdRef", required = false) String folderIdRef,
+                       @RequestParam(value = "parentId", required = false) String parentId,
                        @RequestParam("path") String path,
-                       @RequestParam(value = "owners", required = false) String[] ownersRequest,
+                       @RequestParam(value = "shareSetting", required = false) String[] shareSetting,
                        @RequestParam("shareGroups") String[] shareGroups,
                        RedirectAttributes redirectAttributes,
                        HttpSession session) {
 
         ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
-        QuickDocFolder quickDocFolder = reactiveFolderService.findById(new ObjectId(parentId)).block();
+        ObjectId folderId = folderIdRef != null && folderIdRef.trim().length() > 0 ?
+                new ObjectId(folderIdRef) : new ObjectId(parentId);
+        QuickDocFolder folder = reactiveFolderService.findById(folderId).block();
         // 鉴权检查
-        if (checkAuthentication(quickDocFolder.getOpenAccess(),
-                quickDocFolder.getAuthorizations(),
+        if (checkAuthentication(folder.getOpenAccess(),
+                folder.getAuthorizations(),
                 activeUser, WRITE_PRIVILEGE)) {
-            reactiveFolderService.save(path, new ObjectId(parentId),
-                    getOpenAccessFromOwnerRequest(ownersRequest),
-                    translateOwnerRequest(activeUser, ownersRequest, shareGroups)).subscribe();
 
+            if (folderIdRef != null && folderIdRef.trim().length() > 0) {
+                // folderIdRef字段有数据则修改现有目录的数据
+                reactiveFolderService.save(new ObjectId(folderIdRef), path,
+                        getOpenAccessFromShareSetting(shareSetting),
+                        translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
+            } else {
+                // folderIdRef字段无数据则增加新的子目录
+                reactiveFolderService.save(path, new ObjectId(parentId),
+                        getOpenAccessFromShareSetting(shareSetting),
+                        translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
+            }
             // 发送MQ消息
             streamService.sendMessage("用户" + activeUser.getUsername() +
-                    "成功添加目录： " + path + "到目录：" + parentId);
+                    "成功保存目录： " + path);
             redirectAttributes.addFlashAttribute("message",
-                    "成功添加目录： " + path);
+                    "成功保存目录： " + path);
         } else {
             redirectAttributes.addFlashAttribute("message",
-                    "您无此目录的权限： " + quickDocFolder.getPath() + "，请联系管理员获取！");
+                    "您无此目录的权限： " + folder.getPath() + "，请联系管理员获取！");
         }
         return "redirect:/folders";
     }

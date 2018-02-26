@@ -22,11 +22,12 @@
             var $td = $(this).parents('tr').children('td');
             $(".template-input-icon-container #path").val("");
             $(".template-input-icon-container #parentId").val($td.eq(4).find(".input-group #folderId").val());
+            $(".template-input-icon-container #folderIdRef").val("")
         });
         $(document).on("click", ".editFolder", function () {
             var $td = $(this).parents('tr').children('td');
-            $(".template-input-icon-container #path").val("");
-            $(".template-input-icon-container #parentId").val($td.eq(4).find(".input-group #folderId").val());
+            $(".template-input-icon-container #path").val($td.eq(0).find("#folderPath").text());
+            $(".template-input-icon-container #folderIdRef").val($td.eq(4).find(".input-group #folderId").val());
         });
         //]]>
     </script>
@@ -85,6 +86,7 @@
                                             <input type="text" class="form-control" placeholder="目录名"
                                                    required="required"
                                                    id="path" name="path"/>
+                                            <input type="hidden" name="folderIdRef" id="folderIdRef"/>
                                             <input type="hidden" name="parentId" id="parentId"/>
                                         </div>
                                     </td>
@@ -92,9 +94,9 @@
                                 <tr>
                                     <td align="right">访问权限:</td>
                                     <td>
-                                        <label><input id="owners" name="owners" type="checkbox"
+                                        <label><input id="shareSetting_PublicMode" name="shareSetting" type="checkbox"
                                                       value="PublicMode"/>公开访问</label>
-                                        <label><input id="owners" name="owners" type="checkbox"
+                                        <label><input id="shareSetting_GroupMode" name="shareSetting" type="checkbox"
                                                       value="GroupMode"/>组内共享</label>
                                     </td>
                                 </tr>
@@ -147,7 +149,7 @@
                 <td>
                     <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
                     <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
-                    <a th:href="@{'/folder@'+${folder.id}}" th:text="${folder.path}"/>
+                    <a th:href="@{'/folder@'+${folder.id}}" th:text="${folder.path}" id="folderPath"/>
                 </td>
                 <td th:text="${folder.childrenCount}"></td>
                 <td>

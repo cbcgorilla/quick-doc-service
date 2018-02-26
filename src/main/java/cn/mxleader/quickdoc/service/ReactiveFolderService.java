@@ -19,6 +19,8 @@ public interface ReactiveFolderService {
      */
     Mono<QuickDocFolder> save(String path, ObjectId parentId, Boolean openAccess, AccessAuthorization[] authorizations);
 
+    Mono<QuickDocFolder> save(ObjectId folderId, String path, Boolean openAccess, AccessAuthorization[] authorizations);
+
     /**
      * 新增文件目录;
      *

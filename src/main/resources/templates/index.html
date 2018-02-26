@@ -77,12 +77,24 @@
                                     <td><input type="file" name="file" class="input custom-file"/></td>
                                 </tr>
                                 <tr>
-                                    <td align="right">文件访问权限:</td>
+                                    <td align="right">访问权限:</td>
                                     <td>
-                                        <label><input id="owners" name="owners" type="checkbox"
-                                                      value="PublicMode"/>全员共享</label>
-                                        <label><input id="owners" name="owners" type="checkbox"
+                                        <label><input id="shareSetting_PublicMode" name="shareSetting" type="checkbox"
+                                                      value="PublicMode"/>公开访问</label>
+                                        <label><input id="shareSetting_GroupMode" name="shareSetting" type="checkbox"
                                                       value="GroupMode"/>组内共享</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="right">共享组:</td>
+                                    <td>
+                                        <select id="shareGroups" name="shareGroups"
+                                                class="select custom-select" multiple="multiple">
+                                            <option th:each="entry : ${groupMap}"
+                                                    th:value="${entry.key}"
+                                                    th:text="${entry.value}">共享组
+                                            </option>
+                                        </select>
                                     </td>
                                 </tr>
                             </table>
@@ -110,9 +122,9 @@
             <th>文件类型</th>
             <th>文件长度</th>
             <th>上传日期</th>
-            <th>标签</th>
-            <th>公开访问</th>
-            <th>权限</th>
+            <th th:if="${isAdmin}">标签</th>
+            <th th:if="${isAdmin}">公开访问</th>
+            <th th:if="${isAdmin}">权限</th>
             <th>操作</th>
         </tr>
         </thead>
@@ -124,11 +136,12 @@
                 <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
                 <a th:href="@{'/folder@'+${folder.id}}" th:text="${folder.path}"/>
             </td>
-            <td th:text="@{'文件夹'}" colspan="4"></td>
-            <td>
+            <td th:if="${isAdmin}" colspan="4">文件夹</td>
+            <td th:unless="${isAdmin}" colspan="3">文件夹</td>
+            <td th:if="${isAdmin}">
                 <span th:if="${folder.openAccess}"><i class="fas fa-check"></i></span>
             </td>
-            <td>
+            <td th:if="${isAdmin}">
                 <ul class="custom-list">
                     <li th:each="authorization:${folder.authorizations}">
                         <span th:text="${authorization.name}"></span>[
@@ -156,17 +169,17 @@
                 <td th:text="${file.type}">文件类型</td>
                 <td th:text="${#numbers.formatInteger(file.length,3,'COMMA')}">文件大小</td>
                 <td th:text="${#dates.format(file.uploadDate,'yyyy-MM-dd HH:mm:ss')}">上传日期</td>
-                <td>
+                <td th:if="${isAdmin}">
                     <ul class="custom-list">
                         <li th:each="filelabel:${file.labels}">
                             <span th:text="${filelabel}"></span>.
                         </li>
                     </ul>
                 </td>
-                <td>
+                <td th:if="${isAdmin}">
                     <span th:if="${file.openAccess}"><i class="fas fa-check"></i></span>
                 </td>
-                <td>
+                <td th:if="${isAdmin}">
                     <ul class="custom-list">
                         <li th:each="authorization:${file.authorizations}">
                             <span th:text="${authorization.name}"></span>[

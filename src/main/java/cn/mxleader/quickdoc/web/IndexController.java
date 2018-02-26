@@ -280,7 +280,8 @@ public class IndexController {
     @PostMapping("/upload")
     public String upload(@RequestParam("file") MultipartFile file,
                          @RequestParam("folderId") ObjectId folderId,
-                         @RequestParam(value = "owners", required = false) String[] ownersRequest,
+                         @RequestParam(value = "shareSetting", required = false) String[] shareSetting,
+                         @RequestParam(value = "shareGroups", required = false) String[] shareGroups,
                          RedirectAttributes redirectAttributes,
                          Model model,
                          HttpSession session) throws IOException {
@@ -298,8 +299,8 @@ public class IndexController {
         if (checkAuthentication(quickDocFolder.getOpenAccess(),
                 quickDocFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
             FileMetadata metadata = new FileMetadata(fileType, folderId,
-                    getOpenAccessFromOwnerRequest(ownersRequest),
-                    translateOwnerRequest(activeUser, ownersRequest), null);
+                    getOpenAccessFromShareSetting(shareSetting),
+                    translateShareSetting(activeUser, shareSetting, shareGroups), null);
 
             ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
             // 启动TensorFlow 线程分析图片内容
