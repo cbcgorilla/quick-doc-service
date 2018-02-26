@@ -9,6 +9,7 @@ import cn.mxleader.quickdoc.service.StreamService;
 import cn.mxleader.quickdoc.service.impl.DefaultStreamServiceImpl;
 import cn.mxleader.quickdoc.service.impl.KafkaStreamServiceImpl;
 import cn.mxleader.quickdoc.service.impl.ReactiveUserServiceImpl;
+import cn.mxleader.quickdoc.web.context.MxLeaderMultipartResolver;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -18,6 +19,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -55,6 +58,16 @@ public class QuickDocConfiguration {
             return new KafkaStreamServiceImpl(kafkaTemplate, quickDocStreamProperties.getTopic());
         else
             return new DefaultStreamServiceImpl();
+    }
+
+    @Bean
+    public MultipartResolver multipartResolver(){
+        CommonsMultipartResolver resolver = new MxLeaderMultipartResolver();
+        resolver.setDefaultEncoding("UTF-8");
+        resolver.setResolveLazily(true);//resolveLazily属性启用是为了推迟文件解析，以在在UploadAction中捕获文件大小异常
+        resolver.setMaxInMemorySize(40960);
+        resolver.setMaxUploadSize(1024*1024*1024);//上传文件大小 1G 1024*1024*1024
+        return resolver;
     }
 
     @Bean

@@ -22,13 +22,15 @@ public class ApiAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(
             HttpServletRequest request,
             HttpServletResponse response,
-            AccessDeniedException exc) throws IOException {
+            AccessDeniedException exp) throws IOException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             log.warn("用户: " + auth.getName()
                     + " 尝试访问受保护路径 URL: "
-                    + request.getRequestURI());
+                    + request.getRequestURI()
+                    + "\n异常信息："
+                    + exp.getMessage());
         }
 
         response.setContentType("application/json;charset=UTF-8");

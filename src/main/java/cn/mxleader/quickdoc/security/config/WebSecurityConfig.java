@@ -139,7 +139,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //     head段： <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
             //     form段： <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             // @formatter:off
-            http
+            http.csrf().disable()
                     .authorizeRequests()
                     .antMatchers("/login*", "/login*", "/signin/**", "/signup/**").permitAll()
                     //.antMatchers("/invalidSession*").anonymous()

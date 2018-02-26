@@ -1,6 +1,5 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${title}"></title>
 
     <!-- Bootstrap -->
@@ -100,8 +99,6 @@
                             </table>
                             <input type="hidden" id="folderId" name="folderId"
                                    th:value="${currentFolder.id}"/>
-                            <input type="hidden" th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}"/>
                             <input type="submit" value="上传" class="btn btn-success"/>
                         </form>
                     </div>
@@ -194,8 +191,6 @@
                                th:value="${file.id}"/>
                         <input type="hidden" id="folderId" name="folderId"
                                th:value="${currentFolder.id}"/>
-                        <input type="hidden" th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}"/>
                         <input th:if="${file.deleteAuthorization}" type="submit"
                                value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
                         <a th:href="@{'/download/'+${file.id}}" class="btn btn-dark">
