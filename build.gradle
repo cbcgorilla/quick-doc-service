@@ -45,7 +45,7 @@ repositories {
 
 
 dependencies {
-	optional "org.springframework.boot:spring-boot-configuration-processor"
+	optional("org.springframework.boot:spring-boot-configuration-processor")
 	compile("org.springframework.boot:spring-boot-starter-actuator")
 	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
 	compile("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
@@ -63,8 +63,9 @@ dependencies {
 	compile("com.fasterxml.jackson.module:jackson-module-kotlin")
 	compile("commons-fileupload:commons-fileupload:1.3.3")
 	compile("commons-io:commons-io:2.6")
-	testCompile('io.projectreactor:reactor-test')
-	testCompile('org.springframework.security:spring-security-test')
+	testCompile("io.projectreactor:reactor-test")
+	testCompile ("org.springframework.boot:spring-boot-starter-test")
+	testCompile("org.springframework.security:spring-security-test")
 	testCompile("junit:junit:$junit_version")
 	testCompile("org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version")
 	testCompile("org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version")
