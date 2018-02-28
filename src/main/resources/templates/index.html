@@ -1,12 +1,5 @@
-<!--
- * CoreUI - Open Source Bootstrap Admin Template
- * @version v1.0.10
- * @link http://coreui.io
- * Copyright (c) 2018 creativeLabs Łukasz Holeczek
- * @license MIT
- -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,7 +8,7 @@
     <meta name="author" content="Michael Chen">
     <meta name="keyword" content="Quick Doc Service">
     <link rel="shortcut icon" href="images/favicon.png">
-    <title>CoreUI - Open Source Bootstrap Admin Template</title>
+    <title>Quick Doc Service</title>
 
     <!-- Icons -->
     <link href="css/flag-icon.min.css" rel="stylesheet" type="text/css"/>
@@ -23,38 +16,11 @@
     <link rel="stylesheet" type="text/css" href="css/fontawesome-all.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/simple-line-icons.css"/>
     <!--layui and necessary plugins-->
-    <link rel="stylesheet" type="text/css" href="/lib/layui/css/layui.css"  media="all"/>
+    <link rel="stylesheet" type="text/css" href="/lib/layui/css/layui.css" media="all"/>
     <!-- Main styles for this application -->
     <link rel="stylesheet" type="text/css" href="css/style.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/mxleader-style.css"/>
 </head>
-
-<!-- BODY options, add following classes to body to change options
-
-// Header options
-1. '.header-fixed'					- Fixed Header
-
-// Brand options
-1. '.brand-minimized'       - Minimized brand (Only symbol)
-
-// Sidebar options
-1. '.sidebar-fixed'					- Fixed Sidebar
-2. '.sidebar-hidden'				- Hidden Sidebar
-3. '.sidebar-off-canvas'		- Off Canvas Sidebar
-4. '.sidebar-minimized'			- Minimized Sidebar (Only icons)
-5. '.sidebar-compact'			  - Compact Sidebar
-
-// Aside options
-1. '.aside-menu-fixed'			- Fixed Aside Menu
-2. '.aside-menu-hidden'			- Hidden Aside Menu
-3. '.aside-menu-off-canvas'	- Off Canvas Aside Menu
-
-// Breadcrumb options
-1. '.breadcrumb-fixed'			- Fixed Breadcrumb
-
-// Footer options
-1. '.footer-fixed'					- Fixed footer
-
--->
 
 <body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
 <header class="app-header navbar">
@@ -68,47 +34,33 @@
 
     <ul class="nav navbar-nav d-md-down-none">
         <li class="nav-item px-3">
-            <a class="nav-link" href="#">Dashboard</a>
+            <a class="nav-link" href="files">文件管理</a>
         </li>
         <li class="nav-item px-3">
-            <a class="nav-link" href="#">Users</a>
+            <a class="nav-link" href="folders">目录管理</a>
         </li>
         <li class="nav-item px-3">
-            <a class="nav-link" href="#">Settings</a>
+            <a class="nav-link" href="users">系统用户</a>
         </li>
     </ul>
     <ul class="nav navbar-nav ml-auto">
-        <li class="nav-item d-md-down-none">
-            <a class="nav-link" href="#"><i class="icon-bell"></i><span class="badge badge-pill badge-danger">5</span></a>
-        </li>
-        <li class="nav-item d-md-down-none">
-            <a class="nav-link" href="#"><i class="icon-list"></i></a>
-        </li>
-        <li class="nav-item d-md-down-none">
-            <a class="nav-link" href="#"><i class="icon-location-pin"></i></a>
-        </li>
         <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+               aria-expanded="false">
                 <img src="img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
             </a>
             <div class="dropdown-menu dropdown-menu-right">
                 <div class="dropdown-header text-center">
-                    <strong>Account</strong>
+                    <strong>账户</strong>
                 </div>
-                <a class="dropdown-item" href="#"><i class="fa fa-bell-o"></i> Updates<span class="badge badge-info">42</span></a>
-                <a class="dropdown-item" href="#"><i class="fa fa-envelope-o"></i> Messages<span class="badge badge-success">42</span></a>
-                <a class="dropdown-item" href="#"><i class="fa fa-tasks"></i> Tasks<span class="badge badge-danger">42</span></a>
-                <a class="dropdown-item" href="#"><i class="fa fa-comments"></i> Comments<span class="badge badge-warning">42</span></a>
+                <a class="dropdown-item" href="#"><i class="fas fa-wrench"></i> 修改密码</a>
                 <div class="dropdown-header text-center">
-                    <strong>Settings</strong>
+                    <strong>设置</strong>
                 </div>
-                <a class="dropdown-item" href="#"><i class="fa fa-user"></i> Profile</a>
-                <a class="dropdown-item" href="#"><i class="fa fa-wrench"></i> Settings</a>
-                <a class="dropdown-item" href="#"><i class="fa fa-usd"></i> Payments<span class="badge badge-secondary">42</span></a>
-                <a class="dropdown-item" href="#"><i class="fa fa-file"></i> Projects<span class="badge badge-primary">42</span></a>
+                <a class="dropdown-item" href="#"><i class="fas fa-heart"></i> 我的收藏</a>
+                <a class="dropdown-item" href="#"><i class="fas fa-file"></i> 我的文件</a>
                 <div class="divider"></div>
-                <a class="dropdown-item" href="#"><i class="fa fa-shield"></i> Lock Account</a>
-                <a class="dropdown-item" href="#"><i class="fa fa-lock"></i> Logout</a>
+                <a class="dropdown-item" href="/logout" target="_top"><i class="fas fa-sign-out-alt"></i> 退出系统</a>
             </div>
         </li>
     </ul>
@@ -123,20 +75,16 @@
         <nav class="sidebar-nav">
             <ul class="nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="./"><i class="icon-speedometer"></i> Dashboard </a>
-                </li>
-
-                <li class="nav-title">
-                    Theme
+                    <a class="nav-link" href="files"><i class="fas fa-file"></i>文件管理</a>
                 </li>
                 <li class="nav-item">
-                    <a href="colors.html" class="nav-link"><i class="icon-drop"></i> Colors</a>
+                    <a class="nav-link" href="folders"><i class="fas fa-folder"></i>目录管理</a>
                 </li>
                 <li class="nav-item">
-                    <a href="typography.html" class="nav-link"><i class="icon-pencil"></i> Typograhy</a>
+                    <a class="nav-link" href="users"><i class="fas fa-users"></i>系统用户</a>
                 </li>
                 <li class="nav-title">
-                    Components
+                    文件夹
                 </li>
                 <li class="nav-item nav-dropdown">
                     <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> Base</a>
@@ -147,126 +95,8 @@
                         <li class="nav-item">
                             <a class="nav-link" href="base/cards.html"><i class="icon-puzzle"></i> Cards</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/carousel.html"><i class="icon-puzzle"></i> Carousel</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/collapse.html"><i class="icon-puzzle"></i> Collapse</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/forms.html"><i class="icon-puzzle"></i> Forms</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/jumbotron.html"><i class="icon-puzzle"></i> Jumbotron</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/list-group.html"><i class="icon-puzzle"></i> List group</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/navs.html"><i class="icon-puzzle"></i> Navs</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/pagination.html"><i class="icon-puzzle"></i> Pagination</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/popovers.html"><i class="icon-puzzle"></i> Popovers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/progress.html"><i class="icon-puzzle"></i> Progress</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/switches.html"><i class="icon-puzzle"></i> Switches</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/tables.html"><i class="icon-puzzle"></i> Tables</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/tabs.html"><i class="icon-puzzle"></i> Tabs</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/tooltips.html"><i class="icon-puzzle"></i> Tooltips</a>
-                        </li>
                     </ul>
                 </li>
-                <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-cursor"></i> Buttons</a>
-                    <ul class="nav-dropdown-items">
-                        <li class="nav-item">
-                            <a class="nav-link" href="buttons/buttons.html"><i class="icon-cursor"></i> Buttons</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="buttons/button-group.html"><i class="icon-cursor"></i> Buttons Group</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="buttons/dropdowns.html"><i class="icon-cursor"></i> Dropdowns</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="buttons/social-buttons.html"><i class="icon-cursor"></i> Social Buttons</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="charts.html"><i class="icon-pie-chart"></i> Charts</a>
-                </li>
-                <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-star"></i> Icons</a>
-                    <ul class="nav-dropdown-items">
-                        <li class="nav-item">
-                            <a class="nav-link" href="icons/flags.html"><i class="icon-star"></i> Flags <span class="badge badge-success">NEW</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="icons/font-awesome.html"><i class="icon-star"></i> Font Awesome <span class="badge badge-secondary">4.7</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="icons/simple-line-icons.html"><i class="icon-star"></i> Simple Line Icons</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-bell"></i> Notifications</a>
-                    <ul class="nav-dropdown-items">
-                        <li class="nav-item">
-                            <a class="nav-link" href="notifications/alerts.html"><i class="icon-bell"></i> Alerts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="notifications/badge.html"><i class="icon-bell"></i> Badge</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="notifications/modals.html"><i class="icon-bell"></i> Modals</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="widgets.html"><i class="icon-calculator"></i> Widgets <span class="badge badge-primary">NEW</span></a>
-                </li>
-                <li class="divider"></li>
-                <li class="nav-title">
-                    Extras
-                </li>
-                <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-star"></i> Pages</a>
-                    <ul class="nav-dropdown-items">
-                        <li class="nav-item">
-                            <a class="nav-link" href="views/pages/login.html" target="_top"><i class="icon-star"></i> Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="views/pages/register.html" target="_top"><i class="icon-star"></i> Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="views/pages/404.html" target="_top"><i class="icon-star"></i> Error 404</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="views/pages/500.html" target="_top"><i class="icon-star"></i> Error 500</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item mt-auto">
-                    <a class="nav-link nav-link-success" href="http://coreui.io" target="_top"><i class="icon-cloud-download"></i> Download CoreUI</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link nav-link-danger" href="http://coreui.io/pro/" target="_top"><i class="icon-layers"></i> Try CoreUI <strong>PRO</strong></a>
-                </li>
-
             </ul>
         </nav>
         <button class="sidebar-minimizer brand-minimizer" type="button"></button>
@@ -274,19 +104,16 @@
 
     <!-- Main content -->
     <main class="main">
-
-        <!-- Breadcrumb -->
         <ol class="breadcrumb">
-            <li class="breadcrumb-item">Home</li>
-            <li class="breadcrumb-item"><a href="#">Admin</a></li>
-            <li class="breadcrumb-item active">Dashboard</li>
-
-            <!-- Breadcrumb Menu-->
+            <form class="form-inline my-2 my-lg-0" th:action="@{/files/search}">
+                <input class="form-control mr-sm-2" type="search" placeholder="文件名" name="filename" id="filename">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">搜索</button>
+            </form>
             <li class="breadcrumb-menu d-md-down-none">
                 <div class="btn-group" role="group" aria-label="Button group">
                     <a class="btn" href="#"><i class="icon-speech"></i></a>
-                    <a class="btn" href="./"><i class="icon-graph"></i> &nbsp;Dashboard</a>
-                    <a class="btn" href="#"><i class="icon-settings"></i> &nbsp;Settings</a>
+                    <a class="btn" href="./"><i class="icon-graph"></i> &nbsp;首页</a>
+                    <a class="btn" href="#"><i class="icon-settings"></i> &nbsp;设置</a>
                 </div>
             </li>
         </ol>
@@ -294,197 +121,14 @@
         <div class="container-fluid">
             <div id="ui-view"></div>
         </div>
-        <!-- /.conainer-fluid -->
     </main>
 
     <aside class="aside-menu">
-        <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#timeline" role="tab"><i class="icon-list"></i></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#messages" role="tab"><i class="icon-speech"></i></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#settings" role="tab"><i class="icon-settings"></i></a>
-            </li>
-        </ul>
 
         <!-- Tab panes -->
         <div class="tab-content">
-            <div class="tab-pane active" id="timeline" role="tabpanel">
-                <div class="callout m-0 py-2 text-muted text-center bg-light text-uppercase">
-                    <small><b>Today</b></small>
-                </div>
-                <hr class="transparent mx-3 my-0">
-                <div class="callout callout-warning m-0 py-3">
-                    <div class="avatar float-right">
-                        <img src="img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                    </div>
-                    <div>Meeting with
-                        <strong>Lucas</strong>
-                    </div>
-                    <small class="text-muted mr-3"><i class="icon-calendar"></i>&nbsp; 1 - 3pm</small>
-                    <small class="text-muted"><i class="icon-location-pin"></i>&nbsp; Palo Alto, CA </small>
-                </div>
-                <hr class="mx-3 my-0">
-                <div class="callout callout-info m-0 py-3">
-                    <div class="avatar float-right">
-                        <img src="img/avatars/4.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                    </div>
-                    <div>Skype with
-                        <strong>Megan</strong>
-                    </div>
-                    <small class="text-muted mr-3"><i class="icon-calendar"></i>&nbsp; 4 - 5pm</small>
-                    <small class="text-muted"><i class="icon-social-skype"></i>&nbsp; On-line </small>
-                </div>
-                <hr class="transparent mx-3 my-0">
-                <div class="callout m-0 py-2 text-muted text-center bg-light text-uppercase">
-                    <small><b>Tomorrow</b></small>
-                </div>
-                <hr class="transparent mx-3 my-0">
-                <div class="callout callout-danger m-0 py-3">
-                    <div>New UI Project -
-                        <strong>deadline</strong>
-                    </div>
-                    <small class="text-muted mr-3"><i class="icon-calendar"></i>&nbsp; 10 - 11pm</small>
-                    <small class="text-muted"><i class="icon-home"></i>&nbsp; creativeLabs HQ </small>
-                    <div class="avatars-stack mt-2">
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/2.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/3.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/4.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/5.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                    </div>
-                </div>
-                <hr class="mx-3 my-0">
-                <div class="callout callout-success m-0 py-3">
-                    <div>
-                        <strong>#10 Startups.Garden</strong> Meetup</div>
-                    <small class="text-muted mr-3"><i class="icon-calendar"></i>&nbsp; 1 - 3pm</small>
-                    <small class="text-muted"><i class="icon-location-pin"></i>&nbsp; Palo Alto, CA </small>
-                </div>
-                <hr class="mx-3 my-0">
-                <div class="callout callout-primary m-0 py-3">
-                    <div>
-                        <strong>Team meeting</strong>
-                    </div>
-                    <small class="text-muted mr-3"><i class="icon-calendar"></i>&nbsp; 4 - 6pm</small>
-                    <small class="text-muted"><i class="icon-home"></i>&nbsp; creativeLabs HQ </small>
-                    <div class="avatars-stack mt-2">
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/2.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/3.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/4.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/5.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                        <div class="avatar avatar-xs">
-                            <img src="img/avatars/8.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                        </div>
-                    </div>
-                </div>
-                <hr class="mx-3 my-0">
-            </div>
-            <div class="tab-pane p-3" id="messages" role="tabpanel">
-                <div class="message">
-                    <div class="py-3 pb-5 mr-3 float-left">
-                        <div class="avatar">
-                            <img src="img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                            <span class="avatar-status badge-success"></span>
-                        </div>
-                    </div>
-                    <div>
-                        <small class="text-muted">Lukasz Holeczek</small>
-                        <small class="text-muted float-right mt-1">1:52 PM</small>
-                    </div>
-                    <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-                    <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-                </div>
-                <hr>
-                <div class="message">
-                    <div class="py-3 pb-5 mr-3 float-left">
-                        <div class="avatar">
-                            <img src="img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                            <span class="avatar-status badge-success"></span>
-                        </div>
-                    </div>
-                    <div>
-                        <small class="text-muted">Lukasz Holeczek</small>
-                        <small class="text-muted float-right mt-1">1:52 PM</small>
-                    </div>
-                    <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-                    <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-                </div>
-                <hr>
-                <div class="message">
-                    <div class="py-3 pb-5 mr-3 float-left">
-                        <div class="avatar">
-                            <img src="img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                            <span class="avatar-status badge-success"></span>
-                        </div>
-                    </div>
-                    <div>
-                        <small class="text-muted">Lukasz Holeczek</small>
-                        <small class="text-muted float-right mt-1">1:52 PM</small>
-                    </div>
-                    <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-                    <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-                </div>
-                <hr>
-                <div class="message">
-                    <div class="py-3 pb-5 mr-3 float-left">
-                        <div class="avatar">
-                            <img src="img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                            <span class="avatar-status badge-success"></span>
-                        </div>
-                    </div>
-                    <div>
-                        <small class="text-muted">Lukasz Holeczek</small>
-                        <small class="text-muted float-right mt-1">1:52 PM</small>
-                    </div>
-                    <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-                    <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-                </div>
-                <hr>
-                <div class="message">
-                    <div class="py-3 pb-5 mr-3 float-left">
-                        <div class="avatar">
-                            <img src="img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                            <span class="avatar-status badge-success"></span>
-                        </div>
-                    </div>
-                    <div>
-                        <small class="text-muted">Lukasz Holeczek</small>
-                        <small class="text-muted float-right mt-1">1:52 PM</small>
-                    </div>
-                    <div class="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-                    <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</small>
-                </div>
-            </div>
-            <div class="tab-pane p-3" id="settings" role="tabpanel">
-                <h6>Settings</h6>
+            <div class="tab-pane active" id="settings" role="tabpanel">
+                <h6>设置</h6>
 
                 <div class="aside-options">
                     <div class="clearfix mt-4">
@@ -496,7 +140,8 @@
                         </label>
                     </div>
                     <div>
-                        <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</small>
+                        <small class="text-muted">Lorem ipsum dolor sit amua.
+                        </small>
                     </div>
                 </div>
 
@@ -510,7 +155,8 @@
                         </label>
                     </div>
                     <div>
-                        <small class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</small>
+                        <small class="text-muted">Lorem ipsum dololiqua.........
+                        </small>
                     </div>
                 </div>
 
@@ -537,37 +183,23 @@
                 </div>
 
                 <hr>
-                <h6>System Utilization</h6>
-
-                <div class="text-uppercase mb-1 mt-4">
-                    <small><b>CPU Usage</b></small>
-                </div>
-                <div class="progress progress-xs">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <small class="text-muted">348 Processes. 1/4 Cores.</small>
+                <h6>我的空间</h6>
 
                 <div class="text-uppercase mb-1 mt-2">
-                    <small><b>Memory Usage</b></small>
+                    <small><b>磁盘1</b></small>
                 </div>
                 <div class="progress progress-xs">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <small class="text-muted">11444GB/16384MB</small>
-
-                <div class="text-uppercase mb-1 mt-2">
-                    <small><b>SSD 1 Usage</b></small>
-                </div>
-                <div class="progress progress-xs">
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: 95%" aria-valuenow="95"
+                         aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <small class="text-muted">243GB/256GB</small>
 
                 <div class="text-uppercase mb-1 mt-2">
-                    <small><b>SSD 2 Usage</b></small>
+                    <small><b>磁盘2</b></small>
                 </div>
                 <div class="progress progress-xs">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 10%" aria-valuenow="10"
+                         aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <small class="text-muted">25GB/256GB</small>
             </div>

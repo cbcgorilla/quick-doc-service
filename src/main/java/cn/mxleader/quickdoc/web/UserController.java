@@ -70,7 +70,7 @@ public class UserController {
 
         redirectAttributes.addFlashAttribute("message",
                 "保存用户信息成功： " + username);
-        return "redirect:/users";
+        return "redirect:/#users";
     }
 
     /**
@@ -94,7 +94,7 @@ public class UserController {
             redirectAttributes.addFlashAttribute("message",
                     "您无删除用户的权限，请联系管理员获取！");
         }
-        return "redirect:/users";
+        return "redirect:/#users";
     }
 
 }

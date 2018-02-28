@@ -150,7 +150,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .formLogin()
                     .loginPage("/login")
-                    //.defaultSuccessUrl("/homepage.html")
+                    //.defaultSuccessUrl("/index.html")
                     .failureUrl("/login?error=true")
                     .successHandler(webAuthenticationSuccessHandler)
                     /*.failureHandler(webAuthenticationFailureHandler) @TODO 未启用 */

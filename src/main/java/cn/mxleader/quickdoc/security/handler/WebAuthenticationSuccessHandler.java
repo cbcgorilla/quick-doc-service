@@ -82,7 +82,7 @@ public class WebAuthenticationSuccessHandler implements
             }
         }
         if (isAdmin) {
-            return "/users";
+            return "/";
         } else if (isUser) {
             return "/";
         } else {

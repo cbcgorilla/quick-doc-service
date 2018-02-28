@@ -99,7 +99,7 @@ public class FolderController {
             redirectAttributes.addFlashAttribute("message",
                     "您无此目录的权限： " + folder.getPath() + "，请联系管理员获取！");
         }
-        return "redirect:/folders";
+        return "redirect:/#folders";
     }
 
     /**
@@ -128,7 +128,7 @@ public class FolderController {
             redirectAttributes.addFlashAttribute("message",
                     "您无删除文件夹的权限，请联系管理员获取！");
         }
-        return "redirect:/folders";
+        return "redirect:/#folders";
     }
 
 }

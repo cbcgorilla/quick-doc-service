@@ -44,7 +44,7 @@ ul.custom-list a {
     display: block;
     line-height: 2em;
 }
-
+/**
 footer{
     display:flex;
     flex-direction:column;
@@ -81,3 +81,4 @@ footer p{
     color:rgba(255,255,255,.6);
     margin-bottom: 0;
 }
+**/
