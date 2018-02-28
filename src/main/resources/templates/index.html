@@ -87,6 +87,11 @@
                     文件夹
                 </li>
                 <li class="nav-item nav-dropdown">
+                    <div th:each="folderMenu : ${foldersMenu}">
+                        <a class="nav-link nav-dropdown-toggle" th:href="@{'/files/folder@'+${folderMenu.id}}">
+                            <i class="fas fa-folder-open"></i><span th:text="${folderMenu.path}"></span>
+                        </a>
+                    </div>
                     <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> Base</a>
                     <ul class="nav-dropdown-items">
                         <li class="nav-item">
