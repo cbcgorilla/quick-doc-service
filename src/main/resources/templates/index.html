@@ -8,7 +8,7 @@
     <meta name="author" content="Michael Chen">
     <meta name="keyword" content="Quick Doc Service">
     <link rel="shortcut icon" href="images/favicon.png">
-    <title>Quick Doc Service</title>
+    <title th:text="${title}"></title>
 
     <!-- Icons -->
     <link href="css/flag-icon.min.css" rel="stylesheet" type="text/css"/>
@@ -86,6 +86,11 @@
                 <li class="nav-title">
                     文件夹
                 </li>
+                <li class="nav-item" th:each="folderMenu : ${foldersMenu}">
+                    <a class="nav-link" th:href="@{'files/folder@'+${folderMenu.id}}">
+                        <i class="fas fa-folder-open"></i><span th:text="${folderMenu.path}"></span>
+                    </a>
+                </li>
                 <li class="nav-item nav-dropdown">
                     <div th:each="folderMenu : ${foldersMenu}">
                         <a class="nav-link nav-dropdown-toggle" th:href="@{'/files/folder@'+${folderMenu.id}}">
@@ -116,9 +121,9 @@
             </form>
             <li class="breadcrumb-menu d-md-down-none">
                 <div class="btn-group" role="group" aria-label="Button group">
-                    <a class="btn" href="#"><i class="icon-speech"></i></a>
-                    <a class="btn" href="./"><i class="icon-graph"></i> &nbsp;首页</a>
-                    <a class="btn" href="#"><i class="icon-settings"></i> &nbsp;设置</a>
+                    <a class="btn" href="./"><i class="fas fa-home"></i> &nbsp;返回首页</a>
+                    <a class="btn" href="#"><i class="fas fa-cog"></i> &nbsp;设置</a>
+                    <a class="btn" href="/logout" target="_top"><i class="fas fa-sign-out-alt"></i></a>
                 </div>
             </li>
         </ol>

@@ -2,71 +2,73 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
+
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Quick Doc Service Home Page">
+    <meta name="author" content="Michael Chen">
+    <meta name="keyword" content="Quick Doc Service">
     <title th:text="${title}"></title>
 
     <link rel="shortcut icon" href="images/favicon.png">
-    <link rel="stylesheet" href="css/login-style.css" type="text/css">
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="css/fontawesome-all.min.css">
-
-    <script src="js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/fontawesome-all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/simple-line-icons.css"/>
+    <!-- Main styles for this application -->
+    <link rel="stylesheet" type="text/css" href="css/style.min.css"/>
 
 </head>
-<body class="template-bg-image">
 
+<body class="app flex-row align-items-center">
 <div class="container">
-    <div class="col-md-12">
-        <form class="form-horizontal template-login-form" role="form" th:action="@{/login}" method="post">
-            <div class="row">
-                <div class="col-md-12">
-                    <h1>快捷文档共享</h1>
-                </div>
-            </div>
-            <div>
-                <div>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <label for="username" class="control-label">登录账号</label>
-                            <div class="template-input-icon-container">
-                                <i class="fa fa-user"></i>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card-group">
+                <div class="card p-4">
+                    <div class="card-body">
+                        <h1>快捷文档共享</h1>
+                        <p class="text-muted">登录您的账号</p>
+
+                        <form class="form-horizontal template-login-form" role="form" th:action="@{/login}"
+                              method="post">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                                </div>
                                 <input type="text" class="form-control" placeholder="用户名" required="required"
                                        id="username" name="username"/>
                             </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <label for="password" class="control-label">登录密码</label>
-                            <div class="template-input-icon-container">
-                                <i class="fa fa-lock"></i>
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                                </div>
                                 <input type="password" class="form-control" placeholder="密码" required="required"
                                        id="password" name="password"/>
                             </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <div class="alert alert-warning" th:if="${param.error}"
-                                 th:with="errorMsg=${session['SPRING_SECURITY_LAST_EXCEPTION'].message}">
-                                登录异常：<span th:text="${errorMsg}">输入信息有误！</span>
+                            <div class="row">
+                                <div class="col-6">
+                                    <button type="submit" class="btn btn-primary px-4">登录</button>
+                                </div>
+                                <div class="alert alert-warning" th:if="${param.error}"
+                                     th:with="errorMsg=${session['SPRING_SECURITY_LAST_EXCEPTION'].message}">
+                                    登录异常：<span th:text="${errorMsg}">输入信息有误！</span>
+                                </div>
+                                <div class="alert alert-success" th:if="${param.logout}">
+                                    成功退出！
+                                </div>
                             </div>
-                            <div class="alert alert-success" th:if="${param.logout}">
-                                成功退出！
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <input type="submit" value="登录" class="btn btn-warning">
-                        </div>
+                        </form>
+
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
 </body>
 </html>
