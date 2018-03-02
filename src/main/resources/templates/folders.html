@@ -14,7 +14,7 @@
     //]]>
 </script>
 
-<div class="animated fadeIn" >
+<div class="animated fadeIn">
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
@@ -22,121 +22,118 @@
                     <i class="fas fa-align-justify"></i> 目录管理
                 </div>
                 <div class="card-body">
-                    <div class=" form-horizontal">
+                    <div class="alert alert-success" th:if="${message}">
+                        <h2 th:text="${message}"/>
+                    </div>
 
-                        <div class="table-responsive">
+                    <!-- 模态框 -->
+                    <div class="modal fade" id="saveFolderDialogModal">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
 
-                            <div class="alert alert-success" th:if="${message}">
-                                <h2 th:text="${message}"/>
-                            </div>
+                                <!-- 模态框头部 -->
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="modal-title">目录信息</h4>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
 
-                            <!-- 模态框 -->
-                            <div class="modal fade" id="saveFolderDialogModal">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-
-                                        <!-- 模态框头部 -->
-                                        <div class="modal-header">
-                                            <h4 class="modal-title" id="modal-title">目录信息</h4>
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        </div>
-
-                                        <!-- 模态框主体 -->
-                                        <div class="modal-body">
-                                            <div class="table-responsive" style="text-align: center">
-                                                <form class="form-horizontal" method="POST" th:action="@{'folders/save'}">
-                                                    <table class="table table-hover">
-                                                        <tr>
-                                                            <td align="right">目录名:</td>
-                                                            <td>
-                                                                <div class="template-input-icon-container">
-                                                                    <i class="fa fa-user"></i>
-                                                                    <input type="text" class="form-control" placeholder="目录名"
-                                                                           required="required"
-                                                                           id="path" name="path"/>
-                                                                    <input type="hidden" name="folderIdRef" id="folderIdRef"/>
-                                                                    <input type="hidden" name="parentId" id="parentId"/>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td align="right">访问权限:</td>
-                                                            <td>
-                                                                <label><input id="shareSetting_PublicMode" name="shareSetting" type="checkbox"
-                                                                              value="PublicMode"/>公开访问</label>
-                                                                <label><input id="shareSetting_GroupMode" name="shareSetting" type="checkbox"
-                                                                              value="GroupMode"/>组内共享</label>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td align="right">共享组:</td>
-                                                            <td>
-                                                                <select id="shareGroups" name="shareGroups"
-                                                                        class="select custom-select" multiple="multiple">
-                                                                    <option th:each="entry : ${groupMap}"
-                                                                            th:value="${entry.key}"
-                                                                            th:text="${entry.value}">共享组
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                    <input type="submit" value="保存" class="btn btn-success"/>
-                                                </form>
-                                            </div>
-                                        </div>
-                                        <!-- 模态框底部 -->
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-                                        </div>
-
+                                <!-- 模态框主体 -->
+                                <div class="modal-body">
+                                    <div class="table-responsive" style="text-align: center">
+                                        <form class="form-horizontal" method="POST" th:action="@{'folders/save'}">
+                                            <table class="table table-hover">
+                                                <tr>
+                                                    <td align="right">目录名:</td>
+                                                    <td>
+                                                        <div class="template-input-icon-container">
+                                                            <i class="fa fa-user"></i>
+                                                            <input type="text" class="form-control" placeholder="目录名"
+                                                                   required="required"
+                                                                   id="path" name="path"/>
+                                                            <input type="hidden" name="folderIdRef" id="folderIdRef"/>
+                                                            <input type="hidden" name="parentId" id="parentId"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right">访问权限:</td>
+                                                    <td>
+                                                        <label><input id="shareSetting_PublicMode" name="shareSetting"
+                                                                      type="checkbox"
+                                                                      value="PublicMode"/>公开访问</label>
+                                                        <label><input id="shareSetting_GroupMode" name="shareSetting"
+                                                                      type="checkbox"
+                                                                      value="GroupMode"/>组内共享</label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right">共享组:</td>
+                                                    <td>
+                                                        <select id="shareGroups" name="shareGroups"
+                                                                class="select custom-select" multiple="multiple">
+                                                            <option th:each="entry : ${groupMap}"
+                                                                    th:value="${entry.key}"
+                                                                    th:text="${entry.value}">共享组
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <input type="submit" value="保存" class="btn btn-success"/>
+                                        </form>
                                     </div>
                                 </div>
+                                <!-- 模态框底部 -->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                                </div>
+
                             </div>
-
-                            <table class="table table-striped table-hover">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th>文件夹</th>
-                                    <th>文件数</th>
-                                    <th>操作</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-                                <tr th:each="folder : ${folders}">
-                                    <form th:action="@{/folders/delete}" th:method="DELETE">
-                                        <td>
-                                            <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
-                                            <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
-                                            <a th:href="@{'/files/folder@'+${folder.id}}" th:text="${folder.path}" id="folderPath"/>
-                                        </td>
-                                        <td th:text="${folder.childrenCount}"></td>
-                                        <td>
-                                            <div class="input-group">
-                                                <a th:if="${folder.editAuthorization}" data-toggle="modal" title="新增子目录"
-                                                   class="addFolder btn btn-light"
-                                                   href="#saveFolderDialogModal"><i class="fas fa-plus"></i></a>
-                                                <a th:if="${folder.editAuthorization}" data-toggle="modal" title="修改目录信息"
-                                                   class="editFolder btn btn-primary"
-                                                   href="#saveFolderDialogModal"><i class="far fa-edit"></i></a>
-                                                <a th:href="@{'/files/zip-resource/'+${folder.id}}" title="打包下载目录" class="btn btn-dark">
-                                                    <i class="fas fa-cloud-download-alt"></i>
-                                                </a>
-                                                <input type="hidden" id="folderId" name="folderId"
-                                                       th:value="${folder.id}"/>
-                                                <input th:if="${folder.deleteAuthorization}" type="submit"
-                                                       value="&#xf2ed" title="删除该目录"
-                                                       class="btn btn-danger far fa-trash-alt"/>
-                                            </div>
-                                        </td>
-                                    </form>
-                                </tr>
-                                </tbody>
-                            </table>
                         </div>
-
                     </div>
+
+                    <table class="table table-responsive-sm table-bordered table-striped table-hover table-sm">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>文件夹</th>
+                            <th>文件数</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <tr th:each="folder : ${folders}">
+                            <form th:action="@{/folders/delete}" th:method="DELETE">
+                                <td>
+                                    <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
+                                    <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
+                                    <a th:href="@{'/files/folder@'+${folder.id}}" th:text="${folder.path}"
+                                       id="folderPath"/>
+                                </td>
+                                <td th:text="${folder.childrenCount}"></td>
+                                <td>
+                                    <div class="input-group">
+                                        <a th:if="${folder.editAuthorization}" data-toggle="modal" title="新增子目录"
+                                           class="addFolder btn btn-light"
+                                           href="#saveFolderDialogModal"><i class="fas fa-plus"></i></a>
+                                        <a th:if="${folder.editAuthorization}" data-toggle="modal" title="修改目录信息"
+                                           class="editFolder btn btn-primary"
+                                           href="#saveFolderDialogModal"><i class="far fa-edit"></i></a>
+                                        <a th:href="@{'/files/zip-resource/'+${folder.id}}" title="打包下载目录"
+                                           class="btn btn-dark">
+                                            <i class="fas fa-cloud-download-alt"></i>
+                                        </a>
+                                        <input type="hidden" id="folderId" name="folderId"
+                                               th:value="${folder.id}"/>
+                                        <input th:if="${folder.deleteAuthorization}" type="submit"
+                                               value="&#xf2ed" title="删除该目录"
+                                               class="btn btn-danger far fa-trash-alt"/>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <!--/.row-->

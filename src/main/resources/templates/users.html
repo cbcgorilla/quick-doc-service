@@ -21,154 +21,148 @@
                     <i class="fas fa-align-justify"></i> 系统用户
                 </div>
                 <div class="card-body">
-                    <div class=" form-horizontal">
+                    <div class="alert alert-success" th:if="${message}">
+                        <h2 th:text="${message}"/>
+                    </div>
+                    <!-- 模态框 -->
+                    <div class="modal fade" id="addMemberDialogModal">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
 
-                        <div class="table-responsive">
+                                <!-- 模态框头部 -->
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="modal-title">人员信息</h4>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
 
-                            <div class="alert alert-success" th:if="${message}">
-                                <h2 th:text="${message}"/>
-                            </div>
-                            <!-- 模态框 -->
-                            <div class="modal fade" id="addMemberDialogModal">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-
-                                        <!-- 模态框头部 -->
-                                        <div class="modal-header">
-                                            <h4 class="modal-title" id="modal-title">人员信息</h4>
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        </div>
-
-                                        <!-- 模态框主体 -->
-                                        <div class="modal-body">
-                                            <div class="table-responsive" style="text-align: center">
-                                                <form class="form-horizontal" method="POST" th:action="@{'users/save'}">
-                                                    <table class="table table-hover">
-                                                        <tr>
-                                                            <td align="right">用户名:</td>
-                                                            <td>
-                                                                <div class="template-input-icon-container">
-                                                                    <i class="fa fa-user"></i>
-                                                                    <input type="text" class="form-control"
-                                                                           placeholder="用户名"
-                                                                           required="required"
-                                                                           id="username" name="username"/>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td align="right">密 码:</td>
-                                                            <td>
-                                                                <div class="template-input-icon-container">
-                                                                    <i class="fa fa-lock"></i>
-                                                                    <input type="password" class="form-control"
-                                                                           placeholder="密码"
-                                                                           required="required"
-                                                                           id="password" name="password"/>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td align="right">用户组:</td>
-                                                            <td>
-                                                                <div class="template-input-icon-container">
-                                                                    <i class="fas fa-users"></i>
-                                                                    <input type="text" class="form-control"
-                                                                           placeholder="用户组" required="required"
-                                                                           id="userGroup" name="userGroup"/>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td align="right">用户类别:</td>
-                                                            <td>
-                                                                <select id="userType" name="userType"
-                                                                        class="select custom-select">
-                                                                    <option th:each="entry : ${userAuthorityMap}"
-                                                                            th:value="${entry.key}"
-                                                                            th:text="${entry.value}">用户类别
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                    <input type="submit" value="保存" class="btn btn-success"/>
-                                                </form>
-                                            </div>
-                                        </div>
-                                        <!-- 模态框底部 -->
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭
-                                            </button>
-                                        </div>
-
+                                <!-- 模态框主体 -->
+                                <div class="modal-body">
+                                    <div class="table-responsive" style="text-align: center">
+                                        <form class="form-horizontal" method="POST" th:action="@{'users/save'}">
+                                            <table class="table table-hover">
+                                                <tr>
+                                                    <td align="right">用户名:</td>
+                                                    <td>
+                                                        <div class="template-input-icon-container">
+                                                            <i class="fa fa-user"></i>
+                                                            <input type="text" class="form-control"
+                                                                   placeholder="用户名"
+                                                                   required="required"
+                                                                   id="username" name="username"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right">密 码:</td>
+                                                    <td>
+                                                        <div class="template-input-icon-container">
+                                                            <i class="fa fa-lock"></i>
+                                                            <input type="password" class="form-control"
+                                                                   placeholder="密码"
+                                                                   required="required"
+                                                                   id="password" name="password"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right">用户组:</td>
+                                                    <td>
+                                                        <div class="template-input-icon-container">
+                                                            <i class="fas fa-users"></i>
+                                                            <input type="text" class="form-control"
+                                                                   placeholder="用户组" required="required"
+                                                                   id="userGroup" name="userGroup"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right">用户类别:</td>
+                                                    <td>
+                                                        <select id="userType" name="userType"
+                                                                class="select custom-select">
+                                                            <option th:each="entry : ${userAuthorityMap}"
+                                                                    th:value="${entry.key}"
+                                                                    th:text="${entry.value}">用户类别
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <input type="submit" value="保存" class="btn btn-success"/>
+                                        </form>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="m-box">
-                                <div class="box-head">
-                                    <strong class="box-title"> 成员管理</strong>
-                                    <!-- 管理员 0  才可以添加用户 -->
-                                    <button type="button" class="addMemberDialogModal btn btn-success btn-sm pull-right"
-                                            data-toggle="modal"
-                                            data-target="#addMemberDialogModal"><i class="fa fa-user-plus"
-                                                                                   aria-hidden="true"></i> 添加成员
+                                <!-- 模态框底部 -->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭
                                     </button>
                                 </div>
+
                             </div>
-
-                            <table class="table table-striped table-hover">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th>用户名</th>
-                                    <th>分组</th>
-                                    <th>用户类别</th>
-                                    <th>操作</th>
-                                </tr>
-                                </thead>
-
-                                <tbody>
-                                <tr th:each="user : ${users}">
-                                    <form th:action="@{/users/delete}" th:method="DELETE">
-                                        <td th:text="${user.username}"></td>
-                                        <td>
-                                            <ul class="custom-list">
-                                                <li th:each="usergroup:${user.groups}">
-                                                    <span th:text="${usergroup}"></span>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                        <td>
-                                            <ul class="custom-list">
-                                                <li th:each="userAuthority:${user.authorities}">
-                                                    <select id="authority" name="authority" class="select custom-select"
-                                                            readonly="true" disabled="disabled">
-                                                        <option th:each="entry : ${userAuthorityMap}"
-                                                                th:value="${entry.key}"
-                                                                th:text="${entry.value}"
-                                                                th:selected="(${entry.key} == ${userAuthority})">用户类别
-                                                        </option>
-                                                    </select>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                        <td>
-                                            <div class="input-group">
-                                                <a data-toggle="modal" title="Add this item"
-                                                   class="editMemberDialogModal btn btn-primary"
-                                                   href="#addMemberDialogModal"><i class="fas fa-edit"></i></a>
-                                                <input type="hidden" id="userId" name="userId" th:value="${user.id}"/>
-                                                <input type="submit" value="&#xf2ed"
-                                                       class="btn btn-danger far fa-trash-alt"/>
-                                            </div>
-                                        </td>
-                                    </form>
-                                </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
+
+                    <div class="m-box">
+                        <div class="box-head">
+                            <strong class="box-title"> 成员管理</strong>
+                            <!-- 管理员 0  才可以添加用户 -->
+                            <button type="button" class="addMemberDialogModal btn btn-success btn-sm pull-right"
+                                    data-toggle="modal"
+                                    data-target="#addMemberDialogModal"><i class="fa fa-user-plus"
+                                                                           aria-hidden="true"></i> 添加成员
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="table table-responsive-sm table-bordered table-striped table-hover table-sm">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>用户名</th>
+                            <th>分组</th>
+                            <th>用户类别</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr th:each="user : ${users}">
+                            <form th:action="@{/users/delete}" th:method="DELETE">
+                                <td th:text="${user.username}"></td>
+                                <td>
+                                    <ul class="custom-list">
+                                        <li th:each="usergroup:${user.groups}">
+                                            <span th:text="${usergroup}"></span>
+                                        </li>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <ul class="custom-list">
+                                        <li th:each="userAuthority:${user.authorities}">
+                                            <select id="authority" name="authority" class="select custom-select"
+                                                    readonly="true" disabled="disabled">
+                                                <option th:each="entry : ${userAuthorityMap}"
+                                                        th:value="${entry.key}"
+                                                        th:text="${entry.value}"
+                                                        th:selected="(${entry.key} == ${userAuthority})">用户类别
+                                                </option>
+                                            </select>
+                                        </li>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <div class="input-group">
+                                        <a data-toggle="modal" title="Add this item"
+                                           class="editMemberDialogModal btn btn-primary"
+                                           href="#addMemberDialogModal"><i class="fas fa-edit"></i></a>
+                                        <input type="hidden" id="userId" name="userId" th:value="${user.id}"/>
+                                        <input type="submit" value="&#xf2ed"
+                                               class="btn btn-danger far fa-trash-alt"/>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <!--/.row-->
