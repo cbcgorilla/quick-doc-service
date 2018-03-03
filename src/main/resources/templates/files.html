@@ -85,7 +85,7 @@
                     </div>
 
                     <table class="table table-responsive-sm table-bordered table-striped table-hover table-sm">
-                        <thead class="thead-light">
+                        <thead>
                         <tr>
                             <th>文件名</th>
                             <th>文件类型</th>
@@ -112,9 +112,9 @@
                             </td>
                         </tr>
                         <tr th:each="file : ${files}">
-                            <form th:action="@{/deleteFile}" th:method="DELETE">
+                            <form th:action="@{/files/deleteFile}" th:method="DELETE">
                                 <td>
-                                    <a th:href="@{${file.linkPrefix}+${file.id}}">
+                                    <a th:href="@{'/files'+${file.linkPrefix}+${file.id}}">
                                         <i th:class="${file.iconClass}"></i>
                                         <span th:text="${file.filename}"></span>
                                     </a>
@@ -130,7 +130,7 @@
                                                th:value="${currentFolder.id}"/>
                                         <input th:if="${file.deleteAuthorization}" type="submit"
                                                value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
-                                        <a th:href="@{'./download/'+${file.id}}" class="btn btn-dark">
+                                        <a th:href="@{'./files/download/'+${file.id}}" class="btn btn-dark">
                                             <i class="fas fa-cloud-download-alt"></i>
                                         </a>
                                     </div>

@@ -59,7 +59,7 @@ public class QuickDocConfiguration {
         else
             return new DefaultStreamServiceImpl();
     }
-
+/*
     @Bean
     public MultipartResolver multipartResolver(){
         CommonsMultipartResolver resolver = new MxLeaderMultipartResolver();
@@ -68,7 +68,7 @@ public class QuickDocConfiguration {
         resolver.setMaxInMemorySize(40960);
         resolver.setMaxUploadSize(1024*1024*1024);//上传文件大小 1G 1024*1024*1024
         return resolver;
-    }
+    }*/
 
     @Bean
     CommandLineRunner initConfigurationData(ReactiveUserServiceImpl reactiveUserService,

@@ -1,17 +1,3 @@
-<script type="text/javascript">
-    //<![CDATA[
-    $(document).on("click", ".addMemberDialogModal", function () {
-        $(".template-input-icon-container #username").val("");
-        $(".template-input-icon-container #userGroup").val("");
-    });
-    $(document).on("click", ".editMemberDialogModal", function () {
-        var $td = $(this).parents('tr').children('td');
-        $(".template-input-icon-container #username").val($td.eq(0).text());
-        $(".template-input-icon-container #userGroup").val($td.eq(1).find("ul.custom-list > li").text().trim());
-        $(".template-input-icon-container #userType").val($td.eq(2).find("select").get(0).val());
-    });
-    //]]>
-</script>
 
 <div class="animated fadeIn">
     <div class="row">
@@ -115,7 +101,7 @@
                     </div>
 
                     <table class="table table-responsive-sm table-bordered table-striped table-hover table-sm">
-                        <thead class="thead-light">
+                        <thead>
                         <tr>
                             <th>用户名</th>
                             <th>分组</th>
@@ -169,3 +155,17 @@
         </div>
     </div>
 </div>
+<script th:inline="javascript">
+    //<![CDATA[
+    $(document).on("click", ".addMemberDialogModal", function () {
+        $(".template-input-icon-container #username").val("");
+        $(".template-input-icon-container #userGroup").val("");
+    });
+    $(document).on("click", ".editMemberDialogModal", function () {
+        var $td = $(this).parents('tr').children('td');
+        $(".template-input-icon-container #username").val($td.eq(0).text());
+        $(".template-input-icon-container #userGroup").val($td.eq(1).find("ul.custom-list > li").text().trim());
+        $(".template-input-icon-container #userType").val($td.eq(2).find("select").get(0).val());
+    });
+    //]]>
+</script>
