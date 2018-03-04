@@ -293,7 +293,7 @@ public class FilesController {
         if (fileService.getStoredFile(filename, folderId) != null) {
             redirectAttributes.addFlashAttribute("message",
                     "该目录： " + quickDocFolder.getPath() + "中已存在同名文件，请核对文件信息是否重复！");
-            return "redirect:folder@" + folderId;
+            return "redirect:/#files/folder@" + folderId;
         }
         // 鉴权检查
         if (checkAuthentication(quickDocFolder.getOpenAccess(),
@@ -318,7 +318,7 @@ public class FilesController {
             redirectAttributes.addFlashAttribute("message",
                     "您无此目录的上传权限： " + quickDocFolder.getPath() + "，请联系管理员获取！");
         }
-        return "redirect:folder@" + folderId;
+        return "redirect:/#files/folder@" + folderId;
     }
 
     /**
@@ -343,7 +343,7 @@ public class FilesController {
             redirectAttributes.addFlashAttribute("message",
                     "您无删除此文件的权限： " + file.getFilename() + "，请联系管理员获取！");
         }
-        return "redirect:folder@" + folderId;
+        return "redirect:/#files/folder@" + folderId;
     }
 
 }
