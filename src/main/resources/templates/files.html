@@ -145,3 +145,17 @@
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+
+    layui.use(['table', 'form'], function () {
+        var form = layui.form
+            , table = layui.table;
+
+        $('a').click(function() {
+            //alert($(this).attr('href'));
+            //setUpUrl($(this).attr('href'));
+        });
+
+    });
+</script>

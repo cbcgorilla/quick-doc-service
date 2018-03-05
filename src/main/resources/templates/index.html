@@ -99,7 +99,8 @@
     <main class="main">
         <ol class="breadcrumb">
             <form class="form-inline my-2 my-lg-0" id="searchform">
-                <input class="form-control mr-sm-2" type="search" placeholder="文件名" name="filename" id="filename">
+                <input class="form-control mr-sm-2" type="search" placeholder="文件名"
+                       name="filename" id="filename" size="60">
                 <button type="reset" id="searchBtn" class="btn btn-outline-success"
                         lay-submit="" lay-filter="searchBtn"><i class="fas fa-search"></i> 搜索
                 </button>
@@ -279,8 +280,9 @@
 
         form.render();
 
-        form.on('search(filename)', function (data) {
-            var filename = $("#filename").val();
+        $('#filename').on('search', function () {
+            var filename = $(this).val();
+            //alert('hello'+filename);
             setUpUrl("files/search?filename=" + filename);
         });
 
