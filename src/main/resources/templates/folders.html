@@ -92,7 +92,7 @@
                                 <td>
                                     <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
                                     <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
-                                    <a th:href="@{'/files/folder@'+${folder.id}}" th:text="${folder.path}"
+                                    <a th:href="@{'files/folder@'+${folder.id}}" th:text="${folder.path}"
                                        id="folderPath"/>
                                 </td>
                                 <td th:text="${folder.childrenCount}"></td>
@@ -104,7 +104,7 @@
                                         <a th:if="${folder.editAuthorization}" data-toggle="modal" title="修改目录信息"
                                            class="editFolder btn btn-primary"
                                            href="#saveFolderDialogModal"><i class="far fa-edit"></i></a>
-                                        <a th:href="@{'/files/zip-resource/'+${folder.id}}" title="打包下载目录"
+                                        <a th:href="@{'files/zip-resource/'+${folder.id}}" title="打包下载目录"
                                            class="btn btn-dark">
                                             <i class="fas fa-cloud-download-alt"></i>
                                         </a>
@@ -137,6 +137,18 @@
         var $td = $(this).parents('tr').children('td');
         $(".template-input-icon-container #path").val($td.eq(0).find("#folderPath").text());
         $(".template-input-icon-container #folderIdRef").val($td.eq(2).find(".input-group #folderId").val());
+    });
+
+
+    layui.use(['table', 'form'], function () {
+        var form = layui.form
+            , table = layui.table;
+
+        $('a').click(function() {
+            alert($(this).attr('href'));
+            setUpUrl($(this).attr('href'));
+        });
+
     });
     //]]>
 </script>

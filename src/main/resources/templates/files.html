@@ -100,21 +100,23 @@
                             <td>
                                 <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
                                 <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
-                                <a th:href="@{'/files/folder@'+${folder.id}}" th:text="${folder.path}"/>
+                                <a href="#" th:text="${folder.path}"/>
+                                <input type="hidden" id="subFolderLink" name="subFolderLink"
+                                       th:value="@{'files/folder@'+${folder.id}}"/>
                             </td>
                             <td colspan="3">文件夹</td>
                             <td>
                                 <div class="input-group">
-                                    <a th:href="@{'./files/zip-resource/'+${folder.id}}" class="btn btn-dark">
+                                    <a th:href="@{'files/zip-resource/'+${folder.id}}" class="btn btn-dark">
                                         <i class="fas fa-cloud-download-alt"></i>
                                     </a>
                                 </div>
                             </td>
                         </tr>
                         <tr th:each="file : ${files}">
-                            <form th:action="@{/files/deleteFile}" th:method="DELETE">
+                            <form th:action="@{files/deleteFile}" th:method="DELETE">
                                 <td>
-                                    <a th:href="@{'/files'+${file.linkPrefix}+${file.id}}">
+                                    <a th:href="@{'files'+${file.linkPrefix}+${file.id}}">
                                         <i th:class="${file.iconClass}"></i>
                                         <span th:text="${file.filename}"></span>
                                     </a>
@@ -130,7 +132,7 @@
                                                th:value="${currentFolder.id}"/>
                                         <input th:if="${file.deleteAuthorization}" type="submit"
                                                value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
-                                        <a th:href="@{'./files/download/'+${file.id}}" class="btn btn-dark">
+                                        <a th:href="@{'files/download/'+${file.id}}" class="btn btn-dark">
                                             <i class="fas fa-cloud-download-alt"></i>
                                         </a>
                                     </div>
@@ -153,8 +155,9 @@
             , table = layui.table;
 
         $('a').click(function() {
-            //alert($(this).attr('href'));
-            //setUpUrl($(this).attr('href'));
+            var foldUrl = $(this).parents('tr').children('td').eq(0).find("#subFolderLink").val();
+            alert(foldUrl);
+            setUpUrl(foldUrl);
         });
 
     });
