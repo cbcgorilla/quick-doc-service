@@ -51,16 +51,15 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right">
                 <div class="dropdown-header text-center">
-                    <strong>账户</strong>
+                    <strong th:text="@{'账户：'+${username}}"></strong>
                 </div>
-                <a class="dropdown-item" href="#"><i class="fas fa-wrench"></i> 修改密码</a>
-                <div class="dropdown-header text-center">
-                    <strong>设置</strong>
-                </div>
+                <a class="dropdown-item" data-toggle="modal" title="修改密码" href="#changePassword">
+                    <i class="fas fa-wrench"></i> 修改密码</a>
+                <div class="divider"></div>
                 <a class="dropdown-item" href="#"><i class="fas fa-heart"></i> 我的收藏</a>
                 <a class="dropdown-item" href="#"><i class="fas fa-file"></i> 我的文件</a>
                 <div class="divider"></div>
-                <a class="dropdown-item" href="/logout" target="_top"><i class="fas fa-sign-out-alt"></i> 退出系统</a>
+                <a class="dropdown-item" href="/logout" target="_top"><i class="fas fa-sign-out-alt"></i> 退出当前账号</a>
             </div>
         </li>
     </ul>
@@ -91,22 +90,6 @@
                         <i class="fas fa-folder-open"></i><span th:text="${folderMenu.path}"></span>
                     </a>
                 </li>
-                <li class="nav-item nav-dropdown">
-                    <div th:each="folderMenu : ${foldersMenu}">
-                        <a class="nav-link nav-dropdown-toggle" th:href="@{'/files/folder@'+${folderMenu.id}}">
-                            <i class="fas fa-folder-open"></i><span th:text="${folderMenu.path}"></span>
-                        </a>
-                    </div>
-                    <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i> Base</a>
-                    <ul class="nav-dropdown-items">
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/breadcrumb.html"><i class="icon-puzzle"></i> Breadcrumb</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="base/cards.html"><i class="icon-puzzle"></i> Cards</a>
-                        </li>
-                    </ul>
-                </li>
             </ul>
         </nav>
         <button class="sidebar-minimizer brand-minimizer" type="button"></button>
@@ -115,15 +98,17 @@
     <!-- Main content -->
     <main class="main">
         <ol class="breadcrumb">
-            <form class="form-inline my-2 my-lg-0" th:action="@{/files/search}">
+            <form class="form-inline my-2 my-lg-0" id="searchform">
                 <input class="form-control mr-sm-2" type="search" placeholder="文件名" name="filename" id="filename">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">搜索</button>
+                <button type="reset" id="searchBtn" class="btn btn-outline-success"
+                        lay-submit="" lay-filter="searchBtn"><i class="fas fa-search"></i> 搜索
+                </button>
             </form>
             <li class="breadcrumb-menu d-md-down-none">
                 <div class="btn-group" role="group" aria-label="Button group">
                     <a class="btn" href="./"><i class="fas fa-home"></i> &nbsp;返回首页</a>
                     <a class="btn" href="#"><i class="fas fa-cog"></i> &nbsp;设置</a>
-                    <a class="btn" href="/logout" target="_top"><i class="fas fa-sign-out-alt"></i></a>
+                    <a class="btn" href="/logout" target="_top" title="退出当前账号"><i class="fas fa-sign-out-alt"></i></a>
                 </div>
             </li>
         </ol>
@@ -223,6 +208,55 @@
     <span class="ml-auto">Powered by <a href="http://www.mxleader.cn">MXLEADER</a></span>
 </footer>
 
+<!-- 模态框 -->
+<div class="modal fade" id="changePassword">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">修改密码</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <div class="table-responsive" style="text-align: center">
+                    <form method="POST" enctype="multipart/form-data"
+                          th:action="@{'./files/upload'}">
+                        <table class="table table-hover">
+                            <tr>
+                                <td align="right">原密码:</td>
+                                <td><input type="password" name="oldPassword" class="form-control"
+                                           placeholder="原密码" required="required"/></td>
+                            </tr>
+                            <tr>
+                                <td align="right">新密码:</td>
+                                <td><input type="password" name="newPassword" class="form-control"
+                                           placeholder="新密码" required="required"/></td>
+                            </tr>
+                            <tr>
+                                <td align="right">新密码确认:</td>
+                                <td><input type="password" name="verifyPassword" class="form-control"
+                                           placeholder="新密码确认" required="required"/></td>
+                            </tr>
+                        </table>
+                        <input type="hidden" id="changePasswordUsername" name="username"
+                               th:value="${username}"/>
+                        <input type="submit" value="修改" class="btn btn-success"/>
+                    </form>
+                </div>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <!-- Bootstrap and necessary plugins -->
 <script src="js/jquery.min.js"></script>
 <script src="js/popper.min.js"></script>
@@ -236,6 +270,27 @@
 <!-- CoreUI main scripts -->
 
 <script src="js/app.js"></script>
+
+<script th:inline="javascript">
+
+    layui.use(['layer', 'form'], function () {
+        var form = layui.form
+            , layer = layui.layer;
+
+        form.render();
+
+        form.on('search(filename)', function (data) {
+            var filename = $("#filename").val();
+            setUpUrl("files/search?filename=" + filename);
+        });
+
+        form.on('submit(searchBtn)', function (data) {
+            var filename = $("#filename").val();
+            setUpUrl("files/search?filename=" + filename);
+        });
+
+    });
+</script>
 
 </body>
 </html>

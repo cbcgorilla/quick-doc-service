@@ -78,6 +78,7 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
         if (session != null && session.getAttribute(SESSION_USER) != null) {
             ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
             request.setAttribute("groupMap", getUserGroupMap(activeUser));
+            request.setAttribute("username", activeUser.getUsername());
         }
         return super.preHandle(request, response, handler);
     }
