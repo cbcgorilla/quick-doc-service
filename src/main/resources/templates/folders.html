@@ -1,4 +1,3 @@
-
 <div class="animated fadeIn">
     <div class="row">
         <div class="col-lg-12">
@@ -88,12 +87,14 @@
                         <tbody>
 
                         <tr th:each="folder : ${folders}">
-                            <form th:action="@{/folders/delete}" th:method="DELETE">
+                            <form id="folderDeleteForm">
                                 <td>
                                     <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
                                     <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
-                                    <a th:href="@{'files/folder@'+${folder.id}}" th:text="${folder.path}"
+                                    <a href="#" class="folder-link" th:text="${folder.path}"
                                        id="folderPath"/>
+                                    <input type="hidden" id="subFolderLink" name="subFolderLink"
+                                           th:value="@{'files/folder@'+${folder.id}}"/>
                                 </td>
                                 <td th:text="${folder.childrenCount}"></td>
                                 <td>
@@ -111,8 +112,9 @@
                                         <input type="hidden" id="folderId" name="folderId"
                                                th:value="${folder.id}"/>
                                         <input th:if="${folder.deleteAuthorization}" type="submit"
-                                               value="&#xf2ed" title="删除该目录"
-                                               class="btn btn-danger far fa-trash-alt"/>
+                                               value="&#xf2ed" title="删除该目录" id="deleteBtn"
+                                               class="btn btn-danger far fa-trash-alt"
+                                               lay-submit="" lay-filter="deleteBtn"/>
                                     </div>
                                 </td>
                             </form>
@@ -139,14 +141,20 @@
         $(".template-input-icon-container #folderIdRef").val($td.eq(2).find(".input-group #folderId").val());
     });
 
-
     layui.use(['table', 'form'], function () {
         var form = layui.form
             , table = layui.table;
 
-        $('a').click(function() {
-            alert($(this).attr('href'));
-            setUpUrl($(this).attr('href'));
+        $('.folder-link').click(function () {
+            var folderUrl = $(this).parents('tr').children('td').eq(0).find("#subFolderLink").val();
+            //alert(folderUrl);
+            setUpUrl(folderUrl);
+        });
+
+        form.on('submit(deleteBtn)', function (data) {
+            var folderId = $(this).parents('tr').children('td').eq(2).find("#folderId").val();
+            //alert(folderId);
+            setUpUrl("folders/delete?folderId=" + folderId);
         });
 
     });

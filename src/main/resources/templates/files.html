@@ -74,14 +74,21 @@
                     </div>
 
                     <div th:if="${currentFolder}">
-                        <a th:href="@{'/files/folder@'+${currentFolder.parentId}}"
-                           th:text="@{'返回上级目录'}"></a>
+                        <a href="#" class="parent-folder-link">返回上级目录</a>
+                        <script th:inline="javascript">
+                            /*<![CDATA[*/
+                            var parentFolderUrl=/*[[@{'files/folder@'+${currentFolder.parentId}}]]*/;//取值
+                            /*]]>*/
+
+                            $('.parent-folder-link').click(function() {
+                                setUpUrl(parentFolderUrl);
+                            });
+                        </script>
 
                         <button type="button" class="btn btn-primary" data-toggle="modal"
                                 data-target="#uploadModal">
                             <i class="fas fa-cloud-upload-alt"></i>上传文件
                         </button>
-
                     </div>
 
                     <table class="table table-responsive-sm table-bordered table-striped table-hover table-sm">
@@ -100,7 +107,7 @@
                             <td>
                                 <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
                                 <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
-                                <a href="#" th:text="${folder.path}"/>
+                                <a href="#" class="folder-link" th:text="${folder.path}"/>
                                 <input type="hidden" id="subFolderLink" name="subFolderLink"
                                        th:value="@{'files/folder@'+${folder.id}}"/>
                             </td>
@@ -154,10 +161,10 @@
         var form = layui.form
             , table = layui.table;
 
-        $('a').click(function() {
-            var foldUrl = $(this).parents('tr').children('td').eq(0).find("#subFolderLink").val();
-            alert(foldUrl);
-            setUpUrl(foldUrl);
+        $('.folder-link').click(function() {
+            var folderUrl = $(this).parents('tr').children('td').eq(0).find("#subFolderLink").val();
+            //alert(folderUrl);
+            setUpUrl(folderUrl);
         });
 
     });

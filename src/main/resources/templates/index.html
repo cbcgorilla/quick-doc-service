@@ -98,12 +98,29 @@
     <!-- Main content -->
     <main class="main">
         <ol class="breadcrumb">
-            <form class="form-inline my-2 my-lg-0" id="searchform">
+            <form class="breadcrumb-item form-inline my-2 my-lg-0" id="searchform"
+                  onkeydown="if(event.keyCode==13){
+                      setUpUrl('files/search?filename=' + $('#filename').val());
+                      return false;
+                  }">
                 <input class="form-control mr-sm-2" type="search" placeholder="文件名"
                        name="filename" id="filename" size="60">
                 <button type="reset" id="searchBtn" class="btn btn-outline-success"
                         lay-submit="" lay-filter="searchBtn"><i class="fas fa-search"></i> 搜索
                 </button>
+
+                <script th:inline="javascript">
+                    layui.use(['layer', 'form'], function () {
+                        var form = layui.form
+                            , layer = layui.layer;
+
+                        form.on('submit(searchBtn)', function (data) {
+                            var filename = $("#filename").val();
+                            setUpUrl("files/search?filename=" + filename);
+                        });
+                    });
+                </script>
+
             </form>
             <li class="breadcrumb-menu d-md-down-none">
                 <div class="btn-group" role="group" aria-label="Button group">
@@ -271,28 +288,6 @@
 <!-- CoreUI main scripts -->
 
 <script src="js/app.js"></script>
-
-<script th:inline="javascript">
-
-    layui.use(['layer', 'form'], function () {
-        var form = layui.form
-            , layer = layui.layer;
-
-        form.render();
-
-        $('#filename').on('search', function () {
-            var filename = $(this).val();
-            //alert('hello'+filename);
-            setUpUrl("files/search?filename=" + filename);
-        });
-
-        form.on('submit(searchBtn)', function (data) {
-            var filename = $("#filename").val();
-            setUpUrl("files/search?filename=" + filename);
-        });
-
-    });
-</script>
 
 </body>
 </html>
