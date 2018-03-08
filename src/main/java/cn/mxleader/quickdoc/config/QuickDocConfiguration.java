@@ -83,8 +83,10 @@ public class QuickDocConfiguration {
                 userService
                         .saveUser(new QuickDocUser(ObjectId.get(), "admin",
                                 "chenbichao",
+                                new ObjectId("5aa164321652280f5854c9d9"),
                                 new QuickDocUser.Authorities[]{QuickDocUser.Authorities.ADMIN},
-                                new String[]{"administrators"}));
+                                new String[]{"administrators"},
+                                "chenbichao@mxleader.cn"));
 
                 // 初始化系统目录
                 AccessAuthorization[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};

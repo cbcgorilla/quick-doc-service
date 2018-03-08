@@ -62,7 +62,9 @@ public class UserController {
                           HttpSession session) {
         QuickDocUser.Authorities[] authorities = new QuickDocUser.Authorities[]{userType};
         QuickDocUser quickDocUser = new QuickDocUser(ObjectId.get(), username, password,
-                authorities, new String[]{userGroup});
+                new ObjectId("5aa164321652280f5854c9d9"),
+                authorities, new String[]{userGroup},
+                "chenbichao@mxleader.cn");
         userService.saveUser(quickDocUser);
 
         redirectAttributes.addFlashAttribute("message",

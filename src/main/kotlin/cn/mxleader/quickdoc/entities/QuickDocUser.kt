@@ -9,8 +9,10 @@ import java.util.*
 data class QuickDocUser(@Id var id: ObjectId,
                         var username:String,
                         var password:String,
+                        var avatarId:ObjectId,
                         var authorities:Array<Authorities>,
-                        var groups:Array<String>) {
+                        var groups:Array<String>,
+                        var email:String? = null) {
 
     enum class Authorities {
         ADMIN, USER
@@ -25,8 +27,10 @@ data class QuickDocUser(@Id var id: ObjectId,
         if (id != other.id) return false
         if (username != other.username) return false
         if (password != other.password) return false
+        if (avatarId != other.avatarId) return false
         if (!Arrays.equals(authorities, other.authorities)) return false
         if (!Arrays.equals(groups, other.groups)) return false
+        if (email != other.email) return false
 
         return true
     }
@@ -35,8 +39,10 @@ data class QuickDocUser(@Id var id: ObjectId,
         var result = id.hashCode()
         result = 31 * result + username.hashCode()
         result = 31 * result + password.hashCode()
+        result = 31 * result + avatarId.hashCode()
         result = 31 * result + Arrays.hashCode(authorities)
         result = 31 * result + Arrays.hashCode(groups)
+        result = 31 * result + (email?.hashCode() ?: 0)
         return result
     }
 
