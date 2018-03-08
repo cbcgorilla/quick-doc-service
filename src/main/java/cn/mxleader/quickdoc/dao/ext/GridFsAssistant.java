@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.dao.utils;
+package cn.mxleader.quickdoc.dao.ext;
 
 import cn.mxleader.quickdoc.entities.FileMetadata;
 import com.mongodb.MongoClient;

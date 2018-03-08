@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
-import cn.mxleader.quickdoc.dao.utils.GridFsAssistant;
+import cn.mxleader.quickdoc.dao.ext.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.FileMetadata;
 import cn.mxleader.quickdoc.entities.QuickDocFolder;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;

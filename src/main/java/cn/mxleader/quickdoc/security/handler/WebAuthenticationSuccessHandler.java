@@ -2,7 +2,7 @@ package cn.mxleader.quickdoc.security.handler;
 
 import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.security.entities.ActiveUser;
-import cn.mxleader.quickdoc.service.ReactiveUserService;
+import cn.mxleader.quickdoc.service.UserService;
 import cn.mxleader.quickdoc.service.StreamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -30,7 +30,7 @@ public class WebAuthenticationSuccessHandler implements
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Autowired
-    private ReactiveUserService reactiveUserService;
+    private UserService reactiveUserService;
 
     @Autowired
     private StreamService streamService;
@@ -44,7 +44,7 @@ public class WebAuthenticationSuccessHandler implements
         if (session != null) {
             session.setMaxInactiveInterval(30 * 60);
             String[] userGroups = reactiveUserService.findUser(authentication.getName())
-                    .block().getGroups();
+                    .getGroups();
             session.setAttribute(SESSION_USER, new ActiveUser(authentication.getName(),
                     userGroups,
                     authentication.getAuthorities()));

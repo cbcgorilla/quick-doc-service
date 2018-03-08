@@ -36,7 +36,7 @@
                                                th:value="${file.id}"/>
                                         <input th:if="${file.deleteAuthorization}" type="submit"
                                                value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
-                                        <a th:href="@{'/download/'+${file.id}}" class="btn btn-dark">
+                                        <a th:href="@{'files/download/'+${file.id}}" class="btn btn-dark">
                                             <i class="fas fa-cloud-download-alt"></i>
                                         </a>
                                     </div>
@@ -51,3 +51,18 @@
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+
+    layui.use(['table', 'form'], function () {
+        var form = layui.form
+            , table = layui.table;
+
+        $('.folder-link').click(function() {
+            var folderUrl = $(this).parents('tr').children('td').eq(0).find("#subFolderLink").val();
+            //alert(folderUrl);
+            setUpUrl(folderUrl);
+        });
+
+    });
+</script>

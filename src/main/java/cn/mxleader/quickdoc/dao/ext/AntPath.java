@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.dao.utils;
+package cn.mxleader.quickdoc.dao.ext;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

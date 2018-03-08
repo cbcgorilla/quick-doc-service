@@ -17,13 +17,13 @@ public class FileUtils {
      * 不同格式文件对应的预览资源路径前缀
      */
     private static final Map<String, String> typeLinkPrefix = new HashMap<String, String>() {{
-        put("application/pdf", "/view-pdf/");
-        put("image/png", "/view-png/");
-        put("image/gif", "/view-gif/");
-        put("image/jpeg", "/view-jpeg/");
-        put("text/plain", "/view-text/");
-        put("text/html", "/view-text/");
-        put("application/xml", "/view-text/");
+        put("application/pdf", "files/view-pdf/");
+        put("image/png", "files/view-png/");
+        put("image/gif", "files/view-gif/");
+        put("image/jpeg", "files/view-jpeg/");
+        put("text/plain", "files/view-text/");
+        put("text/html", "files/view-text/");
+        put("application/xml", "files/view-text/");
     }};
 
     /**
@@ -48,7 +48,7 @@ public class FileUtils {
      * @return
      */
     public static String getLinkPrefix(String contentType) {
-        return typeLinkPrefix.get(contentType) == null ? "/download/" : typeLinkPrefix.get(contentType);
+        return typeLinkPrefix.get(contentType) == null ? "files/download/" : typeLinkPrefix.get(contentType);
     }
 
     /**
@@ -94,8 +94,9 @@ public class FileUtils {
     public static String read(InputStream input) throws IOException {
         return read(input, Charset.defaultCharset());
     }
-    public static String read(InputStream input,Charset charset) throws IOException {
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(input,charset))) {
+
+    public static String read(InputStream input, Charset charset) throws IOException {
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(input, charset))) {
             return buffer.lines().collect(Collectors.joining("\n"));
         }
     }

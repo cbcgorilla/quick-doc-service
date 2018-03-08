@@ -12,28 +12,31 @@
 
                     <script type="text/html" id="userOpsBar">
                         <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
-                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="edit"><i class="fas fa-edit"></i>编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+                            <i class="fas fa-trash-alt"></i>删除</a>
                     </script>
 
-                    <script>
+                    <script th:inline="javascript">
                         layui.use('table', function () {
                             var table = layui.table;
                             var opt = {
                                 elem: '#LAY_table_user'
                                 , url: '/api/user/list'
                                 , height: 410
-                                , page: false //开启分页,
+                                , cellMinWidth: 120
+                                , page: true //开启分页,
+                                ,limit:10
+                                ,limits:[10,20,50,100]
                                 , cols: [
                                     [
                                         {type: 'checkbox'}
-                                        , {field: 'username', title: '用户名', width: 80}
+                                        , {field: 'id', title: 'ID'}
+                                        , {field: 'username', title: '用户名'}
+                                        , {field: 'groups', title: '用户组'}
+                                        , {fixed: 'right', title: '操作', align: 'center', toolbar: '#userOpsBar'}
                                     ]
-                                ],
-                                response: {
-                                    countName: 'total', //数据总数的字段名称，默认：count
-                                    dataName: 'rows' //数据列表的字段名称，默认：data
-                                }
+                                ]
                             };
                             //方法级渲染
                             table.render(opt);
@@ -54,6 +57,11 @@
                                     });
                                 } else if (obj.event === 'edit') {
                                     layer.alert('编辑行：<br>' + JSON.stringify(data))
+                                    /*layer.open({
+                                        type: 1,
+                                        area: ['500px', '300px'],
+                                        content: $('#addMemberDialogModal')
+                                    })*/
                                 }
                             });
 

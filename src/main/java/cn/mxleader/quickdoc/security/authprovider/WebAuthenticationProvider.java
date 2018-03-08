@@ -1,8 +1,9 @@
 package cn.mxleader.quickdoc.security.authprovider;
 
+import cn.mxleader.quickdoc.common.UserLogonException;
 import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.security.entities.WebAuthority;
-import cn.mxleader.quickdoc.service.ReactiveUserService;
+import cn.mxleader.quickdoc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +19,7 @@ public class WebAuthenticationProvider
         implements AuthenticationProvider {
 
     @Autowired
-    private ReactiveUserService reactiveUserService;
+    private UserService userService;
 
     @Override
     public Authentication authenticate(Authentication authentication)
@@ -26,14 +27,16 @@ public class WebAuthenticationProvider
 
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
-        QuickDocUser quickDocUser = reactiveUserService
-                .validateUser(name, password)
-                .block();
-        return new UsernamePasswordAuthenticationToken(quickDocUser.getUsername(),
-                quickDocUser.getPassword(),
-                Stream.of(quickDocUser.getAuthorities())
-                        .map(authority -> new WebAuthority(authority.name()))
-                        .collect(Collectors.toList()));
+        if (userService.validateUser(name, password)){
+            QuickDocUser quickDocUser = userService.findUser(name);
+            return new UsernamePasswordAuthenticationToken(quickDocUser.getUsername(),
+                    quickDocUser.getPassword(),
+                    Stream.of(quickDocUser.getAuthorities())
+                            .map(authority -> new WebAuthority(authority.name()))
+                            .collect(Collectors.toList()));
+        }else{
+            throw new UserLogonException("登录错误，用户名或密码有误,请检查后重新输入！");
+        }
     }
 
     @Override

@@ -6,10 +6,9 @@ import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.ReactiveFolderService;
 import cn.mxleader.quickdoc.service.StreamService;
+import cn.mxleader.quickdoc.service.UserService;
 import cn.mxleader.quickdoc.service.impl.DefaultStreamServiceImpl;
 import cn.mxleader.quickdoc.service.impl.KafkaStreamServiceImpl;
-import cn.mxleader.quickdoc.service.impl.ReactiveUserServiceImpl;
-import cn.mxleader.quickdoc.web.context.MxLeaderMultipartResolver;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -19,8 +18,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -72,7 +69,7 @@ public class QuickDocConfiguration {
 */
 
     @Bean
-    CommandLineRunner initConfigurationData(ReactiveUserServiceImpl reactiveUserService,
+    CommandLineRunner initConfigurationData(UserService userService,
                                             ReactiveFolderService reactiveFolderService,
                                             ConfigService configService) {
         return args -> {
@@ -83,11 +80,11 @@ public class QuickDocConfiguration {
             }
             if (!quickDocHealth.getInitialized()) {
                 // 初始化Admin管理账号
-                reactiveUserService
+                userService
                         .saveUser(new QuickDocUser(ObjectId.get(), "admin",
                                 "chenbichao",
                                 new QuickDocUser.Authorities[]{QuickDocUser.Authorities.ADMIN},
-                                new String[]{"administrators"})).subscribe();
+                                new String[]{"administrators"}));
 
                 // 初始化系统目录
                 AccessAuthorization[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
