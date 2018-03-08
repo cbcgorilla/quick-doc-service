@@ -1,4 +1,3 @@
-
 <div class="animated fadeIn">
     <div class="row">
         <div class="col-lg-12">
@@ -7,6 +6,81 @@
                     <i class="fas fa-align-justify"></i> 系统用户
                 </div>
                 <div class="card-body">
+
+                    <table class="layui-table" id="LAY_table_user" lay-filter="userTable">
+                    </table>
+
+                    <script type="text/html" id="userOpsBar">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+
+                    <script>
+                        layui.use('table', function () {
+                            var table = layui.table;
+                            var opt = {
+                                elem: '#LAY_table_user'
+                                , url: '/api/user/list'
+                                , height: 410
+                                , page: false //开启分页,
+                                , cols: [
+                                    [
+                                        {type: 'checkbox'}
+                                        , {field: 'username', title: '用户名', width: 80}
+                                    ]
+                                ],
+                                response: {
+                                    countName: 'total', //数据总数的字段名称，默认：count
+                                    dataName: 'rows' //数据列表的字段名称，默认：data
+                                }
+                            };
+                            //方法级渲染
+                            table.render(opt);
+
+                            //监听表格复选框选择
+                            table.on('checkbox(userTable)', function (obj) {
+                                console.log(obj)
+                            });
+                            //监听工具条
+                            table.on('tool(userTable)', function (obj) {
+                                var data = obj.data;
+                                if (obj.event === 'detail') {
+                                    layer.msg('ID：' + data.id + ' 的查看操作');
+                                } else if (obj.event === 'del') {
+                                    layer.confirm('真的删除行么', function (index) {
+                                        obj.del();
+                                        layer.close(index);
+                                    });
+                                } else if (obj.event === 'edit') {
+                                    layer.alert('编辑行：<br>' + JSON.stringify(data))
+                                }
+                            });
+
+                            var $ = layui.$, active = {
+                                getCheckData: function () { //获取选中数据
+                                    var checkStatus = table.checkStatus('testReload')
+                                        , data = checkStatus.data;
+                                    layer.alert(JSON.stringify(data));
+                                }
+                                , getCheckLength: function () { //获取选中数目
+                                    var checkStatus = table.checkStatus('testReload')
+                                        , data = checkStatus.data;
+                                    layer.msg('选中了：' + data.length + ' 个');
+                                }
+                                , isAll: function () { //验证是否全选
+                                    var checkStatus = table.checkStatus('testReload');
+                                    layer.msg(checkStatus.isAll ? '全选' : '未全选')
+                                }
+                            };
+
+                            $('.demoTable .layui-btn').on('click', function () {
+                                var type = $(this).data('type');
+                                active[type] ? active[type].call(this) : '';
+                            });
+                        });
+                    </script>
+
                     <div class="alert alert-success" th:if="${message}">
                         <h2 th:text="${message}"/>
                     </div>
