@@ -52,11 +52,11 @@ public class UserRestController {
         return new SuccessResponse<>(reactiveUserService.saveUser(quickDocUser));
     }
 
-    @DeleteMapping(value = "/delete/{username}")
+    @DeleteMapping(value = "/delete")
     @ApiOperation(value = "删除系统用户")
-    public RestResponse deleteUser(@PathVariable String username) {
+    public Boolean deleteUser(@RequestBody String username) {
         reactiveUserService.deleteUserByUsername(username);
-        return new SuccessResponse<>("成功删除系统用户：" + username);
+        return true;
     }
 
 }

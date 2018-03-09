@@ -7,46 +7,69 @@
                 </div>
                 <div class="card-body">
 
+                    <div class="layui-btn-group userTable">
+                        <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
+                        <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
+                        <button class="layui-btn" data-type="isAll">验证是否全选</button>
+                        <button class="addMemberDialogModal layui-btn btn-success"
+                                type="button"
+                                data-toggle="modal"
+                                data-target="#addMemberDialogModal">
+                            <i class="fas fa-user-plus" aria-hidden="true"></i> 添加成员
+                        </button>
+                    </div>
+
                     <table class="layui-table" id="LAY_table_user" lay-filter="userTable">
                     </table>
 
                     <script type="text/html" id="userOpsBar">
-                        <a class="layui-btn layui-btn-primary" lay-event="detail">查看</a>
-                        <a class="layui-btn layui-btn-normal" lay-event="edit">
-                            <i class="layui-icon" title="编辑" style="color: #FFFFFF;">&#xe642;</i>
-                        </a>
-                        <a class="layui-btn layui-btn-danger" lay-event="del">
-                            <i class="layui-icon" title="删除" style="color: #FFFFFF;">&#xe640;</i>
-                        </a>
+                        <div class="layui-btn-group">
+                            <button class="layui-btn layui-btn-sm" lay-event="detail">
+                                <i class="fas fa-info-circle" title="查看用户详细信息"></i>
+                            </button>
+                            <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="edit">
+                                <i class="fas fa-edit" title="修改用户信息"></i>
+                            </button>
+                            <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">
+                                <i class="fas fa-trash-alt" title="删除用户"></i>
+                            </button>
+                        </div>
                     </script>
 
                     <script th:inline="javascript">
                         layui.use('table', function () {
                             var table = layui.table;
                             var opt = {
-                                elem: '#LAY_table_user'
-                                , url: '/api/user/list'
-                                , height: 410
-                                , cellMinWidth: 120
-                                , page: true //开启分页,
-                                , limit: 10
-                                , limits: [10, 20, 50, 100]
-                                , cols: [
+                                elem: '#LAY_table_user',
+                                id: 'reloadUserData',
+                                url: '/api/user/list',
+                                height: 560,
+                                cellMinWidth: 120,
+                                page: true, //开启分页,
+                                limit: 10,
+                                limits: [10, 20, 50, 100],
+                                cols: [
                                     [
-                                        {type: 'checkbox'}
-                                        , {field: 'id', title: 'ID'}
-                                        , {field: 'username', title: '用户名'}
-                                        , {field: 'title', title: '显示名'}
-                                        , {
-                                        field: 'avatarId',
-                                        title: '头像',
-                                        width: 60,
-                                        templet: '<div><img src="files/view-jpeg/{{ d.avatarId}}"></div>',
-                                        style: 'height:48px;width:48px;border-radius: 50em;line-height:48px!important;'
-                                    }
-                                        , {field: 'email', title: '邮箱'}
-                                        , {field: 'groups', title: '用户组'}
-                                        , {fixed: 'right', title: '操作', align: 'center', toolbar: '#userOpsBar'}
+                                        {type: 'checkbox'},
+                                        {field: 'id', title: 'ID'},
+                                        {field: 'username', title: '用户名'},
+                                        {field: 'title', title: '显示名'},
+                                        {
+                                            field: 'avatarId',
+                                            title: '头像',
+                                            width: 60,
+                                            templet: '<div><img src="files/view-jpeg/{{ d.avatarId}}"></div>',
+                                            style: 'height:48px;width:48px;border-radius: 50em;line-height:48px!important;'
+                                        },
+                                        {field: 'email', title: '邮箱'},
+                                        {field: 'groups', title: '用户组'},
+                                        {
+                                            fixed: 'right',
+                                            title: '操作',
+                                            width: 160,
+                                            align: 'center',
+                                            toolbar: '#userOpsBar'
+                                        }
                                     ]
                                 ]
                             };
@@ -61,49 +84,41 @@
                             table.on('tool(userTable)', function (obj) {
                                 var data = obj.data;
                                 if (obj.event === 'detail') {
-                                    layer.msg('ID：' + data.id + ' 的查看操作');
+                                    layer.msg('用户ID号：' + data.id + '\n 显示名称：' + data.title);
                                 } else if (obj.event === 'del') {
-                                    layer.confirm('真的删除行么', function (index) {
-                                        obj.del();
-                                        layer.close(index);
+                                    layer.confirm('真的删除此用户吗？', function (index) {
+
                                     });
+
                                 } else if (obj.event === 'edit') {
                                     layer.alert('编辑行：<br>' + JSON.stringify(data))
-                                    /*layer.open({
-                                        type: 1,
-                                        area: ['500px', '300px'],
-                                        content: $('#addMemberDialogModal')
-                                    })*/
                                 }
                             });
 
                             var $ = layui.$, active = {
                                 getCheckData: function () { //获取选中数据
-                                    var checkStatus = table.checkStatus('testReload')
+                                    var checkStatus = table.checkStatus('reloadUserData')
                                         , data = checkStatus.data;
                                     layer.alert(JSON.stringify(data));
                                 }
                                 , getCheckLength: function () { //获取选中数目
-                                    var checkStatus = table.checkStatus('testReload')
+                                    var checkStatus = table.checkStatus('reloadUserData')
                                         , data = checkStatus.data;
                                     layer.msg('选中了：' + data.length + ' 个');
                                 }
                                 , isAll: function () { //验证是否全选
-                                    var checkStatus = table.checkStatus('testReload');
+                                    var checkStatus = table.checkStatus('reloadUserData');
                                     layer.msg(checkStatus.isAll ? '全选' : '未全选')
                                 }
                             };
 
-                            $('.demoTable .layui-btn').on('click', function () {
+                            $('.userTable .layui-btn').on('click', function () {
                                 var type = $(this).data('type');
                                 active[type] ? active[type].call(this) : '';
                             });
                         });
                     </script>
 
-                    <div class="alert alert-success" th:if="${message}">
-                        <h2 th:text="${message}"/>
-                    </div>
                     <!-- 模态框 -->
                     <div class="modal fade" id="addMemberDialogModal">
                         <div class="modal-dialog modal-lg">
@@ -205,68 +220,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="m-box">
-                        <div class="box-head">
-                            <strong class="box-title"> 成员管理</strong>
-                            <!-- 管理员 0  才可以添加用户 -->
-                            <button type="button" class="addMemberDialogModal btn btn-success btn-sm pull-right"
-                                    data-toggle="modal"
-                                    data-target="#addMemberDialogModal"><i class="fa fa-user-plus"
-                                                                           aria-hidden="true"></i> 添加成员
-                            </button>
-                        </div>
-                    </div>
-
-                    <table class="table table-responsive-sm table-bordered table-striped table-hover table-sm">
-                        <thead>
-                        <tr>
-                            <th>用户名</th>
-                            <th>分组</th>
-                            <th>用户类别</th>
-                            <th>操作</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        <tr th:each="user : ${users}">
-                            <form th:action="@{/users/delete}" th:method="DELETE">
-                                <td th:text="${user.username}"></td>
-                                <td>
-                                    <ul class="custom-list">
-                                        <li th:each="usergroup:${user.groups}">
-                                            <span th:text="${usergroup}"></span>
-                                        </li>
-                                    </ul>
-                                </td>
-                                <td>
-                                    <ul class="custom-list">
-                                        <li th:each="userAuthority:${user.authorities}">
-                                            <select id="authority" name="authority" class="select custom-select"
-                                                    readonly="true" disabled="disabled">
-                                                <option th:each="entry : ${userAuthorityMap}"
-                                                        th:value="${entry.key}"
-                                                        th:text="${entry.value}"
-                                                        th:selected="(${entry.key} == ${userAuthority})">用户类别
-                                                </option>
-                                            </select>
-                                        </li>
-                                    </ul>
-                                </td>
-                                <td>
-                                    <div class="input-group">
-                                        <a data-toggle="modal" title="Add this item"
-                                           class="editMemberDialogModal btn btn-primary"
-                                           href="#addMemberDialogModal"><i class="fas fa-edit"></i></a>
-                                        <input type="hidden" id="userId" name="userId" th:value="${user.id}"/>
-                                        <input type="submit" value="&#xf2ed"
-                                               class="btn btn-danger far fa-trash-alt"/>
-                                    </div>
-                                </td>
-                            </form>
-                        </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
             <!--/.row-->
