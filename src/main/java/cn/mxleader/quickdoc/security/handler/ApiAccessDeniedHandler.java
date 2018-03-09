@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.security.handler;
 
-import cn.mxleader.quickdoc.entities.ErrorResponse;
-import cn.mxleader.quickdoc.entities.RestResponse;
+import cn.mxleader.quickdoc.web.domain.ErrorResponse;
+import cn.mxleader.quickdoc.web.domain.RestResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

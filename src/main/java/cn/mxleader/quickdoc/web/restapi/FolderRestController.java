@@ -1,9 +1,9 @@
 package cn.mxleader.quickdoc.web.restapi;
 
-import cn.mxleader.quickdoc.entities.ErrorResponse;
+import cn.mxleader.quickdoc.web.domain.ErrorResponse;
 import cn.mxleader.quickdoc.entities.QuickDocFolder;
-import cn.mxleader.quickdoc.entities.RestResponse;
-import cn.mxleader.quickdoc.entities.SuccessResponse;
+import cn.mxleader.quickdoc.web.domain.RestResponse;
+import cn.mxleader.quickdoc.web.domain.SuccessResponse;
 import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.ReactiveFolderService;
 import cn.mxleader.quickdoc.web.domain.WebFolder;

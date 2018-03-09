@@ -11,10 +11,13 @@
                     </table>
 
                     <script type="text/html" id="userOpsBar">
-                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
-                        <a class="layui-btn layui-btn-xs" lay-event="edit"><i class="fas fa-edit"></i>编辑</a>
-                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
-                            <i class="fas fa-trash-alt"></i>删除</a>
+                        <a class="layui-btn layui-btn-primary" lay-event="detail">查看</a>
+                        <a class="layui-btn layui-btn-normal" lay-event="edit">
+                            <i class="layui-icon" title="编辑" style="color: #FFFFFF;">&#xe642;</i>
+                        </a>
+                        <a class="layui-btn layui-btn-danger" lay-event="del">
+                            <i class="layui-icon" title="删除" style="color: #FFFFFF;">&#xe640;</i>
+                        </a>
                     </script>
 
                     <script th:inline="javascript">
@@ -26,13 +29,22 @@
                                 , height: 410
                                 , cellMinWidth: 120
                                 , page: true //开启分页,
-                                ,limit:10
-                                ,limits:[10,20,50,100]
+                                , limit: 10
+                                , limits: [10, 20, 50, 100]
                                 , cols: [
                                     [
                                         {type: 'checkbox'}
                                         , {field: 'id', title: 'ID'}
                                         , {field: 'username', title: '用户名'}
+                                        , {field: 'title', title: '显示名'}
+                                        , {
+                                        field: 'avatarId',
+                                        title: '头像',
+                                        width: 60,
+                                        templet: '<div><img src="files/view-jpeg/{{ d.avatarId}}"></div>',
+                                        style: 'height:48px;width:48px;border-radius: 50em;line-height:48px!important;'
+                                    }
+                                        , {field: 'email', title: '邮箱'}
                                         , {field: 'groups', title: '用户组'}
                                         , {fixed: 'right', title: '操作', align: 'center', toolbar: '#userOpsBar'}
                                     ]
@@ -109,14 +121,38 @@
                                         <form class="form-horizontal" method="POST" th:action="@{'users/save'}">
                                             <table class="table table-hover">
                                                 <tr>
-                                                    <td align="right">用户名:</td>
+                                                    <td align="right">登录用户名:</td>
                                                     <td>
                                                         <div class="template-input-icon-container">
-                                                            <i class="fa fa-user"></i>
+                                                            <i class="fas fa-user"></i>
                                                             <input type="text" class="form-control"
-                                                                   placeholder="用户名"
+                                                                   placeholder="登录用户名"
                                                                    required="required"
                                                                    id="username" name="username"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right">显示用户名:</td>
+                                                    <td>
+                                                        <div class="template-input-icon-container">
+                                                            <i class="fas fa-id-card"></i>
+                                                            <input type="text" class="form-control"
+                                                                   placeholder="显示用户名"
+                                                                   required="required"
+                                                                   id="user-title" name="title"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right">用户邮箱:</td>
+                                                    <td>
+                                                        <div class="template-input-icon-container">
+                                                            <i class="fas fa-at"></i>
+                                                            <input type="text" class="form-control"
+                                                                   placeholder="用户邮箱"
+                                                                   required="required"
+                                                                   id="email-address" name="email"/>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -124,7 +160,7 @@
                                                     <td align="right">密 码:</td>
                                                     <td>
                                                         <div class="template-input-icon-container">
-                                                            <i class="fa fa-lock"></i>
+                                                            <i class="fas fa-lock"></i>
                                                             <input type="password" class="form-control"
                                                                    placeholder="密码"
                                                                    required="required"

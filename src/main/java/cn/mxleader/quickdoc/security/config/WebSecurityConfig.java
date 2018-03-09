@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.security.config;
 
 import cn.mxleader.quickdoc.entities.QuickDocUser;
-import cn.mxleader.quickdoc.security.authprovider.WebAuthenticationProvider;
+import cn.mxleader.quickdoc.security.provider.WebAuthenticationProvider;
 import cn.mxleader.quickdoc.security.handler.ApiAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;

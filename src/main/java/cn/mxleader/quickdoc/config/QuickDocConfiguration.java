@@ -81,7 +81,7 @@ public class QuickDocConfiguration {
             if (!quickDocHealth.getInitialized()) {
                 // 初始化Admin管理账号
                 userService
-                        .saveUser(new QuickDocUser(ObjectId.get(), "admin",
+                        .saveUser(new QuickDocUser(ObjectId.get(), "admin","系统管理员",
                                 "chenbichao",
                                 new ObjectId("5aa164321652280f5854c9d9"),
                                 new QuickDocUser.Authorities[]{QuickDocUser.Authorities.ADMIN},

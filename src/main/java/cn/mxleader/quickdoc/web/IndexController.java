@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.web;
 
-import cn.mxleader.quickdoc.security.entities.ActiveUser;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.ReactiveFolderService;
 import cn.mxleader.quickdoc.web.domain.WebFolder;
@@ -35,7 +35,7 @@ public class IndexController {
     @GetMapping()
     public String index(Model model, HttpSession session) {
         ObjectId rootParentId = configService.getQuickDocHealth().getId();
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
         if (activeUser.isAdmin()) {
             model.addAttribute(FOLDERS_MENU,

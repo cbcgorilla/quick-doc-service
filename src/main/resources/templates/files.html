@@ -49,9 +49,9 @@
                                                         <select id="shareGroups" name="shareGroups"
                                                                 class="select custom-select"
                                                                 multiple="multiple">
-                                                            <option th:each="entry : ${groupMap}"
-                                                                    th:value="${entry.key}"
-                                                                    th:text="${entry.value}">共享组
+                                                            <option th:each="group : ${session.ActiveUser.groups}"
+                                                                    th:value="${group}"
+                                                                    th:text="${group}">共享组
                                                             </option>
                                                         </select>
                                                     </td>

@@ -47,11 +47,12 @@
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
                aria-expanded="false">
-                <img src="files/view-jpeg/5aa164141652280f5854c9c1" class="img-avatar" alt="admin@bootstrapmaster.com">
+                <img th:src="@{'files/view-jpeg/'+${session.ActiveUser.avatarId}}"
+                     class="img-avatar" th:alt="${session.ActiveUser.email}">
             </a>
             <div class="dropdown-menu dropdown-menu-right">
                 <div class="dropdown-header text-center">
-                    <strong th:text="@{'账户：'+${username}}"></strong>
+                    <strong th:text="@{'当前用户：'+${session.ActiveUser.title}}"></strong>
                 </div>
                 <a class="dropdown-item" data-toggle="modal" title="修改密码" href="#changePassword">
                     <i class="fas fa-wrench"></i> 修改密码</a>
@@ -59,7 +60,8 @@
                 <a class="dropdown-item" href="#"><i class="fas fa-heart"></i> 我的收藏</a>
                 <a class="dropdown-item" href="#"><i class="fas fa-file"></i> 我的文件</a>
                 <div class="divider"></div>
-                <a class="dropdown-item" href="/logout" target="_top"><i class="fas fa-sign-out-alt"></i> 退出当前账号</a>
+                <a class="dropdown-item" href="/logout" target="_top">
+                    <i class="fas fa-sign-out-alt"></i> 退出当前账号</a>
             </div>
         </li>
     </ul>

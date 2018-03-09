@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.entities.QuickDocFolder;
-import cn.mxleader.quickdoc.security.entities.ActiveUser;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.service.ReactiveFolderService;
 import cn.mxleader.quickdoc.service.StreamService;
 import org.bson.types.ObjectId;
@@ -70,7 +70,7 @@ public class FolderController {
                        RedirectAttributes redirectAttributes,
                        HttpSession session) {
 
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         ObjectId folderId = folderIdRef != null && folderIdRef.trim().length() > 0 ?
                 new ObjectId(folderIdRef) : new ObjectId(parentId);
         QuickDocFolder folder = reactiveFolderService.findById(folderId).block();
@@ -114,7 +114,7 @@ public class FolderController {
     public String delete(@RequestParam("folderId") ObjectId folderId,
                          HttpSession session,
                          RedirectAttributes redirectAttributes) {
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         if (activeUser.isAdmin()) {
             reactiveFolderService.delete(folderId)
                     .onErrorMap(v -> {

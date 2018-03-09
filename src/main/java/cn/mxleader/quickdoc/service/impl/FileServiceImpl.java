@@ -4,7 +4,7 @@ import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.dao.ext.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.FileMetadata;
 import cn.mxleader.quickdoc.entities.QuickDocFolder;
-import cn.mxleader.quickdoc.security.entities.ActiveUser;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
@@ -155,7 +155,7 @@ public class FileServiceImpl implements FileService {
      */
     public void createZip(ObjectId folderId,
                           OutputStream fos,
-                          ActiveUser activeUser) throws IOException {
+                          QuickDocUser activeUser) throws IOException {
         ZipOutputStream zos = new ZipOutputStream(fos);
         QuickDocFolder folder = mongoTemplate.findById(folderId, QuickDocFolder.class);
         if (folder != null) {
@@ -177,7 +177,7 @@ public class FileServiceImpl implements FileService {
     private void compressFolder(QuickDocFolder folder,
                                 ZipOutputStream out,
                                 String basedir,
-                                ActiveUser activeUser) {
+                                QuickDocUser activeUser) {
         // 递归压缩目录
         List<QuickDocFolder> folders = mongoTemplate.find(
                 Query.query(Criteria.where("parentId").is(folder.getId())),

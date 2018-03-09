@@ -1,8 +1,7 @@
-package cn.mxleader.quickdoc.security.authprovider;
+package cn.mxleader.quickdoc.security.provider;
 
 import cn.mxleader.quickdoc.common.UserLogonException;
 import cn.mxleader.quickdoc.entities.QuickDocUser;
-import cn.mxleader.quickdoc.security.entities.WebAuthority;
 import cn.mxleader.quickdoc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -11,8 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class WebAuthenticationProvider
@@ -31,7 +30,7 @@ public class WebAuthenticationProvider
             QuickDocUser quickDocUser = userService.findUser(name);
             return new UsernamePasswordAuthenticationToken(quickDocUser.getUsername(),
                     quickDocUser.getPassword(),
-                    Stream.of(quickDocUser.getAuthorities())
+                    Arrays.stream(quickDocUser.getAuthorities())
                             .map(authority -> new WebAuthority(authority.name()))
                             .collect(Collectors.toList()));
         }else{

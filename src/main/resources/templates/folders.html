@@ -30,7 +30,7 @@
                                                     <td align="right">目录名:</td>
                                                     <td>
                                                         <div class="template-input-icon-container">
-                                                            <i class="fa fa-user"></i>
+                                                            <i class="fas fa-user"></i>
                                                             <input type="text" class="form-control" placeholder="目录名"
                                                                    required="required"
                                                                    id="path" name="path"/>
@@ -55,9 +55,9 @@
                                                     <td>
                                                         <select id="shareGroups" name="shareGroups"
                                                                 class="select custom-select" multiple="multiple">
-                                                            <option th:each="entry : ${groupMap}"
-                                                                    th:value="${entry.key}"
-                                                                    th:text="${entry.value}">共享组
+                                                            <option th:each="group : ${session.ActiveUser.groups}"
+                                                                    th:value="${group}"
+                                                                    th:text="${group}">共享组
                                                             </option>
                                                         </select>
                                                     </td>

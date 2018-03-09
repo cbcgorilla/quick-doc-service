@@ -1,7 +1,6 @@
 package cn.mxleader.quickdoc.security.handler;
 
 import cn.mxleader.quickdoc.entities.QuickDocUser;
-import cn.mxleader.quickdoc.security.entities.ActiveUser;
 import cn.mxleader.quickdoc.service.UserService;
 import cn.mxleader.quickdoc.service.StreamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class WebAuthenticationSuccessHandler implements
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Autowired
-    private UserService reactiveUserService;
+    private UserService userService;
 
     @Autowired
     private StreamService streamService;
@@ -43,11 +42,8 @@ public class WebAuthenticationSuccessHandler implements
         final HttpSession session = request.getSession(false);
         if (session != null) {
             session.setMaxInactiveInterval(30 * 60);
-            String[] userGroups = reactiveUserService.findUser(authentication.getName())
-                    .getGroups();
-            session.setAttribute(SESSION_USER, new ActiveUser(authentication.getName(),
-                    userGroups,
-                    authentication.getAuthorities()));
+            QuickDocUser user = userService.findUser(authentication.getName());
+            session.setAttribute(SESSION_USER, user);
             // 发送用户登录消息到平台MQ
             Date d = new Date();
             SimpleDateFormat str = new SimpleDateFormat("yyyy年MM月dd日 KK:mm:ss");

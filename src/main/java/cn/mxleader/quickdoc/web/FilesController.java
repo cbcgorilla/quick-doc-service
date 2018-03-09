@@ -3,7 +3,7 @@ package cn.mxleader.quickdoc.web;
 import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.entities.FileMetadata;
 import cn.mxleader.quickdoc.entities.QuickDocFolder;
-import cn.mxleader.quickdoc.security.entities.ActiveUser;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.service.ReactiveFolderService;
@@ -65,7 +65,7 @@ public class FilesController {
     @GetMapping()
     public String index(Model model, HttpSession session) {
         ObjectId rootParentId = configService.getQuickDocHealth().getId();
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
         if (activeUser.isAdmin()) {
             refreshDirList(model, rootParentId);
@@ -96,7 +96,7 @@ public class FilesController {
         QuickDocFolder quickDocFolder = reactiveFolderService.findById(folderId).block();
         model.addAttribute("currentFolder", quickDocFolder);
         refreshDirList(model, folderId);
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
 
         return "files";
@@ -119,7 +119,7 @@ public class FilesController {
     @RequestMapping("/search")
     public String searchFiles(@RequestParam("filename") String filename,
                               Model model, HttpSession session) {
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
         model.addAttribute(FILES_ATTRIBUTE, fileService.searchFilesContaining(filename)
                 .collect(Collectors.toList()));
@@ -138,7 +138,7 @@ public class FilesController {
     void downloadDocument(HttpServletResponse response,
                           @PathVariable ObjectId folderId,
                           HttpSession session) throws IOException {
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader("Content-Disposition",
                 "attachment; filename=" + folderId + ".zip");
@@ -285,7 +285,7 @@ public class FilesController {
                          RedirectAttributes redirectAttributes,
                          Model model,
                          HttpSession session) throws IOException {
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         String filename = FileUtils.getFilename(file.getOriginalFilename());
         String fileType = FileUtils.guessMimeType(filename);
 
@@ -333,7 +333,7 @@ public class FilesController {
                              @RequestParam("fileId") ObjectId fileId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
-        ActiveUser activeUser = (ActiveUser) session.getAttribute(SESSION_USER);
+        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         WebFile file = fileService.getStoredFile(fileId);
         if (checkAuthentication(file.getOpenAccess(), file.getAuthorizations(), activeUser, DELETE_PRIVILEGE)) {
             fileService.delete(fileId);

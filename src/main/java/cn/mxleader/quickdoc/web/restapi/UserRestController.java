@@ -1,8 +1,8 @@
 package cn.mxleader.quickdoc.web.restapi;
 
 import cn.mxleader.quickdoc.entities.QuickDocUser;
-import cn.mxleader.quickdoc.entities.RestResponse;
-import cn.mxleader.quickdoc.entities.SuccessResponse;
+import cn.mxleader.quickdoc.web.domain.RestResponse;
+import cn.mxleader.quickdoc.web.domain.SuccessResponse;
 import cn.mxleader.quickdoc.service.UserService;
 import cn.mxleader.quickdoc.web.domain.LayuiTable;
 import cn.mxleader.quickdoc.web.domain.WebUser;

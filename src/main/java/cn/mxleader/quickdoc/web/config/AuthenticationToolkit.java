@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.web.config;
 
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
-import cn.mxleader.quickdoc.security.entities.ActiveUser;
+import cn.mxleader.quickdoc.entities.QuickDocUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public class AuthenticationToolkit {
 
 
     public static Boolean checkAuthentication(Boolean openAccess, AccessAuthorization[] authorizations,
-                                              ActiveUser activeUser, Integer privilege) {
+                                              QuickDocUser activeUser, Integer privilege) {
         return checkAuthentication(openAccess, Arrays.asList(authorizations), activeUser, privilege);
     }
 
@@ -32,7 +32,7 @@ public class AuthenticationToolkit {
      * @return 鉴权通过返回True，否则返回False
      */
     public static Boolean checkAuthentication(Boolean openAccess, List<AccessAuthorization> authorizations,
-                                              ActiveUser activeUser, Integer privilege) {
+                                              QuickDocUser activeUser, Integer privilege) {
         // 管理员默认可访问所有目录和文件
         if (activeUser.isAdmin()) {
             return true;
@@ -77,7 +77,7 @@ public class AuthenticationToolkit {
         return false;
     }
 
-    public static AccessAuthorization[] translateShareSetting(ActiveUser activeUser,
+    public static AccessAuthorization[] translateShareSetting(QuickDocUser activeUser,
                                                               String[] shareSetting) {
         AccessAuthorization owner = new AccessAuthorization(activeUser.getUsername(),
                 AccessAuthorization.Type.TYPE_PRIVATE, 7);
@@ -97,7 +97,7 @@ public class AuthenticationToolkit {
         return accessAuthorizationList.toArray(accessAuthorizationDesc);
     }
 
-    public static AccessAuthorization[] translateShareSetting(ActiveUser activeUser,
+    public static AccessAuthorization[] translateShareSetting(QuickDocUser activeUser,
                                                               String[] ownersRequest,
                                                               String[] shareGroups) {
         AccessAuthorization owner = new AccessAuthorization(activeUser.getUsername(),

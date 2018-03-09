@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.security.entities;
+package cn.mxleader.quickdoc.security.provider;
 
 import org.springframework.security.core.GrantedAuthority;
 
