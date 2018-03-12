@@ -63,7 +63,7 @@ public class UserController {
                        HttpSession session) {
         QuickDocUser.Authorities[] authorities = new QuickDocUser.Authorities[]{userType};
         QuickDocUser quickDocUser = new QuickDocUser(ObjectId.get(), username, title, password,
-                new ObjectId("5aa164321652280f5854c9d9"),
+                new ObjectId("5aa21a7f16422c306c01796f"),
                 authorities, new String[]{userGroup},
                 email);
         if (userService.findUser(username) == null) {

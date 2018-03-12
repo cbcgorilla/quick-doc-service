@@ -43,7 +43,7 @@
                                 elem: '#LAY_table_user',
                                 id: 'reloadUserData',
                                 url: '/api/user/list',
-                                height: 560,
+                                height: '510',
                                 cellMinWidth: 120,
                                 page: true, //开启分页,
                                 limit: 10,
@@ -57,21 +57,23 @@
                                         {
                                             field: 'avatarId',
                                             title: '头像',
-                                            width: 60,
-                                            templet: '<div><img src="files/view-jpeg/{{ d.avatarId}}"></div>',
-                                            style: 'height:48px;width:48px;border-radius: 50em;line-height:48px!important;'
+                                            align: 'center',
+                                            width: 80,
+                                            templet: '#avatarTpl'
                                         },
                                         {field: 'email', title: '邮箱'},
                                         {field: 'groups', title: '用户组'},
                                         {
-                                            fixed: 'right',
                                             title: '操作',
                                             width: 160,
                                             align: 'center',
                                             toolbar: '#userOpsBar'
                                         }
                                     ]
-                                ]
+                                ],
+                                done: function (res, curr, count) {
+                                    $("[data-field='id']").css('display', 'none');
+                                }
                             };
                             //方法级渲染
                             table.render(opt);
@@ -86,8 +88,27 @@
                                 if (obj.event === 'detail') {
                                     layer.msg('用户ID号：' + data.id + '\n 显示名称：' + data.title);
                                 } else if (obj.event === 'del') {
-                                    layer.confirm('真的删除此用户吗？', function (index) {
+                                    layer.confirm('真的删除用户: '+data.username+' 吗？', {title: "删除确认"}, function (index) {
+                                        postJSON("/api/user/delete", data.username)
+                                            .catch(error => {
 
+                                            })
+                                            .then(value => {
+                                                    var result=JSON.parse(value);
+                                                if (result == true) {
+                                                    layer.alert('用户'+data.username+'删除成功!', {
+                                                        icon: 6, btn: ['确认'], yes: function (index) {
+                                                            obj.del();
+                                                            layer.close(index);
+                                                            var tableIns=table.render(opt);
+                                                            tableIns.reload();
+                                                        }
+                                                    });
+                                                } else {
+                                                    layer.alert("用户删除失败!", {icon: 2});
+                                                }
+                                                layer.close(index);
+                                            });
                                     });
 
                                 } else if (obj.event === 'edit') {
@@ -226,6 +247,8 @@
         </div>
     </div>
 </div>
+
+<script src="/js/ajaxutils.js" th:inline="javascript"></script>
 <script th:inline="javascript">
     //<![CDATA[
     $(document).on("click", ".addMemberDialogModal", function () {
@@ -240,3 +263,15 @@
     });
     //]]>
 </script>
+<script type="text/html" id="avatarTpl">
+    <div style="align:center;">
+        <img src="files/view-jpeg/{{ d.avatarId}}"
+             style="width:32px; height:32px;border-radius:32px">
+    </div>
+</script>
+<style type="text/css">
+    .layui-table-cell {
+        height: 36px;
+        line-height: 36px;
+    }
+</style>
