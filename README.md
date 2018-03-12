@@ -60,6 +60,7 @@ Lombok 在 Java 9 环境导致编译异常
 继续完善该文件服务器的其他功能，包括文件批量转储，移动端APP，文件自动同步功能等
 
 ## 界面截图
+![用户管理界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/image_src/user-management-ui.png)
 ![文件访问界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page1.png)
 
 ![文件夹配置界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page2.png)
