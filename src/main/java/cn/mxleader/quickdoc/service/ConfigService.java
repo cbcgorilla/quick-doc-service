@@ -1,9 +1,9 @@
 package cn.mxleader.quickdoc.service;
 
-import cn.mxleader.quickdoc.entities.QuickDocHealth;
+import cn.mxleader.quickdoc.entities.SysProfile;
 
 public interface ConfigService {
 
-    QuickDocHealth getQuickDocHealth();
-    QuickDocHealth saveQuickDocHealth(QuickDocHealth quickDocHealth);
+    SysProfile getSysProfile();
+    SysProfile saveSysProfile(SysProfile sysProfile);
 }

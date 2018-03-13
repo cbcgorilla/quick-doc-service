@@ -2,7 +2,7 @@ package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.dao.ReactiveFolderRepository;
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
-import cn.mxleader.quickdoc.entities.QuickDocFolder;
+import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.service.ReactiveFolderService;
 import cn.mxleader.quickdoc.web.domain.WebFolder;
 import org.bson.types.ObjectId;
@@ -37,22 +37,21 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
      * @param authorizations
      * @return
      */
-    public Mono<QuickDocFolder> save(String path, ObjectId parentId,
-                                     Boolean openAccess, AccessAuthorization[] authorizations) {
+    public Mono<SysFolder> save(String path, ObjectId parentId,
+                                AccessAuthorization[] authorizations) {
         return reactiveFolderRepository.findByPathAndParentId(path, parentId)
-                .defaultIfEmpty(new QuickDocFolder(ObjectId.get(), path, parentId, openAccess, authorizations))
+                .defaultIfEmpty(new SysFolder(ObjectId.get(), path, parentId, authorizations))
                 .flatMap(folder -> {
-                    folder.setOpenAccess(openAccess);
                     folder.setAuthorizations(authorizations);
                     return reactiveFolderRepository.save(folder);
                 });
     }
 
-    public Mono<QuickDocFolder> save(ObjectId folderId, String path, Boolean openAccess, AccessAuthorization[] authorizations) {
+    public Mono<SysFolder> save(ObjectId folderId, String path,
+                                AccessAuthorization[] authorizations) {
         return reactiveFolderRepository.findById(folderId)
                 .flatMap(folder -> {
-                    folder.setPath(path);
-                    folder.setOpenAccess(openAccess);
+                    folder.setName(path);
                     folder.setAuthorizations(authorizations);
                     return reactiveFolderRepository.save(folder);
                 });
@@ -61,14 +60,13 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
     /**
      * 新增文件目录;
      *
-     * @param quickDocFolder
+     * @param sysFolder
      * @return
      */
-    public Mono<QuickDocFolder> save(QuickDocFolder quickDocFolder) {
-        return save(quickDocFolder.getPath(),
-                quickDocFolder.getParentId(),
-                quickDocFolder.getOpenAccess(),
-                quickDocFolder.getAuthorizations());
+    public Mono<SysFolder> save(SysFolder sysFolder) {
+        return save(sysFolder.getName(),
+                sysFolder.getParentId(),
+                sysFolder.getAuthorizations());
     }
 
     /**
@@ -79,19 +77,15 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
      * @param newPath
      * @return
      */
-    public Mono<QuickDocFolder> rename(QuickDocFolder folder, String newPath) {
+    public Mono<SysFolder> rename(SysFolder folder, String newPath) {
         return reactiveFolderRepository.findById(folder.getId())
                 .switchIfEmpty(noDirectoryMsg(folder.toString()))
                 .flatMap(v -> {
-                    /*mongoTemplate.exists(
-                            Query.query(
-                                    Criteria.where("path").is(newPath).and("parentId").in(directory.getParentId())),
-                            QuickDocFolder.class);*/
                     if (reactiveFolderRepository.findByPathAndParentId(newPath,
                             folder.getParentId()).blockOptional().isPresent()) {
                         return dirConflictMsg(newPath);
                     }
-                    v.setPath(newPath);
+                    v.setName(newPath);
                     return reactiveFolderRepository.save(v);
                 });
     }
@@ -104,7 +98,7 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
      * @param newParentId 新上级目录ID
      * @return
      */
-    public Mono<QuickDocFolder> move(ObjectId folderId, ObjectId newParentId) {
+    public Mono<SysFolder> move(ObjectId folderId, ObjectId newParentId) {
         return reactiveFolderRepository.findById(folderId)
                 .switchIfEmpty(noDirectoryMsg(folderId))
                 .flatMap(v -> {
@@ -130,10 +124,10 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
                 .flatMap(v -> {
                     if (mongoTemplate.count(
                             Query.query(Criteria.where("parentId").is(folderId)),
-                            QuickDocFolder.class) == 0) {
+                            SysFolder.class) == 0) {
                         return reactiveFolderRepository.delete(v);
                     } else {
-                        return notEmptyDirMsg("[" + folderId.toString() + "] " + v.getPath());
+                        return notEmptyDirMsg("[" + folderId.toString() + "] " + v.getName());
                     }
                 });
     }
@@ -148,7 +142,7 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
         return switchToWebFormat(findAllByParentId(parentId));
     }
 
-    public Flux<QuickDocFolder> findAllByParentId(ObjectId parentId) {
+    public Flux<SysFolder> findAllByParentId(ObjectId parentId) {
         return reactiveFolderRepository.findAllByParentId(parentId);
     }
 
@@ -156,17 +150,17 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
         return switchToWebFormat(findAll());
     }
 
-    public Flux<QuickDocFolder> findAll() {
+    public Flux<SysFolder> findAll() {
         return reactiveFolderRepository.findAll();
     }
 
-    private Flux<WebFolder> switchToWebFormat(Flux<QuickDocFolder> folderFlux) {
+    private Flux<WebFolder> switchToWebFormat(Flux<SysFolder> folderFlux) {
         return folderFlux.map(folder -> {
             WebFolder webFolder = new WebFolder();
             BeanUtils.copyProperties(folder, webFolder);
             Long dirCount = mongoTemplate.count(
                     Query.query(Criteria.where("parentId").is(folder.getId())),
-                    QuickDocFolder.class);
+                    SysFolder.class);
             Long filesCount = mongoTemplate.count(Query.query(GridFsCriteria
                             .whereMetaData("folderId").is(folder.getId())),
                     "fs.files");
@@ -182,7 +176,7 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
      * @param parentId 上级目录ID
      * @return
      */
-    public Mono<QuickDocFolder> findByPathAndParentId(String path, ObjectId parentId) {
+    public Mono<SysFolder> findByPathAndParentId(String path, ObjectId parentId) {
         return reactiveFolderRepository.findByPathAndParentId(path, parentId);
     }
 
@@ -192,7 +186,7 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
      * @param id 文件目录ID
      * @return
      */
-    public Mono<QuickDocFolder> findById(ObjectId id) {
+    public Mono<SysFolder> findById(ObjectId id) {
         return reactiveFolderRepository.findById(id);
     }
 

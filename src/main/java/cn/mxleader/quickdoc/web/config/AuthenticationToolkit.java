@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.web.config;
 
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.SysUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,28 +17,23 @@ public class AuthenticationToolkit {
             AccessAuthorization.Type.TYPE_GROUP, 7);
 
 
-    public static Boolean checkAuthentication(Boolean openAccess, AccessAuthorization[] authorizations,
-                                              QuickDocUser activeUser, Integer privilege) {
-        return checkAuthentication(openAccess, Arrays.asList(authorizations), activeUser, privilege);
+    public static Boolean checkAuthentication(AccessAuthorization[] authorizations,
+                                              SysUser activeUser, Integer privilege) {
+        return checkAuthentication(Arrays.asList(authorizations), activeUser, privilege);
     }
 
     /**
      * 检查是否有授权访问该目录或文件
      *
-     * @param openAccess     公开访问开关
      * @param authorizations 授权列表
      * @param activeUser     用户信息
      * @param privilege      待校验权限级别（READ_PRIVILEGE，WRITE_PRIVILEGE，DELETE_PRIVILEGE）
      * @return 鉴权通过返回True，否则返回False
      */
-    public static Boolean checkAuthentication(Boolean openAccess, List<AccessAuthorization> authorizations,
-                                              QuickDocUser activeUser, Integer privilege) {
+    public static Boolean checkAuthentication(List<AccessAuthorization> authorizations,
+                                              SysUser activeUser, Integer privilege) {
         // 管理员默认可访问所有目录和文件
         if (activeUser.isAdmin()) {
-            return true;
-        }
-        // 公开访问权限仅设置读权限
-        if (openAccess && privilege == READ_PRIVILEGE) {
             return true;
         }
         if (authorizations != null && authorizations.size() > 0) {
@@ -66,18 +61,7 @@ public class AuthenticationToolkit {
         return false;
     }
 
-    public static Boolean getOpenAccessFromShareSetting(String[] ownersRequest) {
-        if (ownersRequest != null && ownersRequest.length > 0) {
-            for (String item : ownersRequest) {
-                if (item.equalsIgnoreCase("PublicMode")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static AccessAuthorization[] translateShareSetting(QuickDocUser activeUser,
+    public static AccessAuthorization[] translateShareSetting(SysUser activeUser,
                                                               String[] shareSetting) {
         AccessAuthorization owner = new AccessAuthorization(activeUser.getUsername(),
                 AccessAuthorization.Type.TYPE_PRIVATE, 7);
@@ -97,7 +81,7 @@ public class AuthenticationToolkit {
         return accessAuthorizationList.toArray(accessAuthorizationDesc);
     }
 
-    public static AccessAuthorization[] translateShareSetting(QuickDocUser activeUser,
+    public static AccessAuthorization[] translateShareSetting(SysUser activeUser,
                                                               String[] ownersRequest,
                                                               String[] shareGroups) {
         AccessAuthorization owner = new AccessAuthorization(activeUser.getUsername(),

@@ -95,7 +95,7 @@
                 </li>
                 <li class="nav-item" th:each="folderMenu : ${foldersMenu}">
                     <a class="nav-link" th:href="@{'files/folder@'+${folderMenu.id}}">
-                        <i class="fas fa-folder-open"></i><span th:text="${folderMenu.path}"></span>
+                        <i class="fas fa-folder-open"></i><span th:text="${folderMenu.name}"></span>
                     </a>
                 </li>
             </ul>

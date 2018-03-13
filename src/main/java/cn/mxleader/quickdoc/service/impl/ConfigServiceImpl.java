@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.dao.QuickDocHealthRepository;
-import cn.mxleader.quickdoc.entities.QuickDocHealth;
+import cn.mxleader.quickdoc.dao.SysProfileRepository;
+import cn.mxleader.quickdoc.entities.SysProfile;
 import cn.mxleader.quickdoc.service.ConfigService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 
 @Service
 public class ConfigServiceImpl implements ConfigService {
-    private final QuickDocHealthRepository quickDocHealthRepository;
+    private final SysProfileRepository sysProfileRepository;
 
     @Value("${server.port}")
     String serverPort;
@@ -24,15 +24,15 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    ConfigServiceImpl(QuickDocHealthRepository quickDocHealthRepository) {
-        this.quickDocHealthRepository = quickDocHealthRepository;
+    ConfigServiceImpl(SysProfileRepository sysProfileRepository) {
+        this.sysProfileRepository = sysProfileRepository;
     }
 
-    public QuickDocHealth getQuickDocHealth() {
-        return quickDocHealthRepository.findByServiceAddress(serviceAddress());
+    public SysProfile getSysProfile() {
+        return sysProfileRepository.findByServiceAddress(serviceAddress());
     }
 
-    public QuickDocHealth saveQuickDocHealth(QuickDocHealth quickDocHealth) {
-        return quickDocHealthRepository.save(quickDocHealth);
+    public SysProfile saveSysProfile(SysProfile sysProfile) {
+        return sysProfileRepository.save(sysProfile);
     }
 }

@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.web;
 
-import cn.mxleader.quickdoc.entities.QuickDocFolder;
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.SysFolder;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.ReactiveFolderService;
 import cn.mxleader.quickdoc.service.StreamService;
 import org.bson.types.ObjectId;
@@ -70,24 +70,21 @@ public class FolderController {
                        RedirectAttributes redirectAttributes,
                        HttpSession session) {
 
-        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         ObjectId folderId = folderIdRef != null && folderIdRef.trim().length() > 0 ?
                 new ObjectId(folderIdRef) : new ObjectId(parentId);
-        QuickDocFolder folder = reactiveFolderService.findById(folderId).block();
+        SysFolder folder = reactiveFolderService.findById(folderId).block();
         // 鉴权检查
-        if (checkAuthentication(folder.getOpenAccess(),
-                folder.getAuthorizations(),
+        if (checkAuthentication(folder.getAuthorizations(),
                 activeUser, WRITE_PRIVILEGE)) {
 
             if (folderIdRef != null && folderIdRef.trim().length() > 0) {
                 // folderIdRef字段有数据则修改现有目录的数据
                 reactiveFolderService.save(new ObjectId(folderIdRef), path,
-                        getOpenAccessFromShareSetting(shareSetting),
                         translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
             } else {
                 // folderIdRef字段无数据则增加新的子目录
                 reactiveFolderService.save(path, new ObjectId(parentId),
-                        getOpenAccessFromShareSetting(shareSetting),
                         translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
             }
             // 发送MQ消息
@@ -97,7 +94,7 @@ public class FolderController {
                     "成功保存目录： " + path);
         } else {
             redirectAttributes.addFlashAttribute("message",
-                    "您无此目录的权限： " + folder.getPath() + "，请联系管理员获取！");
+                    "您无此目录的权限： " + folder.getName() + "，请联系管理员获取！");
         }
         return "redirect:/#folders";
     }
@@ -114,7 +111,7 @@ public class FolderController {
     public String delete(@RequestParam("folderId") ObjectId folderId,
                          HttpSession session,
                          RedirectAttributes redirectAttributes) {
-        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         if (activeUser.isAdmin()) {
             reactiveFolderService.delete(folderId)
                     .onErrorMap(v -> {

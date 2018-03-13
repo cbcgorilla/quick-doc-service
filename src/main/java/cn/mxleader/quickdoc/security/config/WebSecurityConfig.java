@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.security.config;
 
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.security.provider.WebAuthenticationProvider;
 import cn.mxleader.quickdoc.security.handler.ApiAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // @TODO 删除.csrf().disable() 可屏蔽 /management 路径下的POST提交，仅支持GET方法交互
             http.csrf().disable().requestMatcher(
                     EndpointRequest.to("mongo-status", "quick-doc-health")).authorizeRequests()
-                    .anyRequest().hasAuthority(QuickDocUser.Authorities.ADMIN.name())
+                    .anyRequest().hasAuthority(SysUser.Authorities.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -88,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //http.antMatcher("/guest/**").authorizeRequests().anyRequest().permitAll();
 
             http.antMatcher("/api/**").authorizeRequests()
-                    .anyRequest().hasAuthority(QuickDocUser.Authorities.ADMIN.name())
+                    .anyRequest().hasAuthority(SysUser.Authorities.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -145,8 +145,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     //.antMatchers("/invalidSession*").anonymous()
                     .antMatchers(SWAGGER_AUTH_WHITELIST).permitAll()
                     .antMatchers("/admin*", "/admin/**", "/swagger-ui.html")
-                    .hasAuthority(QuickDocUser.Authorities.ADMIN.name())
-                    .anyRequest().hasAnyAuthority(QuickDocUser.Authorities.ADMIN.name(), QuickDocUser.Authorities.USER.name())
+                    .hasAuthority(SysUser.Authorities.ADMIN.name())
+                    .anyRequest().hasAnyAuthority(SysUser.Authorities.ADMIN.name(), SysUser.Authorities.USER.name())
                     .and()
                     .formLogin()
                     .loginPage("/login")

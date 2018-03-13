@@ -107,7 +107,7 @@
                             <td>
                                 <i th:if="${folder.childrenCount>0}" class="fas fa-folder"></i>
                                 <i th:if="${folder.childrenCount==0}" class="far fa-folder"></i>
-                                <a href="#" class="folder-link" th:text="${folder.path}"/>
+                                <a href="#" class="folder-link" th:text="${folder.name}"/>
                                 <input type="hidden" id="subFolderLink" name="subFolderLink"
                                        th:value="@{'files/folder@'+${folder.id}}"/>
                             </td>

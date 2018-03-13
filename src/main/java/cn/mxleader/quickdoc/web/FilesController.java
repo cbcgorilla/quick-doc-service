@@ -1,9 +1,9 @@
 package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
-import cn.mxleader.quickdoc.entities.FileMetadata;
-import cn.mxleader.quickdoc.entities.QuickDocFolder;
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.Metadata;
+import cn.mxleader.quickdoc.entities.SysFolder;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.service.ReactiveFolderService;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -65,14 +64,14 @@ public class FilesController {
      */
     @GetMapping()
     public String index(Model model, HttpSession session) {
-        ObjectId rootParentId = configService.getQuickDocHealth().getId();
-        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+        ObjectId rootParentId = configService.getSysProfile().getId();
+        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
         if (activeUser.isAdmin()) {
             refreshDirList(model, rootParentId);
         } else {
             List<WebFolder> webFolders = reactiveFolderService.findAllByParentIdInWebFormat(rootParentId)
-                    .filter(webFolder -> webFolder.getPath().equalsIgnoreCase("root"))
+                    .filter(webFolder -> webFolder.getName().equalsIgnoreCase("root"))
                     .toStream()
                     .collect(Collectors.toList());
             if (webFolders != null && webFolders.size() > 0) {
@@ -94,10 +93,10 @@ public class FilesController {
      */
     @GetMapping("/folder@{folderId}")
     public String index(@PathVariable ObjectId folderId, Model model, HttpSession session) {
-        QuickDocFolder quickDocFolder = reactiveFolderService.findById(folderId).block();
-        model.addAttribute("currentFolder", quickDocFolder);
+        SysFolder sysFolder = reactiveFolderService.findById(folderId).block();
+        model.addAttribute("currentFolder", sysFolder);
         refreshDirList(model, folderId);
-        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
 
         return "files";
@@ -120,7 +119,7 @@ public class FilesController {
     @RequestMapping("/search")
     public String searchFiles(@RequestParam("filename") String filename,
                               Model model, HttpSession session) {
-        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         model.addAttribute("isAdmin", activeUser.isAdmin());
         model.addAttribute(FILES_ATTRIBUTE, fileService.searchFilesContaining(filename)
                 .collect(Collectors.toList()));
@@ -139,7 +138,7 @@ public class FilesController {
     void downloadDocument(HttpServletResponse response,
                           @PathVariable ObjectId folderId,
                           HttpSession session) throws IOException {
-        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader("Content-Disposition",
                 "attachment; filename=" + folderId + ".zip");
@@ -286,24 +285,22 @@ public class FilesController {
                          RedirectAttributes redirectAttributes,
                          Model model,
                          HttpSession session) throws IOException {
-        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         String filename = FileUtils.getFilename(file.getOriginalFilename());
         String fileType = FileUtils.guessMimeType(filename);
 /*
         MimetypesFileTypeMap m = new MimetypesFileTypeMap();
         String fileType = m.getContentType(filename);*/
 
-        QuickDocFolder quickDocFolder = reactiveFolderService.findById(folderId).block();
+        SysFolder sysFolder = reactiveFolderService.findById(folderId).block();
         if (fileService.getStoredFile(filename, folderId) != null) {
             redirectAttributes.addFlashAttribute("message",
-                    "该目录： " + quickDocFolder.getPath() + "中已存在同名文件，请核对文件信息是否重复！");
+                    "该目录： " + sysFolder.getName() + "中已存在同名文件，请核对文件信息是否重复！");
             return "redirect:/#files/folder@" + folderId;
         }
         // 鉴权检查
-        if (checkAuthentication(quickDocFolder.getOpenAccess(),
-                quickDocFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
-            FileMetadata metadata = new FileMetadata(fileType, folderId,
-                    getOpenAccessFromShareSetting(shareSetting),
+        if (checkAuthentication(sysFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
+            Metadata metadata = new Metadata(fileType, folderId,
                     translateShareSetting(activeUser, shareSetting, shareGroups), null);
 
             ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
@@ -320,7 +317,7 @@ public class FilesController {
                     "成功上传文件： " + filename);
         } else {
             redirectAttributes.addFlashAttribute("message",
-                    "您无此目录的上传权限： " + quickDocFolder.getPath() + "，请联系管理员获取！");
+                    "您无此目录的上传权限： " + sysFolder.getName() + "，请联系管理员获取！");
         }
         return "redirect:/#files/folder@" + folderId;
     }
@@ -337,9 +334,9 @@ public class FilesController {
                              @RequestParam("fileId") ObjectId fileId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
-        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         WebFile file = fileService.getStoredFile(fileId);
-        if (checkAuthentication(file.getOpenAccess(), file.getAuthorizations(), activeUser, DELETE_PRIVILEGE)) {
+        if (checkAuthentication(file.getAuthorizations(), activeUser, DELETE_PRIVILEGE)) {
             fileService.delete(fileId);
             redirectAttributes.addFlashAttribute("message",
                     "成功删除文件： " + file.getFilename());

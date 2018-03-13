@@ -54,7 +54,7 @@ public class QuickDocTaskExecutorTestConfig {
                                 file -> {
                                     try {
                                         String fileType = FileUtils.guessMimeType(file.getName());
-                                       /* FileMetadata metadata = new FileMetadata("音乐",
+                                       /* Metadata metadata = new Metadata("音乐",
                                                 new ObjectId("5a6966f7ae3e442518745836"),
                                                 false,
                                                 getRandomOwners(), null);

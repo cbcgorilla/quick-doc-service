@@ -1,12 +1,10 @@
 package cn.mxleader.quickdoc.config;
 
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
-import cn.mxleader.quickdoc.entities.QuickDocHealth;
-import cn.mxleader.quickdoc.entities.QuickDocUser;
-import cn.mxleader.quickdoc.service.ConfigService;
-import cn.mxleader.quickdoc.service.ReactiveFolderService;
-import cn.mxleader.quickdoc.service.StreamService;
-import cn.mxleader.quickdoc.service.UserService;
+import cn.mxleader.quickdoc.entities.Metadata;
+import cn.mxleader.quickdoc.entities.SysProfile;
+import cn.mxleader.quickdoc.entities.SysUser;
+import cn.mxleader.quickdoc.service.*;
 import cn.mxleader.quickdoc.service.impl.DefaultStreamServiceImpl;
 import cn.mxleader.quickdoc.service.impl.KafkaStreamServiceImpl;
 import org.bson.types.ObjectId;
@@ -24,6 +22,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 
 import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.SYSTEM_ADMIN_GROUP_OWNER;
+import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.translateShareSetting;
 
 @SpringBootConfiguration
 @ConditionalOnClass(StreamService.class)
@@ -70,41 +69,45 @@ public class QuickDocConfiguration {
 
     @Bean
     CommandLineRunner initConfigurationData(UserService userService,
+                                            FileService fileService,
                                             ReactiveFolderService reactiveFolderService,
                                             ConfigService configService) {
         return args -> {
-            QuickDocHealth quickDocHealth = configService.getQuickDocHealth();
-            if (quickDocHealth == null) {
-                quickDocHealth = new QuickDocHealth(ObjectId.get(), serviceAddress(),
+            SysProfile sysProfile = configService.getSysProfile();
+            if (sysProfile == null) {
+                sysProfile = new SysProfile(ObjectId.get(), serviceAddress(),
                         false, new Date(), null);
             }
-            if (!quickDocHealth.getInitialized()) {
+            if (!sysProfile.getInitialized()) {
+
+                Metadata metadata = new Metadata("image/jpeg", ObjectId.get(),
+                        new AccessAuthorization[]{new AccessAuthorization("users",
+                                AccessAuthorization.Type.TYPE_GROUP,1)}, null);
+
+                //ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
                 // 初始化Admin管理账号
                 userService
-                        .saveUser(new QuickDocUser(ObjectId.get(), "admin","系统管理员",
+                        .saveUser(new SysUser(ObjectId.get(), "admin", "系统管理员",
                                 "chenbichao",
-                                new ObjectId("5aa164321652280f5854c9d9"),
-                                new QuickDocUser.Authorities[]{QuickDocUser.Authorities.ADMIN},
-                                new String[]{"administrators"},
+                                new ObjectId("5aa7a78b16422c2e3c19e3b9"),
+                                new SysUser.Authorities[]{SysUser.Authorities.ADMIN},
+                                new String[]{"administrators","users"},
                                 "chenbichao@mxleader.cn"));
 
                 // 初始化系统目录
                 AccessAuthorization[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
                 AccessAuthorization[] rootOwners = {SYSTEM_ADMIN_GROUP_OWNER};
 
-                reactiveFolderService.save("config", quickDocHealth.getId(),
-                        false, configOwners).subscribe();
+                reactiveFolderService.save("config", sysProfile.getId(), configOwners).subscribe();
 
-                reactiveFolderService.save("root", quickDocHealth.getId(),
-                        true, rootOwners).subscribe();
-                reactiveFolderService.save("api", quickDocHealth.getId(),
-                        true, rootOwners).subscribe();
+                reactiveFolderService.save("root", sysProfile.getId(), rootOwners).subscribe();
+                reactiveFolderService.save("api", sysProfile.getId(), rootOwners).subscribe();
 
                 // 初始化成功标记
-                quickDocHealth.setInitialized(true);
+                sysProfile.setInitialized(true);
             }
-            quickDocHealth.setStartup(new Date());
-            configService.saveQuickDocHealth(quickDocHealth);
+            sysProfile.setStartup(new Date());
+            configService.saveSysProfile(sysProfile);
         };
     }
 

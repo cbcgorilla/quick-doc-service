@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.web;
 
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +32,10 @@ public class UserController {
      * @return
      */
     @ModelAttribute("userAuthorityMap")
-    public Map<QuickDocUser.Authorities, String> getUserAuthorityMap() {
-        Map<QuickDocUser.Authorities, String> userAuthorityMap = new HashMap<>();
-        userAuthorityMap.put(QuickDocUser.Authorities.USER, "普通用户");
-        userAuthorityMap.put(QuickDocUser.Authorities.ADMIN, "系统管理员");
+    public Map<SysUser.Authorities, String> getUserAuthorityMap() {
+        Map<SysUser.Authorities, String> userAuthorityMap = new HashMap<>();
+        userAuthorityMap.put(SysUser.Authorities.USER, "普通用户");
+        userAuthorityMap.put(SysUser.Authorities.ADMIN, "系统管理员");
         return userAuthorityMap;
     }
 
@@ -57,17 +57,17 @@ public class UserController {
                        @RequestParam("email") String email,
                        @RequestParam("password") String password,
                        @RequestParam("userGroup") String userGroup,
-                       @RequestParam("userType") QuickDocUser.Authorities userType,
+                       @RequestParam("userType") SysUser.Authorities userType,
                        RedirectAttributes redirectAttributes,
                        Model model,
                        HttpSession session) {
-        QuickDocUser.Authorities[] authorities = new QuickDocUser.Authorities[]{userType};
-        QuickDocUser quickDocUser = new QuickDocUser(ObjectId.get(), username, title, password,
+        SysUser.Authorities[] authorities = new SysUser.Authorities[]{userType};
+        SysUser sysUser = new SysUser(ObjectId.get(), username, title, password,
                 new ObjectId("5aa21a7f16422c306c01796f"),
                 authorities, new String[]{userGroup},
                 email);
         if (userService.findUser(username) == null) {
-            userService.saveUser(quickDocUser);
+            userService.saveUser(sysUser);
 
             redirectAttributes.addFlashAttribute("message",
                     "保存用户信息成功： " + username);
@@ -87,7 +87,7 @@ public class UserController {
     public String delete(@RequestParam("userId") ObjectId userId,
                          HttpSession session,
                          RedirectAttributes redirectAttributes) {
-        QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         if (activeUser.isAdmin()) {
             userService.deleteUserById(userId);
             redirectAttributes.addFlashAttribute("message",

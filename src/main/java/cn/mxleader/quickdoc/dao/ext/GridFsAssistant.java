@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.dao.ext;
 
-import cn.mxleader.quickdoc.entities.FileMetadata;
+import cn.mxleader.quickdoc.entities.Metadata;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -198,7 +198,7 @@ public class GridFsAssistant implements GridFsOperations, ResourcePatternResolve
         }
     }
 
-    public GridFSFile updateMetadata(ObjectId fileId, FileMetadata metadata) {
+    public GridFSFile updateMetadata(ObjectId fileId, Metadata metadata) {
         Document document = null;
 
         if (metadata != null) {

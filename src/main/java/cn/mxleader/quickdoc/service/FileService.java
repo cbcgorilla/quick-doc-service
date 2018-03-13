@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.service;
 
-import cn.mxleader.quickdoc.entities.FileMetadata;
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.Metadata;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -32,11 +32,11 @@ public interface FileService {
 
     ObjectId store(InputStream file, String filename, String contentType);
 
-    ObjectId store(InputStream file, String filename, FileMetadata metadata);
+    ObjectId store(InputStream file, String filename, Metadata metadata);
 
     void rename(ObjectId fileId, String newFilename);
 
-    GridFSFile saveMetadata(ObjectId fileId, FileMetadata fileMetadata);
+    GridFSFile saveMetadata(ObjectId fileId, Metadata metadata);
 
     /**
      * 删除Mongo库内文件
@@ -62,6 +62,6 @@ public interface FileService {
      * @param fos        生成的zip文件存在路径（包括文件名）
      * @param activeUser 用户信息
      */
-    void createZip(ObjectId folderId, OutputStream fos, QuickDocUser activeUser) throws IOException;
+    void createZip(ObjectId folderId, OutputStream fos, SysUser activeUser) throws IOException;
 
 }

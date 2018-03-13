@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.security.handler;
 
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.UserService;
 import cn.mxleader.quickdoc.service.StreamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class WebAuthenticationSuccessHandler implements
         final HttpSession session = request.getSession(false);
         if (session != null) {
             session.setMaxInactiveInterval(30 * 60);
-            QuickDocUser user = userService.findUser(authentication.getName());
+            SysUser user = userService.findUser(authentication.getName());
             session.setAttribute(SESSION_USER, user);
             // 发送用户登录消息到平台MQ
             Date d = new Date();
@@ -68,11 +68,11 @@ public class WebAuthenticationSuccessHandler implements
         Collection<? extends GrantedAuthority> authorities = authentication
                 .getAuthorities();
         for (GrantedAuthority grantedAuthority : authorities) {
-            if (grantedAuthority.getAuthority().equals(QuickDocUser.Authorities.ADMIN.name())) {
+            if (grantedAuthority.getAuthority().equals(SysUser.Authorities.ADMIN.name())) {
                 isAdmin = true;
                 break;
             }
-            if (grantedAuthority.getAuthority().equals(QuickDocUser.Authorities.USER.name())) {
+            if (grantedAuthority.getAuthority().equals(SysUser.Authorities.USER.name())) {
                 isUser = true;
                 break;
             }

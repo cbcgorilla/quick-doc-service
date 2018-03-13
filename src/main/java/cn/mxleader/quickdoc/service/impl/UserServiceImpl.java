@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.dao.UserRepository;
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.common.utils.PasswordUtil;
 import cn.mxleader.quickdoc.service.UserService;
 import org.bson.types.ObjectId;
@@ -18,16 +18,16 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
-    public QuickDocUser saveUser(QuickDocUser quickDocUser) {
-        quickDocUser.setPassword(PasswordUtil.getEncryptedPwd(quickDocUser.getPassword()));
-        return userRepository.save(quickDocUser);
+    public SysUser saveUser(SysUser sysUser) {
+        sysUser.setPassword(PasswordUtil.getEncryptedPwd(sysUser.getPassword()));
+        return userRepository.save(sysUser);
     }
 
-    public List<QuickDocUser> findAllUsers() {
+    public List<SysUser> findAllUsers() {
         return userRepository.findAll();
     }
 
-    public QuickDocUser findUser(String username) {
+    public SysUser findUser(String username) {
         return userRepository.findByUsername(username);
     }
 
@@ -39,11 +39,11 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     public Boolean validateUser(String username, String password) {
-        QuickDocUser quickDocUser = findUser(username);
-        if (quickDocUser == null) {
+        SysUser sysUser = findUser(username);
+        if (sysUser == null) {
             return false;
         } else {
-            return PasswordUtil.validPassword(password, quickDocUser.getPassword());
+            return PasswordUtil.validPassword(password, sysUser.getPassword());
         }
     }
 

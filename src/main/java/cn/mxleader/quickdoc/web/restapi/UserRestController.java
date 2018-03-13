@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.web.restapi;
 
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.web.domain.RestResponse;
 import cn.mxleader.quickdoc.web.domain.SuccessResponse;
 import cn.mxleader.quickdoc.service.UserService;
@@ -40,7 +40,7 @@ public class UserRestController {
 
     @RequestMapping(value = "/get/{username}", method = RequestMethod.GET)
     @ApiOperation(value = "根据用户名返回用户信息详情")
-    public QuickDocUser getUser(@PathVariable("username") String username) {
+    public SysUser getUser(@PathVariable("username") String username) {
         return reactiveUserService.findUser(username);
     }
 
@@ -48,8 +48,8 @@ public class UserRestController {
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "新增或保存系统用户")
     public RestResponse addUser(
-            @RequestBody QuickDocUser quickDocUser) {
-        return new SuccessResponse<>(reactiveUserService.saveUser(quickDocUser));
+            @RequestBody SysUser sysUser) {
+        return new SuccessResponse<>(reactiveUserService.saveUser(sysUser));
     }
 
     @PostMapping(value = "/delete")

@@ -2,9 +2,9 @@ package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.dao.ext.GridFsAssistant;
-import cn.mxleader.quickdoc.entities.FileMetadata;
-import cn.mxleader.quickdoc.entities.QuickDocFolder;
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.Metadata;
+import cn.mxleader.quickdoc.entities.SysFolder;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
@@ -108,7 +108,7 @@ public class FileServiceImpl implements FileService {
 
     public ObjectId store(InputStream file,
                           String filename,
-                          FileMetadata metadata) {
+                          Metadata metadata) {
         return gridFsAssistant.store(file, filename, metadata);
     }
 
@@ -116,8 +116,8 @@ public class FileServiceImpl implements FileService {
         gridFsAssistant.rename(fileId, newFilename);
     }
 
-    public GridFSFile saveMetadata(ObjectId fileId, FileMetadata fileMetadata) {
-        return gridFsAssistant.updateMetadata(fileId, fileMetadata);
+    public GridFSFile saveMetadata(ObjectId fileId, Metadata metadata) {
+        return gridFsAssistant.updateMetadata(fileId, metadata);
     }
 
     /**
@@ -155,11 +155,11 @@ public class FileServiceImpl implements FileService {
      */
     public void createZip(ObjectId folderId,
                           OutputStream fos,
-                          QuickDocUser activeUser) throws IOException {
+                          SysUser activeUser) throws IOException {
         ZipOutputStream zos = new ZipOutputStream(fos);
-        QuickDocFolder folder = mongoTemplate.findById(folderId, QuickDocFolder.class);
+        SysFolder folder = mongoTemplate.findById(folderId, SysFolder.class);
         if (folder != null) {
-            compressFolder(folder, zos, folder.getPath(), activeUser);
+            compressFolder(folder, zos, folder.getName(), activeUser);
         } else {
             throw new FileNotFoundException("文件夹ID：" + folderId);
         }
@@ -174,31 +174,29 @@ public class FileServiceImpl implements FileService {
      * @param basedir    当前目录
      * @param activeUser 当前操作用户信息（用于判断是否有操作权限）
      */
-    private void compressFolder(QuickDocFolder folder,
+    private void compressFolder(SysFolder folder,
                                 ZipOutputStream out,
                                 String basedir,
-                                QuickDocUser activeUser) {
+                                SysUser activeUser) {
         // 递归压缩目录
-        List<QuickDocFolder> folders = mongoTemplate.find(
+        List<SysFolder> folders = mongoTemplate.find(
                 Query.query(Criteria.where("parentId").is(folder.getId())),
-                QuickDocFolder.class).stream()
-                .filter(quickDocFolder -> checkAuthentication(quickDocFolder.getOpenAccess(),
-                        quickDocFolder.getAuthorizations(),
+                SysFolder.class).stream()
+                .filter(quickDocFolder -> checkAuthentication(quickDocFolder.getAuthorizations(),
                         activeUser, READ_PRIVILEGE))
                 .collect(Collectors.toList());
         if (folders != null && folders.size() > 0) {
-            for (QuickDocFolder subFolder : folders) {
-                compressFolder(subFolder, out, basedir + "/" + subFolder.getPath(),
+            for (SysFolder subFolder : folders) {
+                compressFolder(subFolder, out, basedir + "/" + subFolder.getName(),
                         activeUser);
             }
         }
         // 压缩目录内的文件
         switchWebFiles(getStoredFiles(folder.getId()))
                 .forEach(file -> {
-                    if (checkAuthentication(file.getOpenAccess(),
-                            file.getAuthorizations(),
+                    if (checkAuthentication(file.getAuthorizations(),
                             activeUser, READ_PRIVILEGE)) {
-                        compressFile(getResource(file.getId()), out, basedir);
+                        compressFile(getResource(new ObjectId(file.getId())), out, basedir);
                     }
                 });
 
@@ -237,14 +235,13 @@ public class FileServiceImpl implements FileService {
      */
     private WebFile switchWebFile(GridFSFile gridFSFile) {
         if (gridFSFile == null) return null;
-        FileMetadata metadata = converter.read(FileMetadata.class, gridFSFile.getMetadata());
-        return new WebFile(gridFSFile.getObjectId(),
+        Metadata metadata = converter.read(Metadata.class, gridFSFile.getMetadata());
+        return new WebFile(gridFSFile.getObjectId().toString(),
                 gridFSFile.getFilename(),
                 gridFSFile.getLength(),
                 gridFSFile.getUploadDate(),
                 metadata.get_contentType(),
-                metadata.getFolderId(),
-                metadata.getOpenAccess(),
+                metadata.getFolderId().toString(),
                 metadata.getAuthorizations(),
                 metadata.getLabels(),
                 FileUtils.getLinkPrefix(metadata.get_contentType()),

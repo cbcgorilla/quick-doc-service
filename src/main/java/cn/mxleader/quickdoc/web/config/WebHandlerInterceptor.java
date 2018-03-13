@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.web.config;
 
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
-import cn.mxleader.quickdoc.entities.QuickDocUser;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import cn.mxleader.quickdoc.web.domain.WebFolder;
 import org.springframework.ui.ModelMap;
@@ -82,7 +82,7 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute(SESSION_USER) != null &&
                 modelAndView != null) {
-            QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
+            SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
             ModelMap model = modelAndView.getModelMap();
 
             // 目录按授权信息进行显示
@@ -90,15 +90,12 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
                 List<WebFolder> folders = (List<WebFolder>) model.get(FOLDERS_ATTRIBUTE);
                 model.remove(FOLDERS_ATTRIBUTE);
                 model.addAttribute(FOLDERS_ATTRIBUTE,
-                        folders.stream().filter(webFolder -> checkAuthentication(webFolder.getOpenAccess(),
-                                webFolder.getAuthorizations(),
+                        folders.stream().filter(webFolder -> checkAuthentication(webFolder.getAuthorizations(),
                                 activeUser, READ_PRIVILEGE))
                                 .map(webFolder -> {
-                                    webFolder.setEditAuthorization(checkAuthentication(webFolder.getOpenAccess(),
-                                            webFolder.getAuthorizations(),
+                                    webFolder.setEditAuthorization(checkAuthentication(webFolder.getAuthorizations(),
                                             activeUser, WRITE_PRIVILEGE));
-                                    webFolder.setDeleteAuthorization(checkAuthentication(webFolder.getOpenAccess(),
-                                            webFolder.getAuthorizations(),
+                                    webFolder.setDeleteAuthorization(checkAuthentication(webFolder.getAuthorizations(),
                                             activeUser, DELETE_PRIVILEGE));
                                     return webFolder;
                                 })
@@ -110,15 +107,12 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
                 List<WebFile> files = (List<WebFile>) model.get(FILES_ATTRIBUTE);
                 model.remove(FILES_ATTRIBUTE);
                 model.addAttribute(FILES_ATTRIBUTE,
-                        files.stream().filter(file -> checkAuthentication(file.getOpenAccess(),
-                                file.getAuthorizations(),
+                        files.stream().filter(file -> checkAuthentication(file.getAuthorizations(),
                                 activeUser, READ_PRIVILEGE))
                                 .map(file -> {
-                                    file.setEditAuthorization(checkAuthentication(file.getOpenAccess(),
-                                            file.getAuthorizations(),
+                                    file.setEditAuthorization(checkAuthentication(file.getAuthorizations(),
                                             activeUser, WRITE_PRIVILEGE));
-                                    file.setDeleteAuthorization(checkAuthentication(file.getOpenAccess(),
-                                            file.getAuthorizations(),
+                                    file.setDeleteAuthorization(checkAuthentication(file.getAuthorizations(),
                                             activeUser, DELETE_PRIVILEGE));
                                     return file;
                                 })

@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.web.restapi;
 
 import cn.mxleader.quickdoc.web.domain.ErrorResponse;
-import cn.mxleader.quickdoc.entities.QuickDocFolder;
+import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.web.domain.RestResponse;
 import cn.mxleader.quickdoc.web.domain.SuccessResponse;
 import cn.mxleader.quickdoc.service.ConfigService;
@@ -38,7 +38,7 @@ public class FolderRestController {
     @ApiOperation(value = "获取根目录列表")
     public Flux<WebFolder> list() {
         return reactiveFolderService.findAllByParentIdInWebFormat(
-                configService.getQuickDocHealth().getId());
+                configService.getSysProfile().getId());
     }
 
     @GetMapping("/list/{parentId}")
@@ -50,7 +50,7 @@ public class FolderRestController {
     @PostMapping(value = "/save",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "保存目录信息")
-    public Mono<RestResponse> save(@RequestBody QuickDocFolder folder) {
+    public Mono<RestResponse> save(@RequestBody SysFolder folder) {
         return reactiveFolderService.save(folder)
                 .map(SuccessResponse::new);
     }
@@ -60,7 +60,7 @@ public class FolderRestController {
     @ApiOperation(value = "更改目录名称")
     public Mono<RestResponse> rename(@PathVariable("folderId") ObjectId folderId,
                                      @RequestBody String newPath) {
-        Optional<QuickDocFolder> folderOptional = reactiveFolderService.findById(folderId).blockOptional();
+        Optional<SysFolder> folderOptional = reactiveFolderService.findById(folderId).blockOptional();
         if (folderOptional.isPresent()) {
             return reactiveFolderService.rename(folderOptional.get(), newPath)
                     .map(folder -> new SuccessResponse<>("目录改名成功！"));
@@ -75,7 +75,7 @@ public class FolderRestController {
     public Mono<RestResponse> move
             (@PathVariable("folderId") ObjectId folderId,
              @RequestBody String newFolderId) {
-        Optional<QuickDocFolder> folderOptional = reactiveFolderService.findById(folderId).blockOptional();
+        Optional<SysFolder> folderOptional = reactiveFolderService.findById(folderId).blockOptional();
         if (folderOptional.isPresent()) {
             return reactiveFolderService.move(folderId, new ObjectId(newFolderId))
                     .map(folder -> new SuccessResponse<>("目录转移成功！"));
