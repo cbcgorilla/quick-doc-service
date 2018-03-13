@@ -39,10 +39,10 @@
         <li class="nav-item px-3">
             <a class="nav-link" href="files">共享文件</a>
         </li>
-        <li class="nav-item px-3">
+        <li class="nav-item px-3" th:if="${session.ActiveUser.isAdmin()}">
             <a class="nav-link" href="folders">目录管理</a>
         </li>
-        <li class="nav-item px-3">
+        <li class="nav-item px-3" th:if="${session.ActiveUser.isAdmin()}">
             <a class="nav-link" href="users">系统用户</a>
         </li>
     </ul>
@@ -84,10 +84,10 @@
                 <li class="nav-item">
                     <a class="nav-link" href="files"><i class="fas fa-file"></i>共享文件</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">
                     <a class="nav-link" href="folders"><i class="fas fa-folder"></i>目录管理</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">
                     <a class="nav-link" href="users"><i class="fas fa-users"></i>系统用户</a>
                 </li>
                 <li class="nav-title">

@@ -61,12 +61,9 @@ Lombok 在 Java 9 环境导致编译异常
 
 ## 界面截图
 ![用户管理界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/image_src/user-management-ui.png)
-![文件访问界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page1.png)
 
-![文件夹配置界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page2.png)
+![文件访问界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/image_src/file-management-ui.png)
 
-![系统用户配置界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page3.png)
+![文件夹配置界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/image_src/folder-management-ui.png)
 
-![TensorFlow识别图像标签界面](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/page-tensorflow.png)
-
-![REST API接口](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/src/main/resources/static/images/restapi.png)
+![REST API接口](https://raw.githubusercontent.com/cbcgorilla/quick-doc-service/master/image_src/restapi.png)
