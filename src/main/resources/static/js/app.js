@@ -8,7 +8,7 @@ $.ajaxLoad = true;
 //required when $.ajaxLoad = true
 $.defaultPage = 'files';
 $.subPagesDirectory = '/';
-$.page404 = 'views/pages/404.html';
+$.page404 = '404';
 $.mainContent = $('#ui-view');
 
 //Main navigation

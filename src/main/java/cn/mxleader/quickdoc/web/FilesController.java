@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -288,6 +289,9 @@ public class FilesController {
         QuickDocUser activeUser = (QuickDocUser) session.getAttribute(SESSION_USER);
         String filename = FileUtils.getFilename(file.getOriginalFilename());
         String fileType = FileUtils.guessMimeType(filename);
+/*
+        MimetypesFileTypeMap m = new MimetypesFileTypeMap();
+        String fileType = m.getContentType(filename);*/
 
         QuickDocFolder quickDocFolder = reactiveFolderService.findById(folderId).block();
         if (fileService.getStoredFile(filename, folderId) != null) {
