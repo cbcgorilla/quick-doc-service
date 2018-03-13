@@ -16,7 +16,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -80,19 +83,21 @@ public class QuickDocConfiguration {
             }
             if (!sysProfile.getInitialized()) {
 
-                Metadata metadata = new Metadata("image/jpeg", ObjectId.get(),
+                Metadata metadata = new Metadata("image/png", ObjectId.get(),
                         new AccessAuthorization[]{new AccessAuthorization("users",
-                                AccessAuthorization.Type.TYPE_GROUP,1)}, null);
-
-                //ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
+                                AccessAuthorization.Type.TYPE_GROUP, 1)}, null);
+                //获取跟目录
+                File file = new File(ResourceUtils.getURL(
+                        "classpath:/static/images/favicon.png").getPath());
+                if (!file.exists()) file = new File("");
+                System.out.println("path:" + file.getAbsolutePath());
+                ObjectId fileId = fileService.store(new FileInputStream(file), file.getName(), metadata);
                 // 初始化Admin管理账号
-                userService
-                        .saveUser(new SysUser(ObjectId.get(), "admin", "系统管理员",
-                                "chenbichao",
-                                new ObjectId("5aa7a78b16422c2e3c19e3b9"),
-                                new SysUser.Authorities[]{SysUser.Authorities.ADMIN},
-                                new String[]{"administrators","users"},
-                                "chenbichao@mxleader.cn"));
+                userService.saveUser(new SysUser(ObjectId.get(), "admin",
+                        "系统管理员", "chenbichao", fileId,
+                        new SysUser.Authorities[]{SysUser.Authorities.ADMIN},
+                        new String[]{"administrators", "users"},
+                        "chenbichao@mxleader.cn"));
 
                 // 初始化系统目录
                 AccessAuthorization[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
