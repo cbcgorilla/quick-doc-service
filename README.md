@@ -17,25 +17,24 @@
 
 **系统启动即可使用，无需数据初始化脚本，默认用户名/密码：_admin/chenbichao_**
 
-架构组成： 
-
-存储（MongoDB 3.6.2）
-
-服务端：Spring Framework 5.0.4.RELEASE
-
-Spring Boot 2.0 Actuator 提供MongoDB状态及系统配置信息监控点
-
-Spring Security 5.0.2.RELEASE
-
-Kotlin 1.2 实现实体映射Bean
-
-Kafka消息中间件，同步登录信息及文件上传下载记录
-
-Web层： BootStrap 4.0， + font-awesome.css 5.0 + Thymeleaf
-
-Springfox Swagger 2.8.0 实现REST API文档化交付界面
-
-TensorFlow for Java 1.5.0 分析上传的图片文件，自动添加识别内容的标签 **`(因资源开销较大，剥离为单独的工程)`**
+# 架构组成： 
+| **系统组件** |  **开源产品**| 
+| ------   |:------:|
+| 数据存储 | MongoDB 3.6.2  |
+| 容器框架 | Spring Framework 5.0.4.RELEASE  |
+| 系统框架 | Spring Boot 2.0.0.RELEASE |
+| 状态监控 | Spring Actuator  |
+| 安全框架 | Spring Security 5.0.3.RELEASE  |
+| 实体Bean映射 | Kotlin 1.2  |
+| 页面模板 | Thymeleaf  |
+| WEB UI | Bootstrap 4.0  |
+| WEB UI | Core UI  | 
+| WEB UI | font-awesome 5.0.6  |
+| WEB UI | LayUI  |
+| 消息流 |  Kafka | 
+| REST API |  Springfox Swagger 2.8.0 | 
+| REST API |  swagger-bootstrap-ui 1.7.2 | 
+| 系统构建 |  Gradle 4.6  |
 
 ## 待办：
 
