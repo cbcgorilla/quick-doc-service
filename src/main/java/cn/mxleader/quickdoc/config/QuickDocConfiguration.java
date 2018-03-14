@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashMap;
 
 import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.SYSTEM_ADMIN_GROUP_OWNER;
 import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.translateShareSetting;
@@ -78,23 +79,22 @@ public class QuickDocConfiguration {
         return args -> {
             SysProfile sysProfile = configService.getSysProfile();
             if (sysProfile == null) {
-                sysProfile = new SysProfile(ObjectId.get(), serviceAddress(),
+                sysProfile = new SysProfile(ObjectId.get(), serviceAddress(), new HashMap<>(),
                         false, new Date(), null);
             }
             if (!sysProfile.getInitialized()) {
 
-                Metadata metadata = new Metadata("image/png", ObjectId.get(),
-                        new AccessAuthorization[]{new AccessAuthorization("users",
-                                AccessAuthorization.Type.TYPE_GROUP, 1)}, null);
-                //获取跟目录
-                File file = new File(ResourceUtils.getURL(
-                        "classpath:/static/images/favicon.png").getPath());
-                if (!file.exists()) file = new File("");
-                System.out.println("path:" + file.getAbsolutePath());
-                ObjectId fileId = fileService.store(new FileInputStream(file), file.getName(), metadata);
+                // 初始化默认图标文件
+                sysProfile.getIconMap().put("SYS_LOGO", fileService.
+                        storeServerFile("classpath:static/images/favicon.png"));
+
+                sysProfile.getIconMap().put("AWARD", fileService.
+                        storeServerFile("classpath:static/images/Goldbull.jpg"));
+
                 // 初始化Admin管理账号
                 userService.saveUser(new SysUser(ObjectId.get(), "admin",
-                        "系统管理员", "chenbichao", fileId,
+                        "系统管理员", "chenbichao",
+                        sysProfile.getIconMap().get("AWARD"),
                         new SysUser.Authorities[]{SysUser.Authorities.ADMIN},
                         new String[]{"administrators", "users"},
                         "chenbichao@mxleader.cn"));

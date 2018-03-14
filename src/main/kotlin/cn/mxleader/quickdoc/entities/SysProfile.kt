@@ -8,6 +8,7 @@ import java.util.*
 @Document
 data class SysProfile(@Id val id: ObjectId,
                       var serviceAddress: String,
+                      var iconMap: Map<String, ObjectId>,
                       var initialized: Boolean,
                       var setupTime: Date,
                       var startup: Date? = null)

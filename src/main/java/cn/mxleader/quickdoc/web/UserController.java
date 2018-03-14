@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.entities.SysUser;
+import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,12 @@ import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 public class UserController {
 
     private final UserService userService;
+    private final ConfigService configService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ConfigService configService) {
         this.userService = userService;
+        this.configService = configService;
     }
 
     /**
@@ -63,7 +66,7 @@ public class UserController {
                        HttpSession session) {
         SysUser.Authorities[] authorities = new SysUser.Authorities[]{userType};
         SysUser sysUser = new SysUser(ObjectId.get(), username, title, password,
-                new ObjectId("5aa21a7f16422c306c01796f"),
+                configService.getSysProfile().getIconMap().get("SYS_LOGO"),
                 authorities, new String[]{userGroup},
                 email);
         if (userService.findUser(username) == null) {

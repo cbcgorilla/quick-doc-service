@@ -8,9 +8,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.stream.Stream;
 
 public interface FileService {
@@ -34,6 +32,8 @@ public interface FileService {
 
     ObjectId store(InputStream file, String filename, Metadata metadata);
 
+    ObjectId storeServerFile(String resourceLocation) throws FileNotFoundException;
+
     void rename(ObjectId fileId, String newFilename);
 
     GridFSFile saveMetadata(ObjectId fileId, Metadata metadata);
@@ -53,6 +53,7 @@ public interface FileService {
      * @return
      */
     GridFsResource getResource(ObjectId fileId);
+
     GridFSDownloadStream getFSDownloadStream(ObjectId fileId);
 
     /**

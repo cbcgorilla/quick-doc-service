@@ -2,6 +2,7 @@ package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.dao.ext.GridFsAssistant;
+import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.entities.Metadata;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.entities.SysUser;
@@ -18,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsCriteria;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import java.io.*;
 import java.util.List;
@@ -111,6 +113,17 @@ public class FileServiceImpl implements FileService {
                           Metadata metadata) {
         return gridFsAssistant.store(file, filename, metadata);
     }
+
+
+    public ObjectId storeServerFile(String resourceLocation) throws FileNotFoundException {
+        File file = ResourceUtils.getFile(resourceLocation);
+        String fileType = FileUtils.guessMimeType(file.getName());
+        Metadata metadata = new Metadata(fileType, ObjectId.get(),
+                new AccessAuthorization[]{new AccessAuthorization("users",
+                        AccessAuthorization.Type.TYPE_GROUP, READ_PRIVILEGE)}, null);
+        return gridFsAssistant.store(new FileInputStream(file), file.getName(), metadata);
+    }
+
 
     public void rename(ObjectId fileId, String newFilename) {
         gridFsAssistant.rename(fileId, newFilename);
