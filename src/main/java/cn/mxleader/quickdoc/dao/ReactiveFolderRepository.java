@@ -12,4 +12,5 @@ public interface ReactiveFolderRepository extends ReactiveMongoRepository<SysFol
     Mono<SysFolder> findByPathAndParentId(String path, ObjectId parentId);
 
     Flux<SysFolder> findAllByParentId(ObjectId parentId);
+    Flux<SysFolder> findAllByParentIdIsNull();
 }

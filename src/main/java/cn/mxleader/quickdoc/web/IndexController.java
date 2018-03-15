@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/sss")
 public class IndexController {
 
     public static final String FOLDERS_MENU = "foldersMenu";
@@ -36,7 +36,6 @@ public class IndexController {
     public String index(Model model, HttpSession session) {
         ObjectId rootParentId = configService.getSysProfile().getId();
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        model.addAttribute("isAdmin", activeUser.isAdmin());
         if (activeUser.isAdmin()) {
             model.addAttribute(FOLDERS_MENU,
                     reactiveFolderService.findAllByParentIdInWebFormat(rootParentId)

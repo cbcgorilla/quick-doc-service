@@ -42,17 +42,14 @@ public class FilesController {
 
     private final ReactiveFolderService reactiveFolderService;
     private final FileService fileService;
-    private final ConfigService configService;
     private final StreamService streamService;
 
     @Autowired
     public FilesController(ReactiveFolderService reactiveFolderService,
                            FileService fileService,
-                           ConfigService configService,
                            StreamService streamService) {
         this.reactiveFolderService = reactiveFolderService;
         this.fileService = fileService;
-        this.configService = configService;
         this.streamService = streamService;
     }
 
@@ -64,13 +61,11 @@ public class FilesController {
      */
     @GetMapping()
     public String index(Model model, HttpSession session) {
-        ObjectId rootParentId = configService.getSysProfile().getId();
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        model.addAttribute("isAdmin", activeUser.isAdmin());
         if (activeUser.isAdmin()) {
-            refreshDirList(model, rootParentId);
+            refreshDirList(model, null);
         } else {
-            List<WebFolder> webFolders = reactiveFolderService.findAllByParentIdInWebFormat(rootParentId)
+            List<WebFolder> webFolders = reactiveFolderService.findAllByParentIdInWebFormat(null)
                     .filter(webFolder -> webFolder.getName().equalsIgnoreCase("root"))
                     .toStream()
                     .collect(Collectors.toList());
@@ -97,7 +92,6 @@ public class FilesController {
         model.addAttribute("currentFolder", sysFolder);
         refreshDirList(model, folderId);
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        model.addAttribute("isAdmin", activeUser.isAdmin());
 
         return "files";
     }
@@ -119,8 +113,6 @@ public class FilesController {
     @RequestMapping("/search")
     public String searchFiles(@RequestParam("filename") String filename,
                               Model model, HttpSession session) {
-        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        model.addAttribute("isAdmin", activeUser.isAdmin());
         model.addAttribute(FILES_ATTRIBUTE, fileService.searchFilesContaining(filename)
                 .collect(Collectors.toList()));
         return "search";

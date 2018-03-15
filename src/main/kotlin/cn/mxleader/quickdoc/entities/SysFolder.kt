@@ -8,7 +8,7 @@ import java.util.*
 @Document
 data class SysFolder(@Id var id: ObjectId,
                      var name: String,
-                     var parentId: ObjectId,
+                     var parents: List<ObjectId>,
                      var authorizations: Array<AccessAuthorization>? = null) {
 
 }

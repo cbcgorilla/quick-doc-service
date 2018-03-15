@@ -103,10 +103,8 @@ public class QuickDocConfiguration {
                 AccessAuthorization[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
                 AccessAuthorization[] rootOwners = {SYSTEM_ADMIN_GROUP_OWNER};
 
-                reactiveFolderService.save("config", sysProfile.getId(), configOwners).subscribe();
-
-                reactiveFolderService.save("root", sysProfile.getId(), rootOwners).subscribe();
-                reactiveFolderService.save("api", sysProfile.getId(), rootOwners).subscribe();
+                reactiveFolderService.save("root", null, rootOwners).subscribe();
+                reactiveFolderService.save("api", null, rootOwners).subscribe();
 
                 // 初始化成功标记
                 sysProfile.setInitialized(true);

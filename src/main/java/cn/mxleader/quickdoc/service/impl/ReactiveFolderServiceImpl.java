@@ -143,7 +143,8 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
     }
 
     public Flux<SysFolder> findAllByParentId(ObjectId parentId) {
-        return reactiveFolderRepository.findAllByParentId(parentId);
+        return parentId == null ? reactiveFolderRepository.findAllByParentIdIsNull() :
+                reactiveFolderRepository.findAllByParentId(parentId);
     }
 
     public Flux<WebFolder> findAllInWebFormat() {
