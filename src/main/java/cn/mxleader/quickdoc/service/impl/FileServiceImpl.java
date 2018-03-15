@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsCriteria;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
@@ -102,12 +103,16 @@ public class FileServiceImpl implements FileService {
      * @param contentType 文件类型
      * @return
      */
+    @Override
+    @Async
     public ObjectId store(InputStream file,
                           String filename,
                           String contentType) {
         return gridFsAssistant.store(file, filename, contentType);
     }
 
+    @Override
+    @Async
     public ObjectId store(InputStream file,
                           String filename,
                           Metadata metadata) {
@@ -115,10 +120,12 @@ public class FileServiceImpl implements FileService {
     }
 
 
+    @Override
+    @Async
     public ObjectId storeServerFile(String resourceLocation) throws FileNotFoundException {
         File file = ResourceUtils.getFile(resourceLocation);
         String fileType = FileUtils.guessMimeType(file.getName());
-        Metadata metadata = new Metadata(fileType, ObjectId.get(),
+        Metadata metadata = new Metadata(fileType, null,
                 new AccessAuthorization[]{new AccessAuthorization("users",
                         AccessAuthorization.Type.TYPE_GROUP, READ_PRIVILEGE)}, null);
         return gridFsAssistant.store(new FileInputStream(file), file.getName(), metadata);
@@ -254,7 +261,7 @@ public class FileServiceImpl implements FileService {
                 gridFSFile.getLength(),
                 gridFSFile.getUploadDate(),
                 metadata.get_contentType(),
-                metadata.getFolderId().toString(),
+                "",//metadata.getFolderId().toString(),
                 metadata.getAuthorizations(),
                 metadata.getLabels(),
                 FileUtils.getLinkPrefix(metadata.get_contentType()),

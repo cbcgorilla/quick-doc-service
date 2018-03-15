@@ -1,7 +1,6 @@
 package cn.mxleader.quickdoc.web.domain
 
 import cn.mxleader.quickdoc.entities.AccessAuthorization
-import org.bson.types.ObjectId
 import java.util.*
 
 data class WebFile(val id: String,
@@ -10,7 +9,6 @@ data class WebFile(val id: String,
                    val uploadDate: Date,
                    val type: String,
                    val folderId: String,
-                   val authorizations: Array<AccessAuthorization>? = null,
                    var labels: Array<String>? = null,
                    var linkPrefix: String? = null,
                    var iconClass: String? = null,
@@ -22,10 +20,6 @@ data class WebFile(val id: String,
                 uploadDate: Date,
                 type: String,
                 folderId: String,
-                openAccess: Boolean = false,
-                authorizations: Array<AccessAuthorization>? = null,
                 labels: Array<String>? = null) : this(id, filename, length,
-            uploadDate, type, folderId,
-            authorizations, labels,
-            null, null)
+            uploadDate, type, folderId, labels, null, null)
 }

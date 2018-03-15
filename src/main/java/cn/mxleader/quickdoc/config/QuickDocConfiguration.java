@@ -1,7 +1,6 @@
 package cn.mxleader.quickdoc.config;
 
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
-import cn.mxleader.quickdoc.entities.Metadata;
 import cn.mxleader.quickdoc.entities.SysProfile;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.*;
@@ -16,10 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -74,7 +70,7 @@ public class QuickDocConfiguration {
     @Bean
     CommandLineRunner initConfigurationData(UserService userService,
                                             FileService fileService,
-                                            ReactiveFolderService reactiveFolderService,
+                                            FolderService folderService,
                                             ConfigService configService) {
         return args -> {
             SysProfile sysProfile = configService.getSysProfile();
@@ -103,8 +99,8 @@ public class QuickDocConfiguration {
                 AccessAuthorization[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
                 AccessAuthorization[] rootOwners = {SYSTEM_ADMIN_GROUP_OWNER};
 
-                reactiveFolderService.save("root", null, rootOwners).subscribe();
-                reactiveFolderService.save("api", null, rootOwners).subscribe();
+                folderService.save("root", null, rootOwners).subscribe();
+                folderService.save("api", null, rootOwners).subscribe();
 
                 // 初始化成功标记
                 sysProfile.setInitialized(true);

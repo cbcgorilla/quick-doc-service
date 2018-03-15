@@ -2,7 +2,7 @@ package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.entities.SysUser;
-import cn.mxleader.quickdoc.service.ReactiveFolderService;
+import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.service.StreamService;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -26,13 +26,13 @@ public class FolderController {
 
     private final Logger log = LoggerFactory.getLogger(FolderController.class);
 
-    private final ReactiveFolderService reactiveFolderService;
+    private final FolderService folderService;
     private final StreamService streamService;
 
     @Autowired
-    public FolderController(ReactiveFolderService reactiveFolderService,
+    public FolderController(FolderService folderService,
                             StreamService streamService) {
-        this.reactiveFolderService = reactiveFolderService;
+        this.folderService = folderService;
         this.streamService = streamService;
     }
 
@@ -44,7 +44,7 @@ public class FolderController {
      */
     @GetMapping()
     public String index(Model model) {
-        model.addAttribute(FOLDERS_ATTRIBUTE, reactiveFolderService.findAllInWebFormat()
+        model.addAttribute(FOLDERS_ATTRIBUTE, folderService.findAllInWebFormat()
                 .toStream().collect(Collectors.toList()));
         return "folders";
     }
@@ -73,18 +73,18 @@ public class FolderController {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         ObjectId folderId = folderIdRef != null && folderIdRef.trim().length() > 0 ?
                 new ObjectId(folderIdRef) : new ObjectId(parentId);
-        SysFolder folder = reactiveFolderService.findById(folderId).block();
+        SysFolder folder = folderService.findById(folderId).block();
         // 鉴权检查
         if (checkAuthentication(folder.getAuthorizations(),
                 activeUser, WRITE_PRIVILEGE)) {
 
             if (folderIdRef != null && folderIdRef.trim().length() > 0) {
                 // folderIdRef字段有数据则修改现有目录的数据
-                reactiveFolderService.save(new ObjectId(folderIdRef), path,
+                folderService.save(new ObjectId(folderIdRef), path,
                         translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
             } else {
                 // folderIdRef字段无数据则增加新的子目录
-                reactiveFolderService.save(path, new ObjectId(parentId),
+                folderService.save(path, new ObjectId(parentId),
                         translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
             }
             // 发送MQ消息
@@ -113,7 +113,7 @@ public class FolderController {
                          RedirectAttributes redirectAttributes) {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         if (activeUser.isAdmin()) {
-            reactiveFolderService.delete(folderId)
+            folderService.delete(folderId)
                     .onErrorMap(v -> {
                         log.warn(v.getMessage());
                         return v;

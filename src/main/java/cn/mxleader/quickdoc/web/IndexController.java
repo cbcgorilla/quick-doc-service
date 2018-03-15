@@ -2,7 +2,7 @@ package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.ConfigService;
-import cn.mxleader.quickdoc.service.ReactiveFolderService;
+import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.WebFolder;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +23,13 @@ public class IndexController {
 
     public static final String FOLDERS_MENU = "foldersMenu";
 
-    private final ReactiveFolderService reactiveFolderService;
+    private final FolderService folderService;
     private final ConfigService configService;
 
     @Autowired
-    public IndexController(ReactiveFolderService reactiveFolderService,
+    public IndexController(FolderService folderService,
                            ConfigService configService) {
-        this.reactiveFolderService = reactiveFolderService;
+        this.folderService = folderService;
         this.configService = configService;
     }
     @GetMapping()
@@ -38,10 +38,10 @@ public class IndexController {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         if (activeUser.isAdmin()) {
             model.addAttribute(FOLDERS_MENU,
-                    reactiveFolderService.findAllByParentIdInWebFormat(rootParentId)
+                    folderService.findAllByParentIdInWebFormat(rootParentId)
                             .toStream().collect(Collectors.toList()));
         } else {
-            List<WebFolder> webFolders = reactiveFolderService.findAllByParentIdInWebFormat(rootParentId)
+            List<WebFolder> webFolders = folderService.findAllByParentIdInWebFormat(rootParentId)
                     .filter(webFolder -> webFolder.getName().equalsIgnoreCase("root"))
                     .toStream()
                     .collect(Collectors.toList());
@@ -49,7 +49,7 @@ public class IndexController {
                 for (WebFolder subFolder : webFolders) {
                     //model.addAttribute("currentFolder", subFolder);
                     model.addAttribute(FOLDERS_MENU,
-                            reactiveFolderService.findAllByParentIdInWebFormat(rootParentId)
+                            folderService.findAllByParentIdInWebFormat(rootParentId)
                                     .toStream().collect(Collectors.toList()));
                 }
             }

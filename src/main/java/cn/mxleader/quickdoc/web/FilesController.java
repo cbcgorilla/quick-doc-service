@@ -4,9 +4,8 @@ import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.entities.Metadata;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.entities.SysUser;
-import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.FileService;
-import cn.mxleader.quickdoc.service.ReactiveFolderService;
+import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.service.StreamService;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import cn.mxleader.quickdoc.web.domain.WebFolder;
@@ -40,15 +39,15 @@ import static cn.mxleader.quickdoc.web.config.WebHandlerInterceptor.FOLDERS_ATTR
 @SessionAttributes("ActiveUser")
 public class FilesController {
 
-    private final ReactiveFolderService reactiveFolderService;
+    private final FolderService folderService;
     private final FileService fileService;
     private final StreamService streamService;
 
     @Autowired
-    public FilesController(ReactiveFolderService reactiveFolderService,
+    public FilesController(FolderService folderService,
                            FileService fileService,
                            StreamService streamService) {
-        this.reactiveFolderService = reactiveFolderService;
+        this.folderService = folderService;
         this.fileService = fileService;
         this.streamService = streamService;
     }
@@ -65,7 +64,7 @@ public class FilesController {
         if (activeUser.isAdmin()) {
             refreshDirList(model, null);
         } else {
-            List<WebFolder> webFolders = reactiveFolderService.findAllByParentIdInWebFormat(null)
+            List<WebFolder> webFolders = folderService.findAllByParentIdInWebFormat(null)
                     .filter(webFolder -> webFolder.getName().equalsIgnoreCase("root"))
                     .toStream()
                     .collect(Collectors.toList());
@@ -88,7 +87,7 @@ public class FilesController {
      */
     @GetMapping("/folder@{folderId}")
     public String index(@PathVariable ObjectId folderId, Model model, HttpSession session) {
-        SysFolder sysFolder = reactiveFolderService.findById(folderId).block();
+        SysFolder sysFolder = folderService.findById(folderId).block();
         model.addAttribute("currentFolder", sysFolder);
         refreshDirList(model, folderId);
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
@@ -104,7 +103,7 @@ public class FilesController {
      */
     private void refreshDirList(Model model, ObjectId folderId) {
         model.addAttribute(FOLDERS_ATTRIBUTE,
-                reactiveFolderService.findAllByParentIdInWebFormat(folderId)
+                folderService.findAllByParentIdInWebFormat(folderId)
                         .toStream().collect(Collectors.toList()));
         model.addAttribute(FILES_ATTRIBUTE, fileService.getWebFiles(folderId)
                 .collect(Collectors.toList()));
@@ -284,7 +283,7 @@ public class FilesController {
         MimetypesFileTypeMap m = new MimetypesFileTypeMap();
         String fileType = m.getContentType(filename);*/
 
-        SysFolder sysFolder = reactiveFolderService.findById(folderId).block();
+        SysFolder sysFolder = folderService.findById(folderId).block();
         if (fileService.getStoredFile(filename, folderId) != null) {
             redirectAttributes.addFlashAttribute("message",
                     "该目录： " + sysFolder.getName() + "中已存在同名文件，请核对文件信息是否重复！");

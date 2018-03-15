@@ -1,9 +1,10 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.dao.ReactiveFolderRepository;
+import cn.mxleader.quickdoc.dao.SysFolderRepository;
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
-import cn.mxleader.quickdoc.service.ReactiveFolderService;
+import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.WebFolder;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
@@ -15,17 +16,20 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.Optional;
+
 import static cn.mxleader.quickdoc.common.utils.MessageUtil.*;
 
 @Service
-public class ReactiveFolderServiceImpl implements ReactiveFolderService {
+public class FolderServiceImpl implements FolderService {
 
-    private final ReactiveFolderRepository reactiveFolderRepository;
+    private final SysFolderRepository sysFolderRepository;
     private final MongoTemplate mongoTemplate;
 
-    ReactiveFolderServiceImpl(ReactiveFolderRepository reactiveFolderRepository,
-                              MongoTemplate mongoTemplate) {
-        this.reactiveFolderRepository = reactiveFolderRepository;
+    FolderServiceImpl(SysFolderRepository sysFolderRepository,
+                      MongoTemplate mongoTemplate) {
+        this.sysFolderRepository = sysFolderRepository;
         this.mongoTemplate = mongoTemplate;
     }
 
@@ -132,29 +136,6 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
                 });
     }
 
-    /**
-     * 根据上级目录ID信息获取子文件目录
-     *
-     * @param parentId
-     * @return
-     */
-    public Flux<WebFolder> findAllByParentIdInWebFormat(ObjectId parentId) {
-        return switchToWebFormat(findAllByParentId(parentId));
-    }
-
-    public Flux<SysFolder> findAllByParentId(ObjectId parentId) {
-        return parentId == null ? reactiveFolderRepository.findAllByParentIdIsNull() :
-                reactiveFolderRepository.findAllByParentId(parentId);
-    }
-
-    public Flux<WebFolder> findAllInWebFormat() {
-        return switchToWebFormat(findAll());
-    }
-
-    public Flux<SysFolder> findAll() {
-        return reactiveFolderRepository.findAll();
-    }
-
     private Flux<WebFolder> switchToWebFormat(Flux<SysFolder> folderFlux) {
         return folderFlux.map(folder -> {
             WebFolder webFolder = new WebFolder();
@@ -170,15 +151,14 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
         });
     }
 
-    /**
-     * 获取文件目录
-     *
-     * @param path     文件路径名
-     * @param parentId 上级目录ID
-     * @return
-     */
-    public Mono<SysFolder> findByPathAndParentId(String path, ObjectId parentId) {
-        return reactiveFolderRepository.findByPathAndParentId(path, parentId);
+    @Override
+    public List<SysFolder> findAllByParent(ParentLink parent) {
+        return sysFolderRepository.findAllByParentsContains(parent);
+    }
+
+    @Override
+    public List<WebFolder> findAllByParentInWebFormat(ParentLink parent) {
+        return switchToWebFormat(Flux.just(findAllByParent(parent)));
     }
 
     /**
@@ -187,8 +167,24 @@ public class ReactiveFolderServiceImpl implements ReactiveFolderService {
      * @param id 文件目录ID
      * @return
      */
-    public Mono<SysFolder> findById(ObjectId id) {
-        return reactiveFolderRepository.findById(id);
+    @Override
+    public Optional<SysFolder> findById(ObjectId id) {
+        return sysFolderRepository.findById(id);
+    }
+
+    @Override
+    public SysFolder save(String name, ParentLink[] parents, AccessAuthorization[] authorizations) {
+        return null;
+    }
+
+    @Override
+    public SysFolder rename(ObjectId id, String newName) {
+        return null;
+    }
+
+    @Override
+    public SysFolder move(ObjectId id, ParentLink oldParent, ParentLink newParent) {
+        return null;
     }
 
 }

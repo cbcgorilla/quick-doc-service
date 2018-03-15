@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.dao.UserRepository;
+import cn.mxleader.quickdoc.dao.SysUserRepository;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.common.utils.PasswordUtil;
 import cn.mxleader.quickdoc.service.UserService;
@@ -12,9 +12,9 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
+    private final SysUserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(SysUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
