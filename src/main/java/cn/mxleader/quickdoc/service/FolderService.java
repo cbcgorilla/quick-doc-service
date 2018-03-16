@@ -19,8 +19,6 @@ public interface FolderService {
      */
     List<SysFolder> findAllByParent(ParentLink parent);
 
-    List<WebFolder> findAllByParentInWebFormat(ParentLink parent);
-
     /**
      * 根据ID获取文件目录信息
      *
@@ -33,12 +31,11 @@ public interface FolderService {
      * 新增文件目录；
      *
      * @param name
-     * @param parents
+     * @param parent
      * @param authorizations
      * @return
      */
-    SysFolder save(String name, ParentLink[] parents, AccessAuthorization[] authorizations);
-
+    SysFolder save(String name, ParentLink parent, List<AccessAuthorization> authorizations);
 
     /**
      * 重命名文件目录
@@ -50,14 +47,22 @@ public interface FolderService {
     SysFolder rename(ObjectId id, String newName);
 
     /**
-     * 迁移文件目录
+     * 增加文件目录上级关系
      *
-     * @param id        待迁移文件夹ID
-     * @param oldParent 原始上级目录信息
-     * @param newParent 新上级目录信息
+     * @param id     文件夹ID
+     * @param parent 新增上级目录信息
      * @return
      */
-    SysFolder move(ObjectId id, ParentLink oldParent, ParentLink newParent);
+    SysFolder addParent(ObjectId id, ParentLink parent);
+
+    /**
+     * 删除文件目录上级关系
+     *
+     * @param id     文件夹ID
+     * @param parent 待删除上级目录信息
+     * @return
+     */
+    SysFolder removeParent(ObjectId id, ParentLink parent);
 
     /**
      * 删除文件目录

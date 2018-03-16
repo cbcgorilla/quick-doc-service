@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -33,6 +35,7 @@ import java.util.zip.ZipOutputStream;
 
 import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.READ_PRIVILEGE;
 import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.checkAuthentication;
+import static java.util.Arrays.asList;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -126,8 +129,10 @@ public class FileServiceImpl implements FileService {
         File file = ResourceUtils.getFile(resourceLocation);
         String fileType = FileUtils.guessMimeType(file.getName());
         Metadata metadata = new Metadata(fileType, null,
-                new AccessAuthorization[]{new AccessAuthorization("users",
-                        AccessAuthorization.Type.TYPE_GROUP, READ_PRIVILEGE)}, null);
+                new ArrayList<>(Arrays.asList(new AccessAuthorization("users",
+                        AccessAuthorization.Type.TYPE_GROUP,
+                        READ_PRIVILEGE))),
+                null);
         return gridFsAssistant.store(new FileInputStream(file), file.getName(), metadata);
     }
 
@@ -262,8 +267,6 @@ public class FileServiceImpl implements FileService {
                 gridFSFile.getUploadDate(),
                 metadata.get_contentType(),
                 "",//metadata.getFolderId().toString(),
-                metadata.getAuthorizations(),
-                metadata.getLabels(),
                 FileUtils.getLinkPrefix(metadata.get_contentType()),
                 FileUtils.getIconClass(metadata.get_contentType()),
                 false,

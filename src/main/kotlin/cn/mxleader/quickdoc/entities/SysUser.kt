@@ -13,8 +13,8 @@ class SysUser(@Id var id: ObjectId,
               var title: String,
               var password: String,
               var avatarId: ObjectId,
-              var authorities: Array<Authorities>,
-              var groups: Array<String>,
+              var authorities: List<Authorities>,
+              var groups: List<String>,
               var email: String? = null) : HttpSessionBindingListener {
 
     enum class Authorities {

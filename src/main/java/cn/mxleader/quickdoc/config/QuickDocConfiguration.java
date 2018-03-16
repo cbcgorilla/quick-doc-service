@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.SYSTEM_ADMIN_GROUP_OWNER;
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.translateShareSetting;
 
 @SpringBootConfiguration
 @ConditionalOnClass(StreamService.class)
@@ -99,8 +98,8 @@ public class QuickDocConfiguration {
                 AccessAuthorization[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
                 AccessAuthorization[] rootOwners = {SYSTEM_ADMIN_GROUP_OWNER};
 
-                folderService.save("root", null, rootOwners).subscribe();
-                folderService.save("api", null, rootOwners).subscribe();
+                folderService.save("root", null, rootOwners);
+                folderService.save("api", null, rootOwners);
 
                 // 初始化成功标记
                 sysProfile.setInitialized(true);
