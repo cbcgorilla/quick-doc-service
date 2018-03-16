@@ -18,6 +18,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -69,7 +71,7 @@ public class QuickDocConfiguration {
     @Bean
     CommandLineRunner initConfigurationData(UserService userService,
                                             FileService fileService,
-                                            FolderService folderService,
+                                            DiskService diskService,
                                             ConfigService configService) {
         return args -> {
             SysProfile sysProfile = configService.getSysProfile();
@@ -90,16 +92,13 @@ public class QuickDocConfiguration {
                 userService.saveUser(new SysUser(ObjectId.get(), "admin",
                         "系统管理员", "chenbichao",
                         sysProfile.getIconMap().get("AWARD"),
-                        new SysUser.Authorities[]{SysUser.Authorities.ADMIN},
-                        new String[]{"administrators", "users"},
+                        new ArrayList<>(Arrays.asList(SysUser.Authorities.ADMIN)),
+                        new ArrayList<>(Arrays.asList("administrators", "users")),
                         "chenbichao@mxleader.cn"));
 
                 // 初始化系统目录
-                AccessAuthorization[] configOwners = {SYSTEM_ADMIN_GROUP_OWNER};
-                AccessAuthorization[] rootOwners = {SYSTEM_ADMIN_GROUP_OWNER};
-
-                folderService.save("root", null, rootOwners);
-                folderService.save("api", null, rootOwners);
+                diskService.save("root", SYSTEM_ADMIN_GROUP_OWNER);
+                diskService.save("api", SYSTEM_ADMIN_GROUP_OWNER);
 
                 // 初始化成功标记
                 sysProfile.setInitialized(true);
