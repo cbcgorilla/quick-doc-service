@@ -86,7 +86,7 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
             ModelMap model = modelAndView.getModelMap();
 
             // 目录按授权信息进行显示
-            if (model.containsAttribute(FOLDERS_ATTRIBUTE)) {
+            /*if (model.containsAttribute(FOLDERS_ATTRIBUTE)) {
                 List<WebFolder> folders = (List<WebFolder>) model.get(FOLDERS_ATTRIBUTE);
                 model.remove(FOLDERS_ATTRIBUTE);
                 model.addAttribute(FOLDERS_ATTRIBUTE,
@@ -100,10 +100,10 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
                                     return webFolder;
                                 })
                                 .collect(Collectors.toList()));
-            }
+            }*/
 
             // 文件按授权信息进行显示
-            if (model.containsAttribute(FILES_ATTRIBUTE)) {
+            /*if (model.containsAttribute(FILES_ATTRIBUTE)) {
                 List<WebFile> files = (List<WebFile>) model.get(FILES_ATTRIBUTE);
                 model.remove(FILES_ATTRIBUTE);
                 model.addAttribute(FILES_ATTRIBUTE,
@@ -117,7 +117,7 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
                                     return file;
                                 })
                                 .collect(Collectors.toList()));
-            }
+            }*/
         }
     }
 }

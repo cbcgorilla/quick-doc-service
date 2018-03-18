@@ -6,7 +6,7 @@
 $.ajaxLoad = true;
 
 //required when $.ajaxLoad = true
-$.defaultPage = 'files';
+$.defaultPage = 'users';
 $.subPagesDirectory = '/';
 $.page404 = '404';
 $.mainContent = $('#ui-view');

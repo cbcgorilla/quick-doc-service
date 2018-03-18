@@ -33,9 +33,7 @@ import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.READ_PRIVILEGE;
 import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.checkAuthentication;
-import static java.util.Arrays.asList;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -124,14 +122,14 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    @Async
+    //@Async
     public ObjectId storeServerFile(String resourceLocation) throws FileNotFoundException {
         File file = ResourceUtils.getFile(resourceLocation);
         String fileType = FileUtils.guessMimeType(file.getName());
         Metadata metadata = new Metadata(fileType, null,
-                new ArrayList<>(Arrays.asList(new AccessAuthorization("users",
+                Arrays.asList(new AccessAuthorization("users",
                         AccessAuthorization.Type.TYPE_GROUP,
-                        READ_PRIVILEGE))),
+                        AccessAuthorization.Action.READ)),
                 null);
         return gridFsAssistant.store(new FileInputStream(file), file.getName(), metadata);
     }
@@ -208,7 +206,7 @@ public class FileServiceImpl implements FileService {
                 Query.query(Criteria.where("parentId").is(folder.getId())),
                 SysFolder.class).stream()
                 .filter(quickDocFolder -> checkAuthentication(quickDocFolder.getAuthorizations(),
-                        activeUser, READ_PRIVILEGE))
+                        activeUser, AccessAuthorization.Action.READ))
                 .collect(Collectors.toList());
         if (folders != null && folders.size() > 0) {
             for (SysFolder subFolder : folders) {
@@ -219,10 +217,10 @@ public class FileServiceImpl implements FileService {
         // 压缩目录内的文件
         switchWebFiles(getStoredFiles(folder.getId()))
                 .forEach(file -> {
-                    if (checkAuthentication(file.getAuthorizations(),
+                    compressFile(getResource(new ObjectId(file.getId())), out, basedir);
+                    /*if (checkAuthentication(file.getAuthorizations(),
                             activeUser, READ_PRIVILEGE)) {
-                        compressFile(getResource(new ObjectId(file.getId())), out, basedir);
-                    }
+                    }*/
                 });
 
     }
@@ -266,7 +264,6 @@ public class FileServiceImpl implements FileService {
                 gridFSFile.getLength(),
                 gridFSFile.getUploadDate(),
                 metadata.get_contentType(),
-                "",//metadata.getFolderId().toString(),
                 FileUtils.getLinkPrefix(metadata.get_contentType()),
                 FileUtils.getIconClass(metadata.get_contentType()),
                 false,

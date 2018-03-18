@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
@@ -64,10 +66,10 @@ public class UserController {
                        RedirectAttributes redirectAttributes,
                        Model model,
                        HttpSession session) {
-        SysUser.Authorities[] authorities = new SysUser.Authorities[]{userType};
+        List<SysUser.Authorities> authorities = Arrays.asList(userType);
         SysUser sysUser = new SysUser(ObjectId.get(), username, title, password,
                 configService.getSysProfile().getIconMap().get("SYS_LOGO"),
-                authorities, new String[]{userGroup},
+                authorities, Arrays.asList(userGroup),
                 email);
         if (userService.findUser(username) == null) {
             userService.saveUser(sysUser);

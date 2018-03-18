@@ -8,9 +8,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface ReactiveFolderRepository extends ReactiveMongoRepository<SysFolder, ObjectId> {
-    @Query("{ 'path': ?0, 'parentId': ?1}")
+/*    @Query("{ 'path': ?0, 'parentId': ?1}")
     Mono<SysFolder> findByPathAndParentId(String path, ObjectId parentId);
 
     Flux<SysFolder> findAllByParentId(ObjectId parentId);
-    Flux<SysFolder> findAllByParentIdIsNull();
+    Flux<SysFolder> findAllByParentIdIsNull();*/
 }

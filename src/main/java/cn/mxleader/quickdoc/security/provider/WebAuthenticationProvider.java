@@ -26,14 +26,14 @@ public class WebAuthenticationProvider
 
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
-        if (userService.validateUser(name, password)){
+        if (userService.validateUser(name, password)) {
             SysUser sysUser = userService.findUser(name);
             return new UsernamePasswordAuthenticationToken(sysUser.getUsername(),
                     sysUser.getPassword(),
-                    Arrays.stream(sysUser.getAuthorities())
+                    sysUser.getAuthorities().stream()
                             .map(authority -> new WebAuthority(authority.name()))
                             .collect(Collectors.toList()));
-        }else{
+        } else {
             throw new UserLogonException("登录错误，用户名或密码有误,请检查后重新输入！");
         }
     }

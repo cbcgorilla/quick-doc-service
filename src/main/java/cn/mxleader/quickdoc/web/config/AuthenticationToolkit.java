@@ -3,42 +3,35 @@ package cn.mxleader.quickdoc.web.config;
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.entities.SysUser;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class AuthenticationToolkit {
-
-    public static final Integer READ_PRIVILEGE = 1;
-    public static final Integer WRITE_PRIVILEGE = 2;
-    public static final Integer DELETE_PRIVILEGE = 4;
-
-    public static final AccessAuthorization SYSTEM_ADMIN_GROUP_OWNER = new AccessAuthorization("administrators",
-            AccessAuthorization.Type.TYPE_GROUP, 7);
-
+/*
 
     public static Boolean checkAuthentication(AccessAuthorization[] authorizations,
                                               SysUser activeUser, Integer privilege) {
         return checkAuthentication(Arrays.asList(authorizations), activeUser, privilege);
     }
+*/
 
     /**
      * 检查是否有授权访问该目录或文件
      *
      * @param authorizations 授权列表
      * @param activeUser     用户信息
-     * @param privilege      待校验权限级别（READ_PRIVILEGE，WRITE_PRIVILEGE，DELETE_PRIVILEGE）
+     * @param action         待校验权限级别（READ，WRITE，DELETE）
      * @return 鉴权通过返回True，否则返回False
      */
     public static Boolean checkAuthentication(List<AccessAuthorization> authorizations,
-                                              SysUser activeUser, Integer privilege) {
+                                              SysUser activeUser, AccessAuthorization.Action action) {
         // 管理员默认可访问所有目录和文件
         if (activeUser.isAdmin()) {
             return true;
         }
         if (authorizations != null && authorizations.size() > 0) {
             for (AccessAuthorization authorization : authorizations) {
-                if ((authorization.getPrivilege() & privilege) > 0) {
+                if (authorization.getAction().equals(action)) {
                     switch (authorization.getType()) {
                         case TYPE_GROUP:
                             for (String group : activeUser.getGroups()) {
@@ -60,7 +53,7 @@ public class AuthenticationToolkit {
         }
         return false;
     }
-
+/*
     public static AccessAuthorization[] translateShareSetting(SysUser activeUser,
                                                               String[] shareSetting) {
         AccessAuthorization owner = new AccessAuthorization(activeUser.getUsername(),
@@ -79,8 +72,8 @@ public class AuthenticationToolkit {
         }
         AccessAuthorization[] accessAuthorizationDesc = new AccessAuthorization[accessAuthorizationList.size()];
         return accessAuthorizationList.toArray(accessAuthorizationDesc);
-    }
-
+    }*/
+/*
     public static AccessAuthorization[] translateShareSetting(SysUser activeUser,
                                                               String[] ownersRequest,
                                                               String[] shareGroups) {
@@ -100,5 +93,5 @@ public class AuthenticationToolkit {
         }
         AccessAuthorization[] accessAuthorizationDesc = new AccessAuthorization[accessAuthorizationList.size()];
         return accessAuthorizationList.toArray(accessAuthorizationDesc);
-    }
+    }*/
 }

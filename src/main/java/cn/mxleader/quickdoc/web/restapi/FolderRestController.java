@@ -33,6 +33,7 @@ public class FolderRestController {
         this.folderService = folderService;
         this.configService = configService;
     }
+/*
 
     @GetMapping("/list")
     @ApiOperation(value = "获取根目录列表")
@@ -91,5 +92,6 @@ public class FolderRestController {
         return folderService.delete(folderId)
                 .map(v -> new SuccessResponse<>("删除文件夹成功！"));
     }
+*/
 
 }

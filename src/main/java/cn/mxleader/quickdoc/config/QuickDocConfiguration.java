@@ -18,12 +18,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.SYSTEM_ADMIN_GROUP_OWNER;
 
 @SpringBootConfiguration
 @ConditionalOnClass(StreamService.class)
@@ -92,13 +89,15 @@ public class QuickDocConfiguration {
                 userService.saveUser(new SysUser(ObjectId.get(), "admin",
                         "系统管理员", "chenbichao",
                         sysProfile.getIconMap().get("AWARD"),
-                        new ArrayList<>(Arrays.asList(SysUser.Authorities.ADMIN)),
-                        new ArrayList<>(Arrays.asList("administrators", "users")),
+                        Arrays.asList(SysUser.Authorities.ADMIN),
+                        Arrays.asList("administrators", "users"),
                         "chenbichao@mxleader.cn"));
 
                 // 初始化系统目录
-                diskService.save("root", SYSTEM_ADMIN_GROUP_OWNER);
-                diskService.save("api", SYSTEM_ADMIN_GROUP_OWNER);
+                diskService.save("root（管理员组）",  new AccessAuthorization("administrators",
+                        AccessAuthorization.Type.TYPE_GROUP, AccessAuthorization.Action.READ));
+                diskService.save("root（ADMIN）", new AccessAuthorization("admin",
+                        AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ));
 
                 // 初始化成功标记
                 sysProfile.setInitialized(true);

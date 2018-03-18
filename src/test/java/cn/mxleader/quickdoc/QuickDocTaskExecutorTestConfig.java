@@ -70,12 +70,4 @@ public class QuickDocTaskExecutorTestConfig {
         };
     }
 
-    private AccessAuthorization[] getRandomOwners() {
-        AccessAuthorization owners[] = new AccessAuthorization[3];
-        owners[0] = new AccessAuthorization("chenbichao", AccessAuthorization.Type.TYPE_PRIVATE, 7);
-        owners[1] = new AccessAuthorization("陈毕超", AccessAuthorization.Type.TYPE_PRIVATE, 7);
-        owners[2] = new AccessAuthorization("administrators", AccessAuthorization.Type.TYPE_GROUP, 7);
-        return owners;
-    }
-
 }

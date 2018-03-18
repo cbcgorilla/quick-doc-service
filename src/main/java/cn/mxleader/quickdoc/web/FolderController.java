@@ -1,5 +1,6 @@
 package cn.mxleader.quickdoc.web;
 
+import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.FolderService;
@@ -14,11 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
-import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.*;
-import static cn.mxleader.quickdoc.web.config.WebHandlerInterceptor.FOLDERS_ATTRIBUTE;
+import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.checkAuthentication;
 
 @Controller
 @RequestMapping("/folders")
@@ -44,8 +43,8 @@ public class FolderController {
      */
     @GetMapping()
     public String index(Model model) {
-        model.addAttribute(FOLDERS_ATTRIBUTE, folderService.findAllInWebFormat()
-                .toStream().collect(Collectors.toList()));
+        /*model.addAttribute(FOLDERS_ATTRIBUTE, folderService.findAllInWebFormat()
+                .toStream().collect(Collectors.toList()));*/
         return "folders";
     }
 
@@ -73,12 +72,12 @@ public class FolderController {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         ObjectId folderId = folderIdRef != null && folderIdRef.trim().length() > 0 ?
                 new ObjectId(folderIdRef) : new ObjectId(parentId);
-        SysFolder folder = folderService.findById(folderId).block();
+        SysFolder folder = folderService.findById(folderId).get();
         // 鉴权检查
         if (checkAuthentication(folder.getAuthorizations(),
-                activeUser, WRITE_PRIVILEGE)) {
+                activeUser, AccessAuthorization.Action.WRITE)) {
 
-            if (folderIdRef != null && folderIdRef.trim().length() > 0) {
+            /*if (folderIdRef != null && folderIdRef.trim().length() > 0) {
                 // folderIdRef字段有数据则修改现有目录的数据
                 folderService.save(new ObjectId(folderIdRef), path,
                         translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
@@ -86,7 +85,7 @@ public class FolderController {
                 // folderIdRef字段无数据则增加新的子目录
                 folderService.save(path, new ObjectId(parentId),
                         translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
-            }
+            }*/
             // 发送MQ消息
             streamService.sendMessage("用户" + activeUser.getUsername() +
                     "成功保存目录： " + path);
@@ -113,12 +112,7 @@ public class FolderController {
                          RedirectAttributes redirectAttributes) {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         if (activeUser.isAdmin()) {
-            folderService.delete(folderId)
-                    .onErrorMap(v -> {
-                        log.warn(v.getMessage());
-                        return v;
-                    })
-                    .subscribe();
+            folderService.delete(folderId);
             redirectAttributes.addFlashAttribute("message",
                     "成功删除文件夹： " + folderId);
         } else {

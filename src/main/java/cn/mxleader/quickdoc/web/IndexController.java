@@ -1,10 +1,9 @@
 package cn.mxleader.quickdoc.web;
 
+import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.entities.SysDisk;
 import cn.mxleader.quickdoc.entities.SysUser;
-import cn.mxleader.quickdoc.service.ConfigService;
-import cn.mxleader.quickdoc.service.FolderService;
-import cn.mxleader.quickdoc.web.domain.WebFolder;
-import org.bson.types.ObjectId;
+import cn.mxleader.quickdoc.service.DiskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,48 +11,39 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
 @Controller
-@RequestMapping("/sss")
+@RequestMapping("/")
 public class IndexController {
 
-    public static final String FOLDERS_MENU = "foldersMenu";
-
-    private final FolderService folderService;
-    private final ConfigService configService;
+    private final DiskService diskService;
 
     @Autowired
-    public IndexController(FolderService folderService,
-                           ConfigService configService) {
-        this.folderService = folderService;
-        this.configService = configService;
+    public IndexController(DiskService diskService) {
+        this.diskService = diskService;
     }
     @GetMapping()
     public String index(Model model, HttpSession session) {
-        ObjectId rootParentId = configService.getSysProfile().getId();
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        if (activeUser.isAdmin()) {
-            model.addAttribute(FOLDERS_MENU,
-                    folderService.findAllByParentIdInWebFormat(rootParentId)
-                            .toStream().collect(Collectors.toList()));
-        } else {
-            List<WebFolder> webFolders = folderService.findAllByParentIdInWebFormat(rootParentId)
-                    .filter(webFolder -> webFolder.getName().equalsIgnoreCase("root"))
-                    .toStream()
-                    .collect(Collectors.toList());
-            if (webFolders != null && webFolders.size() > 0) {
-                for (WebFolder subFolder : webFolders) {
-                    //model.addAttribute("currentFolder", subFolder);
-                    model.addAttribute(FOLDERS_MENU,
-                            folderService.findAllByParentIdInWebFormat(rootParentId)
-                                    .toStream().collect(Collectors.toList()));
-                }
-            }
+        // 个人磁盘清单
+        AccessAuthorization privateAuthorization = new AccessAuthorization(activeUser.getUsername(),
+                AccessAuthorization.Type.TYPE_PRIVATE,AccessAuthorization.Action.READ);
+        model.addAttribute("private_disk_menu",diskService.list(privateAuthorization));
+
+        //组共享磁盘清单（包含该用户的所有权限组磁盘）
+        List<SysDisk> groupSysDiskList = new ArrayList<>();
+        for(String group: activeUser.getGroups()){
+            AccessAuthorization groupAuthorization = new AccessAuthorization(group,
+                    AccessAuthorization.Type.TYPE_GROUP,AccessAuthorization.Action.READ);
+            groupSysDiskList.addAll(diskService.list(groupAuthorization));
         }
+        model.addAttribute("group_disk_menu",groupSysDiskList);
+
         return "index";
     }
 

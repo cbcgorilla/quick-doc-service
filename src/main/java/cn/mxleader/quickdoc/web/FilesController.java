@@ -64,7 +64,7 @@ public class FilesController {
         if (activeUser.isAdmin()) {
             refreshDirList(model, null);
         } else {
-            List<WebFolder> webFolders = folderService.findAllByParentIdInWebFormat(null)
+            /*List<WebFolder> webFolders = folderService.findAllByParentIdInWebFormat(null)
                     .filter(webFolder -> webFolder.getName().equalsIgnoreCase("root"))
                     .toStream()
                     .collect(Collectors.toList());
@@ -73,7 +73,7 @@ public class FilesController {
                     model.addAttribute("currentFolder", subFolder);
                     refreshDirList(model, subFolder.getId());
                 }
-            }
+            }*/
         }
         return "files";
     }
@@ -87,7 +87,7 @@ public class FilesController {
      */
     @GetMapping("/folder@{folderId}")
     public String index(@PathVariable ObjectId folderId, Model model, HttpSession session) {
-        SysFolder sysFolder = folderService.findById(folderId).block();
+        SysFolder sysFolder = folderService.findById(folderId).get();
         model.addAttribute("currentFolder", sysFolder);
         refreshDirList(model, folderId);
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
@@ -102,9 +102,9 @@ public class FilesController {
      * @param folderId
      */
     private void refreshDirList(Model model, ObjectId folderId) {
-        model.addAttribute(FOLDERS_ATTRIBUTE,
+/*        model.addAttribute(FOLDERS_ATTRIBUTE,
                 folderService.findAllByParentIdInWebFormat(folderId)
-                        .toStream().collect(Collectors.toList()));
+                        .toStream().collect(Collectors.toList()));*/
         model.addAttribute(FILES_ATTRIBUTE, fileService.getWebFiles(folderId)
                 .collect(Collectors.toList()));
     }
@@ -283,22 +283,22 @@ public class FilesController {
         MimetypesFileTypeMap m = new MimetypesFileTypeMap();
         String fileType = m.getContentType(filename);*/
 
-        SysFolder sysFolder = folderService.findById(folderId).block();
+        SysFolder sysFolder = folderService.findById(folderId).get();
         if (fileService.getStoredFile(filename, folderId) != null) {
             redirectAttributes.addFlashAttribute("message",
                     "该目录： " + sysFolder.getName() + "中已存在同名文件，请核对文件信息是否重复！");
             return "redirect:/#files/folder@" + folderId;
         }
         // 鉴权检查
-        if (checkAuthentication(sysFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
-            Metadata metadata = new Metadata(fileType, folderId,
+/*        if (checkAuthentication(sysFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
+           *//* Metadata metadata = new Metadata(fileType, folderId,
                     translateShareSetting(activeUser, shareSetting, shareGroups), null);
 
-            ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
+            ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);*//*
             // 启动TensorFlow 线程分析图片内容
-            /*if (fileType.startsWith("image/")) {
+            *//*if (fileType.startsWith("image/")) {
                 tensorFlowService.updateImageMetadata(fileId, metadata);
-            }*/
+            }*//*
 
             refreshDirList(model, folderId);
             // 发送MQ消息
@@ -309,7 +309,7 @@ public class FilesController {
         } else {
             redirectAttributes.addFlashAttribute("message",
                     "您无此目录的上传权限： " + sysFolder.getName() + "，请联系管理员获取！");
-        }
+        }*/
         return "redirect:/#files/folder@" + folderId;
     }
 
@@ -327,14 +327,14 @@ public class FilesController {
                              RedirectAttributes redirectAttributes) {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         WebFile file = fileService.getStoredFile(fileId);
-        if (checkAuthentication(file.getAuthorizations(), activeUser, DELETE_PRIVILEGE)) {
+        /*if (checkAuthentication(file.getAuthorizations(), activeUser, DELETE_PRIVILEGE)) {
             fileService.delete(fileId);
             redirectAttributes.addFlashAttribute("message",
                     "成功删除文件： " + file.getFilename());
         } else {
             redirectAttributes.addFlashAttribute("message",
                     "您无删除此文件的权限： " + file.getFilename() + "，请联系管理员获取！");
-        }
+        }*/
         return "redirect:/#files/folder@" + folderId;
     }
 

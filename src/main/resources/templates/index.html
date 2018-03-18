@@ -78,25 +78,36 @@
     <div class="sidebar">
         <nav class="sidebar-nav">
             <ul class="nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="files"><i class="fas fa-file"></i>我的文件</a>
+                <li class="nav-title">
+                    文件服务
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="files"><i class="fas fa-file"></i>共享文件</a>
+                <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="fas fa-user-circle"></i> 个人空间
+                    </a>
+                    <ul class="nav-dropdown-items">
+                        <li class="nav-item" th:each="private_disk : ${private_disk_menu}">
+                            <a class="nav-link" th:href="@{'files/folder@'+${private_disk.id}}">
+                                <i class="fas fa-hdd"></i><span th:text="${private_disk.name}"></span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
-                <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">
-                    <a class="nav-link" href="folders"><i class="fas fa-folder"></i>目录管理</a>
+                <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="fab fa-gg-circle"></i> 共享空间
+                    </a>
+                    <ul class="nav-dropdown-items">
+                        <li class="nav-item" th:each="group_disk : ${group_disk_menu}">
+                            <a class="nav-link" th:href="@{'files/folder@'+${group_disk.id}}">
+                                <i class="fas fa-hdd"></i><span th:text="${group_disk.name}"></span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
+
                 <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">
                     <a class="nav-link" href="users"><i class="fas fa-users"></i>系统用户</a>
-                </li>
-                <li class="nav-title">
-                    文件夹
-                </li>
-                <li class="nav-item" th:each="folderMenu : ${foldersMenu}">
-                    <a class="nav-link" th:href="@{'files/folder@'+${folderMenu.id}}">
-                        <i class="fas fa-folder-open"></i><span th:text="${folderMenu.name}"></span>
-                    </a>
                 </li>
             </ul>
         </nav>
