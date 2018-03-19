@@ -5,6 +5,7 @@ import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.service.FolderService;
+import cn.mxleader.quickdoc.web.domain.FolderTreeNode;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FolderServiceImpl implements FolderService {
@@ -27,8 +29,21 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public List<SysFolder> findAllByParent(ParentLink parent) {
+    public List<SysFolder> list(ParentLink parent) {
         return sysFolderRepository.findAllByParentsContains(parent);
+    }
+
+    @Override
+    public List<FolderTreeNode> getFolderTree(ParentLink parent) {
+        return sysFolderRepository.findAllByParentsContains(parent)
+                .stream()
+                .map(sysFolder -> new FolderTreeNode(sysFolder.getId().toString(),
+                        sysFolder.getName(),
+                        parent.getId().toString(),
+                        getFolderTree(new ParentLink(sysFolder.getId(),
+                                ParentLink.PType.FOLDER)))
+                )
+                .collect(Collectors.toList());
     }
 
     /**
@@ -43,11 +58,11 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public SysFolder save(String name, ParentLink parent, List<AccessAuthorization> authorizations) {
+    public SysFolder save(String name, ParentLink parent, AccessAuthorization authorization) {
         Optional<SysFolder> optionalSysFolder = sysFolderRepository.findByParentsContainsAndName(parent, name);
-        if(!optionalSysFolder.isPresent()){
-            return sysFolderRepository.save(new SysFolder(ObjectId.get(),name,
-                    new ArrayList<>(Arrays.asList(parent)),authorizations));
+        if (!optionalSysFolder.isPresent()) {
+            return sysFolderRepository.save(new SysFolder(ObjectId.get(), name,
+                    Arrays.asList(parent), Arrays.asList(authorization)));
         }
         return null;
     }
@@ -83,6 +98,18 @@ public class FolderServiceImpl implements FolderService {
             folder.getParents().remove(parent);
             return sysFolderRepository.save(folder);
         }
+        return null;
+    }
+
+    @Override
+    public SysFolder addAuthorization(ObjectId id, AccessAuthorization authorization) {
+        // @TODO 待实现。。。。。
+        return null;
+    }
+
+    @Override
+    public SysFolder removeAuthorization(ObjectId id, AccessAuthorization authorization) {
+        // @TODO 待实现。。。。。
         return null;
     }
 

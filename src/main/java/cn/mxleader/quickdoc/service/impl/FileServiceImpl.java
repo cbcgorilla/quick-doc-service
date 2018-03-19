@@ -2,10 +2,7 @@ package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.dao.ext.GridFsAssistant;
-import cn.mxleader.quickdoc.entities.AccessAuthorization;
-import cn.mxleader.quickdoc.entities.Metadata;
-import cn.mxleader.quickdoc.entities.SysFolder;
-import cn.mxleader.quickdoc.entities.SysUser;
+import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
@@ -84,6 +81,12 @@ public class FileServiceImpl implements FileService {
         return gridFsAssistant.find(query);
     }
 
+    public List<WebFile> list(ParentLink parent) {
+        Query query = Query.query(GridFsCriteria.whereMetaData("parents").in(parent));
+        GridFSFindIterable fsFiles = gridFsAssistant.find(query);
+        return StreamSupport.stream(switchWebFiles(fsFiles).spliterator(), false)
+                .collect(Collectors.toList());
+    }
     /**
      * 根据文件名进行模糊查询
      *

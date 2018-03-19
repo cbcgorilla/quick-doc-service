@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.entities.Metadata;
+import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
@@ -8,7 +9,11 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
 import java.util.stream.Stream;
 
 public interface FileService {
@@ -19,6 +24,8 @@ public interface FileService {
 
     Stream<WebFile> getWebFiles(ObjectId folderId);
 
+
+    List<WebFile> list(ParentLink parent);
 
     /**
      * 根据文件名进行模糊查询

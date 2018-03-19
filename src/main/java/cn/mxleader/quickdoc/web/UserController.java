@@ -52,7 +52,7 @@ public class UserController {
      */
     @GetMapping()
     public String index(Model model) {
-        model.addAttribute("users", userService.findAllUsers());
+        //model.addAttribute("users", userService.findAllUsers());
         return "users";
     }
 

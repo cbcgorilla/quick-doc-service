@@ -1,11 +1,9 @@
 package cn.mxleader.quickdoc.config;
 
-import cn.mxleader.quickdoc.entities.AccessAuthorization;
-import cn.mxleader.quickdoc.entities.SysProfile;
-import cn.mxleader.quickdoc.entities.SysUser;
+import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.*;
-import cn.mxleader.quickdoc.service.impl.DefaultStreamServiceImpl;
-import cn.mxleader.quickdoc.service.impl.KafkaStreamServiceImpl;
+import cn.mxleader.quickdoc.service.impl.StreamServiceDefaultImpl;
+import cn.mxleader.quickdoc.service.impl.StreamServiceKafkaImpl;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -49,9 +47,9 @@ public class QuickDocConfiguration {
     public StreamService streamService(KafkaTemplate<String, String> kafkaTemplate) {
         //return new DefaultStreamServiceImpl();
         if (quickDocStreamProperties.getEnabled())
-            return new KafkaStreamServiceImpl(kafkaTemplate, quickDocStreamProperties.getTopic());
+            return new StreamServiceKafkaImpl(kafkaTemplate, quickDocStreamProperties.getTopic());
         else
-            return new DefaultStreamServiceImpl();
+            return new StreamServiceDefaultImpl();
     }
 /*
     @Bean
@@ -69,6 +67,7 @@ public class QuickDocConfiguration {
     CommandLineRunner initConfigurationData(UserService userService,
                                             FileService fileService,
                                             DiskService diskService,
+                                            FolderService folderService,
                                             ConfigService configService) {
         return args -> {
             SysProfile sysProfile = configService.getSysProfile();
@@ -94,10 +93,41 @@ public class QuickDocConfiguration {
                         "chenbichao@mxleader.cn"));
 
                 // 初始化系统目录
-                diskService.save("root（管理员组）",  new AccessAuthorization("administrators",
-                        AccessAuthorization.Type.TYPE_GROUP, AccessAuthorization.Action.READ));
-                diskService.save("root（ADMIN）", new AccessAuthorization("admin",
-                        AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ));
+                ObjectId gId = diskService.save("root（管理员组）",
+                        new AccessAuthorization("administrators",
+                        AccessAuthorization.Type.TYPE_GROUP, AccessAuthorization.Action.READ)).getId();
+                ObjectId id = diskService.save("root（管理员）",
+                        new AccessAuthorization("admin",
+                        AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)).getId();
+
+                // ============================以下为测试数据 @TODO 待删除
+                folderService.save("一级目录", new ParentLink(gId, ParentLink.PType.DISK),
+                        new AccessAuthorization("administrators",
+                                AccessAuthorization.Type.TYPE_GROUP, AccessAuthorization.Action.READ)).getId();
+
+                ObjectId id1 = folderService.save("一级目录", new ParentLink(id, ParentLink.PType.DISK),
+                        new AccessAuthorization("admin",
+                                AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)).getId();
+                ObjectId id2 = folderService.save("二级目录", new ParentLink(id1, ParentLink.PType.FOLDER),
+                        new AccessAuthorization("admin",
+                                AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)).getId();
+                ObjectId id3 = folderService.save("三级目录", new ParentLink(id2, ParentLink.PType.FOLDER),
+                        new AccessAuthorization("admin",
+                                AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)).getId();
+                ObjectId id4 = folderService.save("四级目录", new ParentLink(id3, ParentLink.PType.FOLDER),
+                        new AccessAuthorization("admin",
+                                AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)).getId();
+                folderService.save("五级目录", new ParentLink(id4, ParentLink.PType.FOLDER),
+                        new AccessAuthorization("admin",
+                                AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)).getId();
+
+                fileService.saveMetadata(sysProfile.getIconMap().get("AWARD"),
+                        new Metadata("application/octet-stream",
+                                Arrays.asList(new ParentLink(id4, ParentLink.PType.FOLDER)),
+                                Arrays.asList(new AccessAuthorization("admin",
+                                AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)),
+                                null));
+                // ==================测试数据结束
 
                 // 初始化成功标记
                 sysProfile.setInitialized(true);

@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DefaultStreamServiceImpl implements StreamService {
-    private final Logger log = LoggerFactory.getLogger(DefaultStreamServiceImpl.class);
+public class StreamServiceDefaultImpl implements StreamService {
+    private final Logger log = LoggerFactory.getLogger(StreamServiceDefaultImpl.class);
 
     @Override
     public void sendMessage(String message) {

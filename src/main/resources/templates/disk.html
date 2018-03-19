@@ -1,0 +1,172 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-align-justify"></i> 共享文件
+                </div>
+                <div class="card-body">
+
+                    <div class=" form-horizontal">
+                        <div class="row">
+
+                            <div class="col-md-3">
+                                <div id="diskTree"></div>
+                            </div>
+
+                            <div class="col-md-9" style="float: right">
+
+                                <div class="layui-btn-group userTable">
+                                    <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
+                                    <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
+                                    <button class="layui-btn" data-type="isAll">验证是否全选</button>
+                                </div>
+
+                                <table class="layui-table" id="LAY_table_files" lay-filter="file-table">
+                                </table>
+
+                                <script type="text/html" id="userOpsBar">
+                                    <div class="layui-btn-group">
+                                        <button class="layui-btn layui-btn-sm" lay-event="detail">
+                                            <i class="fas fa-info-circle" title="查看用户详细信息"></i>
+                                        </button>
+                                        <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="edit">
+                                            <i class="fas fa-edit" title="修改用户信息"></i>
+                                        </button>
+                                        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">
+                                            <i class="fas fa-trash-alt" title="删除用户"></i>
+                                        </button>
+                                    </div>
+                                </script>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--/.row-->
+        </div>
+    </div>
+</div>
+<link href="./css/bootstrap-treeview.min.css" rel="stylesheet">
+<script src="./js/bootstrap-treeview.min.js"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    layui.use('table', function () {
+        var table = layui.table;
+        var opt = {
+            elem: '#LAY_table_files',
+            id: 'file-data',
+            url: '/api/file/list',
+            height: '510',
+            cellMinWidth: 120,
+            page: true, //开启分页,
+            limit: 10,
+            limits: [10, 20, 50, 100],
+            cols: [
+                [
+                    {type: 'checkbox'},
+                    {field: 'id', title: 'ID'},
+                    {field: 'filename', title: '文件名'},
+                    {field: 'length', title: '文件大小'},
+                    {field: 'type', title: '文件类型'},
+                    {field: 'uploadDate', title: '上传日期'},
+                    {
+                        title: '操作',
+                        width: 160,
+                        align: 'center',
+                        toolbar: '#userOpsBar'
+                    }
+                ]
+            ],
+            done: function (res, curr, count) {
+                $("[data-field='id']").css('display', 'none');
+            }
+        };
+        //方法级渲染
+        table.render(opt);
+
+        //监听表格复选框选择
+        table.on('checkbox(file-table)', function (obj) {
+            console.log(obj)
+        });
+        //监听工具条
+        table.on('tool(file-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+                layer.msg('用户ID号：' + data.id + '\n 显示名称：' + data.title);
+            } else if (obj.event === 'del') {
+                layer.confirm('真的删除用户: '+data.username+' 吗？', {title: "删除确认"}, function (index) {
+                    postJSON("/api/user/delete", data.username)
+                        .catch(error => {
+
+                        })
+                    .then(value => {
+                            var result=JSON.parse(value);
+                        if (result == true) {
+                            layer.alert('用户'+data.username+'删除成功!', {
+                                icon: 6, btn: ['确认'], yes: function (index) {
+                                    obj.del();
+                                    layer.close(index);
+                                    var tableIns=table.render(opt);
+                                    tableIns.reload();
+                                }
+                            });
+                        } else {
+                            layer.alert("用户删除失败!", {icon: 2});
+                        }
+                        layer.close(index);
+                    });
+                });
+
+            } else if (obj.event === 'edit') {
+                layer.alert('编辑行：<br>' + JSON.stringify(data))
+            }
+        });
+
+        var $ = layui.$, active = {
+            getCheckData: function () { //获取选中数据
+                var checkStatus = table.checkStatus('file-data')
+                    , data = checkStatus.data;
+                layer.alert(JSON.stringify(data));
+            }
+            , getCheckLength: function () { //获取选中数目
+                var checkStatus = table.checkStatus('file-data')
+                    , data = checkStatus.data;
+                layer.msg('选中了：' + data.length + ' 个');
+            }
+            , isAll: function () { //验证是否全选
+                var checkStatus = table.checkStatus('file-data');
+                layer.msg(checkStatus.isAll ? '全选' : '未全选')
+            }
+        };
+
+        $('.file-table .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        $('#diskTree').treeview({
+            data: [[${folderTree}]],
+            levels:5,
+            expandIcon: 'fas fa-folder',
+            collapseIcon: 'fas fa-folder-open',
+            nodeIcon: "fas fa-film",
+            onNodeSelected: function(event, data) {
+                //layer.msg("目录: "+data.id, {icon: 2});
+                table.reload('file-data', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    },
+                    where: {
+                        parentId: data.id
+                    }
+                });
+            }
+        });
+        /*]]>*/
+    });
+</script>

@@ -1,22 +1,15 @@
-package cn.mxleader.quickdoc.web.restapi;
+package cn.mxleader.quickdoc.web.rest;
 
-import cn.mxleader.quickdoc.web.domain.ErrorResponse;
-import cn.mxleader.quickdoc.entities.SysFolder;
-import cn.mxleader.quickdoc.web.domain.RestResponse;
-import cn.mxleader.quickdoc.web.domain.SuccessResponse;
-import cn.mxleader.quickdoc.service.ConfigService;
+import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.service.FolderService;
-import cn.mxleader.quickdoc.web.domain.WebFolder;
+import cn.mxleader.quickdoc.web.domain.FolderTreeNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.util.Optional;
+import java.util.List;
 
 
 @RestController
@@ -25,14 +18,18 @@ import java.util.Optional;
 public class FolderRestController {
 
     private final FolderService folderService;
-    private final ConfigService configService;
 
     @Autowired
-    FolderRestController(FolderService folderService,
-                         ConfigService configService) {
+    FolderRestController(FolderService folderService) {
         this.folderService = folderService;
-        this.configService = configService;
     }
+
+    @RequestMapping(value = "/tree", method = RequestMethod.GET)
+    @ApiOperation(value = "根据磁盘ID号获取目录树信息")
+    public List<FolderTreeNode> getFolderTree(@RequestParam String parentId) {
+        return folderService.getFolderTree(new ParentLink(new ObjectId(parentId), ParentLink.PType.DISK));
+    }
+
 /*
 
     @GetMapping("/list")

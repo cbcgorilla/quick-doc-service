@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.web.restapi;
+package cn.mxleader.quickdoc.web.rest;
 
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.web.domain.RestResponse;
