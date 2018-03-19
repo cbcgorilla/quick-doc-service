@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -143,6 +142,14 @@ public class FileServiceImpl implements FileService {
     }
 
     public GridFSFile saveMetadata(ObjectId fileId, Metadata metadata) {
+        return gridFsAssistant.updateMetadata(fileId, metadata);
+    }
+
+    @Override
+    public GridFSFile addParent(ObjectId fileId, ParentLink parent) {
+        GridFSFile file = gridFsAssistant.findOne( Query.query(Criteria.where("_id").is(fileId)));
+        Metadata metadata = converter.read(Metadata.class, file.getMetadata());
+        metadata.getParents().add(parent);
         return gridFsAssistant.updateMetadata(fileId, metadata);
     }
 

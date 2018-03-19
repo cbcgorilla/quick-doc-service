@@ -95,13 +95,13 @@ public class QuickDocConfiguration {
                 // 初始化系统目录
                 ObjectId gId = diskService.save("root（管理员组）",
                         new AccessAuthorization("administrators",
-                        AccessAuthorization.Type.TYPE_GROUP, AccessAuthorization.Action.READ)).getId();
+                                AccessAuthorization.Type.TYPE_GROUP, AccessAuthorization.Action.READ)).getId();
                 ObjectId id = diskService.save("root（管理员）",
                         new AccessAuthorization("admin",
-                        AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)).getId();
+                                AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)).getId();
 
                 // ============================以下为测试数据 @TODO 待删除
-                folderService.save("一级目录", new ParentLink(gId, ParentLink.PType.DISK),
+                ObjectId gId1 = folderService.save("一级目录", new ParentLink(gId, ParentLink.PType.DISK),
                         new AccessAuthorization("administrators",
                                 AccessAuthorization.Type.TYPE_GROUP, AccessAuthorization.Action.READ)).getId();
 
@@ -125,8 +125,17 @@ public class QuickDocConfiguration {
                         new Metadata("application/octet-stream",
                                 Arrays.asList(new ParentLink(id4, ParentLink.PType.FOLDER)),
                                 Arrays.asList(new AccessAuthorization("admin",
-                                AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)),
+                                        AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)),
                                 null));
+
+                fileService.saveMetadata(sysProfile.getIconMap().get("SYS_LOGO"),
+                        new Metadata("application/octet-stream",
+                                Arrays.asList(new ParentLink(gId1, ParentLink.PType.FOLDER)),
+                                Arrays.asList(new AccessAuthorization("administrators",
+                                        AccessAuthorization.Type.TYPE_GROUP, AccessAuthorization.Action.READ)),
+                                null));
+                fileService.addParent(sysProfile.getIconMap().get("SYS_LOGO"),
+                        new ParentLink(gId, ParentLink.PType.DISK));
                 // ==================测试数据结束
 
                 // 初始化成功标记

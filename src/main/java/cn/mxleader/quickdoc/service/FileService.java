@@ -45,6 +45,8 @@ public interface FileService {
 
     GridFSFile saveMetadata(ObjectId fileId, Metadata metadata);
 
+    GridFSFile addParent(ObjectId fileId, ParentLink parent);
+
     /**
      * 删除Mongo库内文件
      *

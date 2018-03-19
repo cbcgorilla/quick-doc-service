@@ -3,7 +3,11 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-align-justify"></i> 共享文件
+                    <i class="fas fa-align-justify"></i>
+                    <span th:if="${disk.authorization.type.toString() eq 'TYPE_PRIVATE'}"
+                          th:text="@{'个人空间：'+${disk.name}}"></span>
+                    <span th:if="${disk.authorization.type.toString() eq 'TYPE_GROUP'}"
+                          th:text="@{'共享空间：'+${disk.name}}"></span>
                 </div>
                 <div class="card-body">
 
@@ -16,7 +20,7 @@
 
                             <div class="col-md-9" style="float: right">
 
-                                <div class="layui-btn-group userTable">
+                                <div class="layui-btn-group file-table">
                                     <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
                                     <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
                                     <button class="layui-btn" data-type="isAll">验证是否全选</button>
@@ -60,7 +64,7 @@
         var opt = {
             elem: '#LAY_table_files',
             id: 'file-data',
-            url: '/api/file/list',
+            url: '/api/file/list?parentId='+[[${disk.id.toString()}]]+'&parentType=DISK',
             height: '510',
             cellMinWidth: 120,
             page: true, //开启分页,
@@ -73,7 +77,7 @@
                     {field: 'filename', title: '文件名'},
                     {field: 'length', title: '文件大小'},
                     {field: 'type', title: '文件类型'},
-                    {field: 'uploadDate', title: '上传日期'},
+                    {field: 'uploadDate', title: '上传日期',width:240},
                     {
                         title: '操作',
                         width: 160,
@@ -90,9 +94,9 @@
         table.render(opt);
 
         //监听表格复选框选择
-        table.on('checkbox(file-table)', function (obj) {
+        /*table.on('checkbox(file-table)', function (obj) {
             console.log(obj)
-        });
+        });*/
         //监听工具条
         table.on('tool(file-table)', function (obj) {
             var data = obj.data;
@@ -100,26 +104,7 @@
                 layer.msg('用户ID号：' + data.id + '\n 显示名称：' + data.title);
             } else if (obj.event === 'del') {
                 layer.confirm('真的删除用户: '+data.username+' 吗？', {title: "删除确认"}, function (index) {
-                    postJSON("/api/user/delete", data.username)
-                        .catch(error => {
-
-                        })
-                    .then(value => {
-                            var result=JSON.parse(value);
-                        if (result == true) {
-                            layer.alert('用户'+data.username+'删除成功!', {
-                                icon: 6, btn: ['确认'], yes: function (index) {
-                                    obj.del();
-                                    layer.close(index);
-                                    var tableIns=table.render(opt);
-                                    tableIns.reload();
-                                }
-                            });
-                        } else {
-                            layer.alert("用户删除失败!", {icon: 2});
-                        }
-                        layer.close(index);
-                    });
+                    //
                 });
 
             } else if (obj.event === 'edit') {
@@ -158,15 +143,19 @@
             onNodeSelected: function(event, data) {
                 //layer.msg("目录: "+data.id, {icon: 2});
                 table.reload('file-data', {
+                    url: '/api/file/list',
                     page: {
                         curr: 1 //重新从第 1 页开始
                     },
                     where: {
-                        parentId: data.id
+                        parentId: data.id,
+                        parentType:'FOLDER'
                     }
                 });
             }
         });
+
+        createTable();
         /*]]>*/
     });
 </script>

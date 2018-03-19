@@ -24,6 +24,11 @@ public class DiskServiceImpl implements DiskService {
     }
 
     @Override
+    public Optional<SysDisk> get(ObjectId id) {
+        return sysDiskRepository.findById(id);
+    }
+
+    @Override
     public SysDisk save(String name, AccessAuthorization authorization) {
         return sysDiskRepository.save(new SysDisk(ObjectId.get(), name, authorization));
     }
@@ -31,7 +36,7 @@ public class DiskServiceImpl implements DiskService {
     @Override
     public SysDisk rename(ObjectId id, String newName) {
         Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(id);
-        if(optionalSysDisk.isPresent()){
+        if (optionalSysDisk.isPresent()) {
             SysDisk disk = optionalSysDisk.get();
             disk.setName(newName);
             return sysDiskRepository.save(disk);
@@ -42,7 +47,7 @@ public class DiskServiceImpl implements DiskService {
     @Override
     public void delete(ObjectId id) {
         Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(id);
-        if(optionalSysDisk.isPresent()){
+        if (optionalSysDisk.isPresent()) {
             SysDisk disk = optionalSysDisk.get();
             sysDiskRepository.delete(disk);
         }

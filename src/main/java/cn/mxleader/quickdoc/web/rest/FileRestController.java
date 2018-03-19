@@ -8,10 +8,7 @@ import cn.mxleader.quickdoc.web.domain.WebFile;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,14 +19,26 @@ public class FileRestController {
 
     private final FileService fileService;
 
-    FileRestController(FileService fileService){
+    FileRestController(FileService fileService) {
         this.fileService = fileService;
     }
 
+    /**
+     * 根据上级ID和分类（DISK：磁盘，FOLDER：目录）获取文件清单
+     *
+     * @param parentId   上级ID
+     * @param parentType 上级分类
+     * @param page       当前页面编号（起始编号为1）
+     * @param limit      每页显示数量限制
+     * @return 返回LayUI标准Table数据格式
+     */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value = "根据上级目录ID获取文件列表")
-    public LayuiTable<WebFile> getFolderTree(@RequestParam String parentId) {
-        List<WebFile> webFileList = fileService.list(new ParentLink(new ObjectId(parentId), ParentLink.PType.FOLDER));
+    public LayuiTable<WebFile> list(@RequestParam ObjectId parentId,
+                                    @RequestParam ParentLink.PType parentType,
+                                    @RequestParam Integer page,
+                                    @RequestParam Integer limit) {
+        List<WebFile> webFileList = fileService.list(new ParentLink(parentId, parentType));
         return new LayuiTable<>(0, "", webFileList.size(), webFileList);
     }
 
