@@ -21,9 +21,9 @@
                             <div class="col-md-9" style="float: right">
 
                                 <div class="layui-btn-group file-table">
-                                    <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
-                                    <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
-                                    <button class="layui-btn" data-type="isAll">验证是否全选</button>
+                                    <button class="layui-btn" data-type="downloadSelectedFiles">
+                                        <i class="fas fa-cloud-download-alt"></i>下载选中的文件
+                                    </button>
                                 </div>
 
                                 <table class="layui-table" id="LAY_table_files" lay-filter="file-table">
@@ -31,14 +31,11 @@
 
                                 <script type="text/html" id="userOpsBar">
                                     <div class="layui-btn-group">
-                                        <button class="layui-btn layui-btn-sm" lay-event="detail">
-                                            <i class="fas fa-info-circle" title="查看用户详细信息"></i>
+                                        <button class="layui-btn layui-btn-sm" lay-event="download">
+                                            <i class="fas fa-cloud-download-alt" title="下载该文件"></i>
                                         </button>
-                                        <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="edit">
-                                            <i class="fas fa-edit" title="修改用户信息"></i>
-                                        </button>
-                                        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">
-                                            <i class="fas fa-trash-alt" title="删除用户"></i>
+                                        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
+                                            <i class="fas fa-trash-alt" title="删除文件"></i>
                                         </button>
                                     </div>
                                 </script>
@@ -100,32 +97,39 @@
         //监听工具条
         table.on('tool(file-table)', function (obj) {
             var data = obj.data;
-            if (obj.event === 'detail') {
-                layer.msg('用户ID号：' + data.id + '\n 显示名称：' + data.title);
-            } else if (obj.event === 'del') {
-                layer.confirm('真的删除用户: '+data.username+' 吗？', {title: "删除确认"}, function (index) {
-                    //
-                });
+            if (obj.event === 'download') {
+                layer.msg('文件ID号：' + data.id + '名称：' + data.filename);
+            } else if (obj.event === 'delete') {
+                layer.confirm('真的删除文件: '+data.filename+' 吗？', {title: "删除确认"}, function (index) {
+                    postJSON("/api/file/delete", data.id)
+                            .catch(error => {
 
-            } else if (obj.event === 'edit') {
-                layer.alert('编辑行：<br>' + JSON.stringify(data))
+                            })
+                            .then(value => {
+                                    var result=JSON.parse(value);
+                                if (result == true) {
+                                    layer.alert('文件【'+data.filename+'】删除成功!', {
+                                        icon: 6, btn: ['确认'], yes: function (index) {
+                                            obj.del();
+                                            layer.close(index);
+                                            var tableIns=table.render(opt);
+                                            tableIns.reload();
+                                        }
+                                    });
+                                } else {
+                                    layer.alert("文件删除失败!", {icon: 2});
+                                }
+                                layer.close(index);
+                            });
+                });
             }
         });
 
         var $ = layui.$, active = {
-            getCheckData: function () { //获取选中数据
+            downloadSelectedFiles: function () { //下载选中的文件
                 var checkStatus = table.checkStatus('file-data')
                     , data = checkStatus.data;
                 layer.alert(JSON.stringify(data));
-            }
-            , getCheckLength: function () { //获取选中数目
-                var checkStatus = table.checkStatus('file-data')
-                    , data = checkStatus.data;
-                layer.msg('选中了：' + data.length + ' 个');
-            }
-            , isAll: function () { //验证是否全选
-                var checkStatus = table.checkStatus('file-data');
-                layer.msg(checkStatus.isAll ? '全选' : '未全选')
             }
         };
 

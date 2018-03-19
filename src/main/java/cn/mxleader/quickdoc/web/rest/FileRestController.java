@@ -2,7 +2,6 @@ package cn.mxleader.quickdoc.web.rest;
 
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.service.FileService;
-import cn.mxleader.quickdoc.web.domain.FolderTreeNode;
 import cn.mxleader.quickdoc.web.domain.LayuiTable;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import io.swagger.annotations.Api;
@@ -40,6 +39,14 @@ public class FileRestController {
                                     @RequestParam Integer limit) {
         List<WebFile> webFileList = fileService.list(new ParentLink(parentId, parentType));
         return new LayuiTable<>(0, "", webFileList.size(), webFileList);
+    }
+
+    @PostMapping(value = "/delete")
+    @ApiOperation(value = "根据文件ID删除库内文件信息")
+    public Boolean delete(@RequestBody ObjectId fileId) {
+        //username=username.replaceAll("\"","");
+        fileService.delete(fileId);
+        return true;
     }
 
 }
