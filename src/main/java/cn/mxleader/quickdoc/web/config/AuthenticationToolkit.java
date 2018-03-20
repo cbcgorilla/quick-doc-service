@@ -3,17 +3,9 @@ package cn.mxleader.quickdoc.web.config;
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.entities.SysUser;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class AuthenticationToolkit {
-/*
-
-    public static Boolean checkAuthentication(AccessAuthorization[] authorizations,
-                                              SysUser activeUser, Integer privilege) {
-        return checkAuthentication(Arrays.asList(authorizations), activeUser, privilege);
-    }
-*/
 
     /**
      * 检查是否有授权访问该目录或文件

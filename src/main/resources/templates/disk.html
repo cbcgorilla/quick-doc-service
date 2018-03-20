@@ -22,8 +22,14 @@
 
                                 <div class="layui-btn-group file-table">
                                     <button class="layui-btn" data-type="downloadSelectedFiles">
-                                        <i class="fas fa-cloud-download-alt"></i>下载选中的文件
+                                        <i class="fas fa-cloud-download-alt"></i>下载
                                     </button>
+
+                                    <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
+                                            data-target="#uploadModal">
+                                        <i class="fas fa-cloud-upload-alt"></i>上传文件
+                                    </button>
+
                                 </div>
 
                                 <table class="layui-table" id="LAY_table_files" lay-filter="file-table">
@@ -51,6 +57,71 @@
         </div>
     </div>
 </div>
+
+<!-- 模态框 -->
+<div class="modal fade" id="uploadModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">上传文件</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <div class="table-responsive" style="text-align: center">
+                    <form method="POST" enctype="multipart/form-data"
+                          th:action="@{'./file/upload'}">
+                        <table class="table table-hover">
+                            <tr>
+                                <td align="right">需要上传的文件:</td>
+                                <td><input type="file" name="file"
+                                           class="input custom-file"/></td>
+                            </tr>
+                            <tr>
+                                <td align="right">访问权限:</td>
+                                <td>
+                                    <label><input id="shareSetting_PublicMode"
+                                                  name="shareSetting" type="checkbox"
+                                                  value="PublicMode"/>公开访问</label>
+                                    <label><input id="shareSetting_GroupMode"
+                                                  name="shareSetting" type="checkbox"
+                                                  value="GroupMode"/>组内共享</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">共享组:</td>
+                                <td>
+                                    <select id="shareGroups" name="shareGroups"
+                                            class="select custom-select"
+                                            multiple="multiple">
+                                        <option th:each="group : ${session.ActiveUser.groups}"
+                                                th:value="${group}"
+                                                th:text="${group}">共享组
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                        <input type="hidden" id="containerId" name="containerId" />
+                        <input type="hidden" id="containerType" name="containerType" />
+                        <input type="submit" value="上传" class="btn btn-success"/>
+                    </form>
+                </div>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
 <link href="./css/bootstrap-treeview.min.css" rel="stylesheet">
 <script src="./js/bootstrap-treeview.min.js"></script>
 
@@ -58,6 +129,8 @@
     /*<![CDATA[*/
     layui.use('table', function () {
         var table = layui.table;
+        var containerId = [[${disk.id.toString()}]],
+            containerType = 'DISK';
         var opt = {
             elem: '#LAY_table_files',
             id: 'file-data',
@@ -146,21 +219,34 @@
             collapseIcon: 'fas fa-folder-open',
             nodeIcon: "fas fa-film",
             onNodeSelected: function(event, data) {
-                //layer.msg("目录: "+data.id, {icon: 2});
-                table.reload('file-data', {
-                    url: '/api/file/list',
-                    page: {
-                        curr: 1 //重新从第 1 页开始
-                    },
-                    where: {
-                        parentId: data.id,
-                        parentType:'FOLDER'
-                    }
-                });
+                containerId = data.id;
+                containerType = 'FOLDER';
+                reloadFileTable('/api/file/list',containerId,containerType);
+            },
+            onNodeUnselected: function(event, data) {
+                containerId = [[${disk.id.toString()}]];
+                containerType = 'DISK';
+                reloadFileTable('/api/file/list',containerId,containerType);
             }
         });
 
-        createTable();
+        $(document).on("click", ".uploadDialog", function () {
+            $("#containerId").val(containerId);
+            $("#containerType").val(containerType);
+        });
+
+        function reloadFileTable(restUrl, parentId,parentType){
+            table.reload('file-data', {
+                url: restUrl,
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                },
+                where: {
+                    parentId: parentId,
+                    parentType:parentType
+                }
+            });
+        }
         /*]]>*/
     });
 </script>

@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
+import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.FileService;
@@ -122,8 +123,8 @@ public class FileController {
      * @return
      * @throws IOException
      */
-    private HttpEntity<byte[]> openDocumentEntity(MediaType returnType, String fileId) throws IOException {
-        GridFsResource fs = fileService.getResource(new ObjectId(fileId));
+    private HttpEntity<byte[]> openDocumentEntity(MediaType returnType, ObjectId fileId) throws IOException {
+        GridFsResource fs = fileService.getResource(fileId);
         byte[] document = FileCopyUtils.copyToByteArray(fs.getInputStream());
 
         HttpHeaders header = new HttpHeaders();
@@ -143,7 +144,7 @@ public class FileController {
      */
     @GetMapping(value = "/view-pdf/{fileId}", produces = MediaType.APPLICATION_PDF_VALUE)
     public @ResponseBody
-    HttpEntity<byte[]> openPdfEntity(@PathVariable String fileId) throws IOException {
+    HttpEntity<byte[]> openPdfEntity(@PathVariable ObjectId fileId) throws IOException {
         return openDocumentEntity(MediaType.APPLICATION_PDF, fileId);
     }
 
@@ -156,7 +157,7 @@ public class FileController {
      */
     @GetMapping(value = "/view-gif/{fileId}", produces = MediaType.IMAGE_GIF_VALUE)
     public @ResponseBody
-    HttpEntity<byte[]> openImageGifEntity(@PathVariable String fileId) throws IOException {
+    HttpEntity<byte[]> openImageGifEntity(@PathVariable ObjectId fileId) throws IOException {
         return openDocumentEntity(MediaType.IMAGE_GIF, fileId);
     }
 
@@ -169,7 +170,7 @@ public class FileController {
      */
     @GetMapping(value = "/view-jpeg/{fileId}", produces = MediaType.IMAGE_JPEG_VALUE)
     public @ResponseBody
-    HttpEntity<byte[]> openImageJpegEntity(@PathVariable String fileId) throws IOException {
+    HttpEntity<byte[]> openImageJpegEntity(@PathVariable ObjectId fileId) throws IOException {
         return openDocumentEntity(MediaType.IMAGE_JPEG, fileId);
     }
 
@@ -182,7 +183,7 @@ public class FileController {
      */
     @GetMapping(value = "/view-png/{fileId}", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody
-    HttpEntity<byte[]> openImageEntity(@PathVariable String fileId) throws IOException {
+    HttpEntity<byte[]> openImageEntity(@PathVariable ObjectId fileId) throws IOException {
         return openDocumentEntity(MediaType.IMAGE_PNG, fileId);
     }
 
@@ -195,8 +196,8 @@ public class FileController {
      */
     @GetMapping(value = "/view-text/{fileId}", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody
-    HttpEntity<String> openTextEntity(@PathVariable String fileId) throws IOException {
-        GridFsResource fs = fileService.getResource(new ObjectId(fileId));
+    HttpEntity<String> openTextEntity(@PathVariable ObjectId fileId) throws IOException {
+        GridFsResource fs = fileService.getResource(fileId);
 
         HttpHeaders header = new HttpHeaders();
         header.set("Content-Disposition", "inline; filename=" + fs.getFilename());
@@ -215,7 +216,8 @@ public class FileController {
      * 上传文件到指定目录和文件分类
      *
      * @param file
-     * @param folderId
+     * @param containerId
+     * @param containerType
      * @param redirectAttributes
      * @param model
      * @param session
@@ -224,7 +226,8 @@ public class FileController {
      */
     @PostMapping("/upload")
     public String upload(@RequestParam("file") MultipartFile file,
-                         @RequestParam("folderId") ObjectId folderId,
+                         @RequestParam("containerId") ObjectId containerId,
+                         @RequestParam("containerType") ParentLink.PType containerType,
                          @RequestParam(value = "shareSetting", required = false) String[] shareSetting,
                          @RequestParam(value = "shareGroups", required = false) String[] shareGroups,
                          RedirectAttributes redirectAttributes,
@@ -237,22 +240,22 @@ public class FileController {
         MimetypesFileTypeMap m = new MimetypesFileTypeMap();
         String fileType = m.getContentType(filename);*/
 
-        SysFolder sysFolder = folderService.findById(folderId).get();
-        if (fileService.getStoredFile(filename, folderId) != null) {
+        SysFolder sysFolder = folderService.findById(containerId).get();
+        if (fileService.getStoredFile(filename, containerId) != null) {
             redirectAttributes.addFlashAttribute("message",
                     "该目录： " + sysFolder.getName() + "中已存在同名文件，请核对文件信息是否重复！");
-            return "redirect:/#files/folder@" + folderId;
+            return "redirect:/#file/folder@" + containerId;
         }
         // 鉴权检查
-/*        if (checkAuthentication(sysFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
-           *//* Metadata metadata = new Metadata(fileType, folderId,
+        /*if (checkAuthentication(sysFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
+            Metadata metadata = new Metadata(fileType, folderId,
                     translateShareSetting(activeUser, shareSetting, shareGroups), null);
 
-            ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);*//*
+            ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
             // 启动TensorFlow 线程分析图片内容
-            *//*if (fileType.startsWith("image/")) {
+            if (fileType.startsWith("image/")) {
                 tensorFlowService.updateImageMetadata(fileId, metadata);
-            }*//*
+            }
 
             refreshDirList(model, folderId);
             // 发送MQ消息
@@ -264,7 +267,7 @@ public class FileController {
             redirectAttributes.addFlashAttribute("message",
                     "您无此目录的上传权限： " + sysFolder.getName() + "，请联系管理员获取！");
         }*/
-        return "redirect:/#files/folder@" + folderId;
+        return "redirect:/#files/folder@" + containerId;
     }
 
     /**
