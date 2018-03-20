@@ -93,10 +93,10 @@ public class QuickDocConfiguration {
                         "chenbichao@mxleader.cn"));
 
                 // 初始化系统目录
-                ObjectId gId = diskService.save("root（管理员组）",
+                ObjectId gId = diskService.save("共享磁盘1",
                         new AccessAuthorization("administrators",
                                 AccessAuthorization.Type.TYPE_GROUP, AccessAuthorization.Action.READ)).getId();
-                ObjectId id = diskService.save("root（管理员）",
+                ObjectId id = diskService.save("我的磁盘1",
                         new AccessAuthorization("admin",
                                 AccessAuthorization.Type.TYPE_PRIVATE, AccessAuthorization.Action.READ)).getId();
 

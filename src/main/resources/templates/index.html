@@ -50,7 +50,7 @@
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
                aria-expanded="false">
-                <img th:src="@{'files/view-jpeg/'+${session.ActiveUser.avatarId}}"
+                <img th:src="@{'file/view-jpeg/'+${session.ActiveUser.avatarId}}"
                      class="img-avatar" th:alt="${session.ActiveUser.email}">
             </a>
             <div class="dropdown-menu dropdown-menu-right">
@@ -105,7 +105,9 @@
                         </li>
                     </ul>
                 </li>
-
+                <li class="nav-title">
+                    系统设置
+                </li>
                 <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">
                     <a class="nav-link" href="users"><i class="fas fa-users"></i>系统用户</a>
                 </li>
@@ -117,29 +119,20 @@
     <!-- Main content -->
     <main class="main">
         <ol class="breadcrumb">
-            <form class="breadcrumb-item form-inline my-2 my-lg-0" id="searchform"
+            <form class="breadcrumb-item form-inline" id="searchform"
                   onkeydown="if(event.keyCode==13){
-                      setUpUrl('files/search?filename=' + $('#filename').val());
+                      setUpUrl('file/search?filename=' + $('#filename').val());
                       return false;
                   }">
-                <input class="form-control mr-sm-2" type="search" placeholder="文件名"
-                       name="filename" id="filename" size="60">
-                <button type="reset" id="searchBtn" class="btn btn-outline-success"
-                        lay-submit="" lay-filter="searchBtn"><i class="fas fa-search"></i> 搜索
-                </button>
-
-                <script th:inline="javascript">
-                    layui.use(['layer', 'form'], function () {
-                        var form = layui.form
-                            , layer = layui.layer;
-
-                        form.on('submit(searchBtn)', function (data) {
-                            var filename = $("#filename").val();
-                            setUpUrl("files/search?filename=" + filename);
-                        });
-                    });
-                </script>
-
+                <div class="container">
+                    <div class="layui-inline">
+                        <input class="form-control" type="search" placeholder="文件名"
+                               name="filename" id="filename" size="60">
+                    </div>
+                    <button type="reset" id="searchBtn" class="btn btn-outline-success"
+                            lay-submit="" lay-filter="searchBtn"><i class="fas fa-search"></i> 搜索
+                    </button>
+                </div>
             </form>
             <li class="breadcrumb-menu d-md-down-none">
                 <div class="btn-group" role="group" aria-label="Button group">
@@ -305,6 +298,18 @@
 
 <!-- CoreUI main scripts -->
 <script src="js/app.js" th:inline="javascript"></script>
+
+<script th:inline="javascript">
+    layui.use(['layer', 'form'], function () {
+        var form = layui.form
+            , layer = layui.layer;
+
+        form.on('submit(searchBtn)', function (data) {
+            var filename = $("#filename").val();
+            setUpUrl("file/search?filename=" + filename);
+        });
+    });
+</script>
 
 </body>
 </html>

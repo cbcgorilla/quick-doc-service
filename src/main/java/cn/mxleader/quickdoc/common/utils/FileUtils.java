@@ -17,13 +17,13 @@ public class FileUtils {
      * 不同格式文件对应的预览资源路径前缀
      */
     private static final Map<String, String> typeLinkPrefix = new HashMap<String, String>() {{
-        put("application/pdf", "files/view-pdf/");
-        put("image/png", "files/view-png/");
-        put("image/gif", "files/view-gif/");
-        put("image/jpeg", "files/view-jpeg/");
-        put("text/plain", "files/view-text/");
-        put("text/html", "files/view-text/");
-        put("application/xml", "files/view-text/");
+        put("application/pdf", "file/view-pdf/");
+        put("image/png", "file/view-png/");
+        put("image/gif", "file/view-gif/");
+        put("image/jpeg", "file/view-jpeg/");
+        put("text/plain", "file/view-text/");
+        put("text/html", "file/view-text/");
+        put("application/xml", "file/view-text/");
     }};
 
     /**
@@ -48,7 +48,7 @@ public class FileUtils {
      * @return
      */
     public static String getLinkPrefix(String contentType) {
-        return typeLinkPrefix.get(contentType) == null ? "files/download/" : typeLinkPrefix.get(contentType);
+        return typeLinkPrefix.get(contentType) == null ? "file/download/" : typeLinkPrefix.get(contentType);
     }
 
     /**

@@ -1,14 +1,12 @@
 package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
-import cn.mxleader.quickdoc.entities.Metadata;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.service.StreamService;
 import cn.mxleader.quickdoc.web.domain.WebFile;
-import cn.mxleader.quickdoc.web.domain.WebFolder;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
@@ -26,27 +24,24 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.*;
 import static cn.mxleader.quickdoc.web.config.WebHandlerInterceptor.FILES_ATTRIBUTE;
-import static cn.mxleader.quickdoc.web.config.WebHandlerInterceptor.FOLDERS_ATTRIBUTE;
 
 @Controller
-@RequestMapping("/files")
+@RequestMapping("/file")
 @SessionAttributes("ActiveUser")
-public class FilesController {
+public class FileController {
 
     private final FolderService folderService;
     private final FileService fileService;
     private final StreamService streamService;
 
     @Autowired
-    public FilesController(FolderService folderService,
-                           FileService fileService,
-                           StreamService streamService) {
+    public FileController(FolderService folderService,
+                          FileService fileService,
+                          StreamService streamService) {
         this.folderService = folderService;
         this.fileService = fileService;
         this.streamService = streamService;
@@ -62,51 +57,10 @@ public class FilesController {
     public String index(Model model, HttpSession session) {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         if (activeUser.isAdmin()) {
-            refreshDirList(model, null);
-        } else {
-            /*List<WebFolder> webFolders = folderService.findAllByParentIdInWebFormat(null)
-                    .filter(webFolder -> webFolder.getName().equalsIgnoreCase("root"))
-                    .toStream()
-                    .collect(Collectors.toList());
-            if (webFolders != null && webFolders.size() > 0) {
-                for (WebFolder subFolder : webFolders) {
-                    model.addAttribute("currentFolder", subFolder);
-                    refreshDirList(model, subFolder.getId());
-                }
-            }*/
+            model.addAttribute(FILES_ATTRIBUTE, fileService.getWebFiles(null)
+                    .collect(Collectors.toList()));
         }
         return "files";
-    }
-
-    /**
-     * 刷新显示指定文件夹内的所有内容
-     *
-     * @param folderId
-     * @param model
-     * @return
-     */
-    @GetMapping("/folder@{folderId}")
-    public String index(@PathVariable ObjectId folderId, Model model, HttpSession session) {
-        SysFolder sysFolder = folderService.findById(folderId).get();
-        model.addAttribute("currentFolder", sysFolder);
-        refreshDirList(model, folderId);
-        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-
-        return "files";
-    }
-
-    /**
-     * 刷新文件夹目录内容
-     *
-     * @param model
-     * @param folderId
-     */
-    private void refreshDirList(Model model, ObjectId folderId) {
-/*        model.addAttribute(FOLDERS_ATTRIBUTE,
-                folderService.findAllByParentIdInWebFormat(folderId)
-                        .toStream().collect(Collectors.toList()));*/
-        model.addAttribute(FILES_ATTRIBUTE, fileService.getWebFiles(folderId)
-                .collect(Collectors.toList()));
     }
 
     @RequestMapping("/search")

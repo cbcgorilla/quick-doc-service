@@ -98,7 +98,8 @@
         table.on('tool(file-table)', function (obj) {
             var data = obj.data;
             if (obj.event === 'download') {
-                layer.msg('文件ID号：' + data.id + '名称：' + data.filename);
+                //layer.msg('文件ID号：' + data.id + '名称：' + data.filename);
+                window.open('file/download/' + data.id);
             } else if (obj.event === 'delete') {
                 layer.confirm('真的删除文件: '+data.filename+' 吗？', {title: "删除确认"}, function (index) {
                     postJSON("/api/file/delete", data.id)
