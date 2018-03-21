@@ -20,7 +20,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -56,23 +55,15 @@ public class ServiceIntercept {
                 .getMethod().getParameterTypes();
         Method m = clazz[0].getMethod(method, parameterTypes);
 
-        if (m != null && m.isAnnotationPresent(PreAuth.class)) {
+        if (m != null && m.isAnnotationPresent(PreAuth.class)
+                && RequestContextHolder.getRequestAttributes() != null) {
             PreAuth preAuth = m.getAnnotation(PreAuth.class);
 
             HttpServletRequest request = ((ServletRequestAttributes)
                     RequestContextHolder.getRequestAttributes()).getRequest();
-            HttpSession session = request.getSession();
-
-            //if (session.getAttribute("ActiveUser") != null) {
-            SysUser sysUser = (SysUser) session.getAttribute("ActiveUser");
-            //}
-
-            // System.out.println("目标类名称：" + joinPoint.getTarget().getClass().getName());
-            // System.out.println("方法名称：" + joinPoint.getSignature().getName());
+            SysUser sysUser = (SysUser) request.getSession().getAttribute("ActiveUser");
             for (Object arg : joinPoint.getArgs()) {
                 if (arg.getClass().equals(preAuth.field())) {
-                    //System.out.println("参数匹配：" + preAuth.field());
-                    //System.out.println("参数值：" + arg);
                     AuthTarget authTarget = null;
                     ObjectId id = null;
                     if (preAuth.field().equals(ParentLink.class)) {
@@ -104,8 +95,7 @@ public class ServiceIntercept {
                         // System.out.println("目标类名称：" + joinPoint.getTarget().getClass().getName());
                         // System.out.println("方法名称：" + joinPoint.getSignature().getName());
                         throw new Exception("用户：" + sysUser.getUsername() +
-                                " 未获得" + joinPoint.getTarget().getClass().getName() +
-                                "." + joinPoint.getSignature().getName() + "访问授权");
+                                " 未获得：" + m.toString() + "的" + preAuth.action() + "访问授权");
                     }
                 }
             }

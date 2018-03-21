@@ -46,7 +46,12 @@ public class FileRestController {
     @ApiOperation(value = "根据文件ID删除库内文件信息")
     public Boolean delete(@RequestBody ObjectId fileId) {
         //username=username.replaceAll("\"","");
-        fileService.delete(fileId);
+        try {
+            fileService.delete(fileId);
+        }catch (Exception exp){
+            //System.out.println(exp.getMessage());
+            return false;
+        }
         return true;
     }
 

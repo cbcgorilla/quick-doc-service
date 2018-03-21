@@ -2,7 +2,6 @@ package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.entities.AuthTarget;
-import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.FileService;

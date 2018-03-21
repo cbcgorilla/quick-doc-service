@@ -21,7 +21,7 @@ public class DiskServiceImpl implements DiskService {
 
     @Override
     public List<SysDisk> list(AccessAuthorization authorization) {
-        return sysDiskRepository.findAllByAuthorization(authorization);
+        return sysDiskRepository.findAllByAuthorizationsContains(authorization);
     }
 
     @Override

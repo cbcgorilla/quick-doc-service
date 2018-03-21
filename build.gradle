@@ -1,26 +1,26 @@
 buildscript {
-	ext.kotlin_version = '1.2.30'
-	ext {
-		springBootVersion = '2.0.0.RELEASE'
-		swagger_version='2.8.0'
-		swagger_bootstrap_version = '1.7.2'
-		spring_kafka_version='2.1.4.RELEASE'
-		junit_version = '4.12'
-        junit_jupiter_version='5.1.0'
-		junit_vintage_version='5.1.0'
-        junit_platform_version='1.1.0'
-	}
-	repositories {
-		mavenCentral()
-		maven { url "https://repo.spring.io/snapshot" }
-		maven { url "https://repo.spring.io/milestone" }
-		maven { url 'http://repo.spring.io/plugins-release' }
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-		classpath 'io.spring.gradle:propdeps-plugin:0.0.9.RELEASE'
-	}
+    ext.kotlin_version = '1.2.30'
+    ext {
+        springBootVersion = '2.0.0.RELEASE'
+        swagger_version = '2.8.0'
+        swagger_bootstrap_version = '1.7.2'
+        spring_kafka_version = '2.1.4.RELEASE'
+        junit_version = '4.12'
+        junit_jupiter_version = '5.1.0'
+        junit_vintage_version = '5.1.0'
+        junit_platform_version = '1.1.0'
+    }
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://repo.spring.io/milestone" }
+        maven { url 'http://repo.spring.io/plugins-release' }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'io.spring.gradle:propdeps-plugin:0.0.9.RELEASE'
+    }
 }
 
 apply plugin: 'java'
@@ -38,51 +38,51 @@ version = '1.0.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
-	mavenCentral()
-	maven { url "https://repo.spring.io/snapshot" }
-	maven { url "https://repo.spring.io/milestone" }
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
 }
 
 
 dependencies {
-	optional("org.springframework.boot:spring-boot-configuration-processor")
-	compile("org.springframework.boot:spring-boot-starter-actuator")
-	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
-	compile("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
-	compile("org.springframework.boot:spring-boot-starter-security")
-	compile("org.springframework.boot:spring-boot-starter-web")
-	compile("org.springframework.boot:spring-boot-starter-webflux")
-	compile("io.springfox:springfox-swagger2:$swagger_version")
-	compile("io.springfox:springfox-swagger-ui:$swagger_version")
-	compile("com.github.xiaoymin:swagger-bootstrap-ui:$swagger_bootstrap_version")
-	compile("org.springframework.kafka:spring-kafka:$spring_kafka_version")
-	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
-	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
-	compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
-	compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
-	compile("com.fasterxml.jackson.module:jackson-module-kotlin")
-	compile("commons-fileupload:commons-fileupload:1.3.3")
-	compile("commons-io:commons-io:2.6")
-	compile("org.aspectj:aspectjrt:1.8.13")
-	compile("org.aspectj:aspectjweaver:1.8.13")
-	compile("cglib:cglib:3.2.6")
-	testCompile("io.projectreactor:reactor-test")
-	testCompile ("org.springframework.boot:spring-boot-starter-test")
-	testCompile("org.springframework.security:spring-security-test")
-	testCompile("junit:junit:$junit_version")
-	testCompile("org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version")
-	testCompile("org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version")
-	testCompile("org.junit.platform:junit-platform-runner:$junit_platform_version")
-	testCompile("org.junit.platform:junit-platform-launcher:$junit_platform_version")
-	testCompile("org.junit.vintage:junit-vintage-engine:$junit_vintage_version")
+    optional("org.springframework.boot:spring-boot-configuration-processor")
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+    compile("org.springframework.boot:spring-boot-starter-security")
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-webflux")
+    compile("io.springfox:springfox-swagger2:$swagger_version")
+    compile("io.springfox:springfox-swagger-ui:$swagger_version")
+    compile("com.github.xiaoymin:swagger-bootstrap-ui:$swagger_bootstrap_version")
+    compile("org.springframework.kafka:spring-kafka:$spring_kafka_version")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
+    compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
+    compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin")
+    compile("commons-fileupload:commons-fileupload:1.3.3")
+    compile("commons-io:commons-io:2.6")
+    compile("org.aspectj:aspectjrt:1.8.13")
+    compile("org.aspectj:aspectjweaver:1.8.13")
+    compile("cglib:cglib:3.2.6")
+    testCompile("io.projectreactor:reactor-test")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("org.springframework.security:spring-security-test")
+    testCompile("junit:junit:$junit_version")
+    testCompile("org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version")
+    testCompile("org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version")
+    testCompile("org.junit.platform:junit-platform-runner:$junit_platform_version")
+    testCompile("org.junit.platform:junit-platform-launcher:$junit_platform_version")
+    testCompile("org.junit.vintage:junit-vintage-engine:$junit_vintage_version")
 }
 compileKotlin {
-	kotlinOptions {
-		jvmTarget = "1.8"
-	}
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 compileTestKotlin {
-	kotlinOptions {
-		jvmTarget = "1.8"
-	}
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }

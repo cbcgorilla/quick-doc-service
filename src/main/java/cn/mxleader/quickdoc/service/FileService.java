@@ -1,9 +1,7 @@
 package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.common.annotation.PreAuth;
-import cn.mxleader.quickdoc.entities.Metadata;
-import cn.mxleader.quickdoc.entities.ParentLink;
-import cn.mxleader.quickdoc.entities.SysUser;
+import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -44,6 +42,7 @@ public interface FileService {
 
     void rename(ObjectId fileId, String newFilename);
 
+    @PreAuth(target = AuthTarget.FILE, action = AuthAction.WRITE)
     GridFSFile saveMetadata(ObjectId fileId, Metadata metadata);
 
     GridFSFile addParent(ObjectId fileId, ParentLink parent);
@@ -54,6 +53,7 @@ public interface FileService {
      * @param fileId 文件ID
      * @return
      */
+    @PreAuth(target = AuthTarget.FILE, action = AuthAction.DELETE)
     void delete(ObjectId fileId);
 
     /**
@@ -73,6 +73,7 @@ public interface FileService {
      * @param fos        生成的zip文件存在路径（包括文件名）
      * @param activeUser 用户信息
      */
+    @PreAuth
     void createZip(ObjectId folderId, OutputStream fos, SysUser activeUser) throws IOException;
 
 }

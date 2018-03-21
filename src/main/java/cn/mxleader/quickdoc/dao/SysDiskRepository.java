@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface SysDiskRepository extends MongoRepository<SysDisk, ObjectId> {
 
-    List<SysDisk> findAllByAuthorization(AccessAuthorization authorization);
+    List<SysDisk> findAllByAuthorizationsContains(AccessAuthorization authorization);
 }
