@@ -79,6 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             return entryPoint;
         }
     }
+/*
 
     @Configuration
     @Order(2)
@@ -108,6 +109,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             return entryPoint;
         }
     }
+*/
 
     @Configuration
     @Order(3)

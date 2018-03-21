@@ -1,5 +1,6 @@
 package cn.mxleader.quickdoc.service;
 
+import cn.mxleader.quickdoc.common.annotation.PreAuth;
 import cn.mxleader.quickdoc.entities.Metadata;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysUser;
@@ -24,7 +25,7 @@ public interface FileService {
 
     Stream<WebFile> getWebFiles(ObjectId folderId);
 
-
+    @PreAuth(field = ParentLink.class)
     List<WebFile> list(ParentLink parent);
 
     /**

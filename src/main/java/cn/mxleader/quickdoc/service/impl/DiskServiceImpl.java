@@ -7,6 +7,7 @@ import cn.mxleader.quickdoc.service.DiskService;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class DiskServiceImpl implements DiskService {
 
     @Override
     public SysDisk save(String name, AccessAuthorization authorization) {
-        return sysDiskRepository.save(new SysDisk(ObjectId.get(), name, authorization));
+        return sysDiskRepository.save(new SysDisk(ObjectId.get(), name, Arrays.asList(authorization)));
     }
 
     @Override
@@ -41,6 +42,16 @@ public class DiskServiceImpl implements DiskService {
             disk.setName(newName);
             return sysDiskRepository.save(disk);
         }
+        return null;
+    }
+
+    @Override
+    public SysDisk addAuthorization(ObjectId id, AccessAuthorization authorization) {
+        return null;
+    }
+
+    @Override
+    public SysDisk removeAuthorization(ObjectId id, AccessAuthorization authorization) {
         return null;
     }
 

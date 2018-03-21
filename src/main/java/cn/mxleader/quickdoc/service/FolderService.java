@@ -1,9 +1,10 @@
 package cn.mxleader.quickdoc.service;
 
+import cn.mxleader.quickdoc.common.annotation.PreAuth;
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
-import cn.mxleader.quickdoc.web.domain.FolderTreeNode;
+import cn.mxleader.quickdoc.web.domain.TreeNode;
 import org.bson.types.ObjectId;
 
 import java.util.List;
@@ -19,7 +20,8 @@ public interface FolderService {
      */
     List<SysFolder> list(ParentLink parent);
 
-    List<FolderTreeNode> getFolderTree(ParentLink parent);
+    @PreAuth(field = ParentLink.class)
+    List<TreeNode> getFolderTree(ParentLink parent);
 
     /**
      * 根据ID获取文件目录信息
@@ -67,7 +69,7 @@ public interface FolderService {
     SysFolder removeParent(ObjectId id, ParentLink parent);
 
     /**
-     * 增加文件目录上级关系
+     * 增加文件目录授权信息
      *
      * @param id            文件夹ID
      * @param authorization 新增授权
@@ -76,7 +78,7 @@ public interface FolderService {
     SysFolder addAuthorization(ObjectId id, AccessAuthorization authorization);
 
     /**
-     * 删除文件目录上级关系
+     * 删除文件目录授权信息
      *
      * @param id            文件夹ID
      * @param authorization 待删除授权

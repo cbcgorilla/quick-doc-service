@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
+import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.entities.SysUser;
@@ -57,10 +58,6 @@ public class FileController {
     @GetMapping()
     public String index(Model model, HttpSession session) {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        if (activeUser.isAdmin()) {
-            model.addAttribute(FILES_ATTRIBUTE, fileService.getWebFiles(null)
-                    .collect(Collectors.toList()));
-        }
         return "files";
     }
 
@@ -227,7 +224,7 @@ public class FileController {
     @PostMapping("/upload")
     public String upload(@RequestParam("file") MultipartFile file,
                          @RequestParam("containerId") ObjectId containerId,
-                         @RequestParam("containerType") ParentLink.PType containerType,
+                         @RequestParam("containerType") AuthTarget containerType,
                          @RequestParam(value = "shareSetting", required = false) String[] shareSetting,
                          @RequestParam(value = "shareGroups", required = false) String[] shareGroups,
                          RedirectAttributes redirectAttributes,

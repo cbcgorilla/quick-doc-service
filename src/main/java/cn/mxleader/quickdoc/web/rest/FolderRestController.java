@@ -1,8 +1,9 @@
 package cn.mxleader.quickdoc.web.rest;
 
+import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.service.FolderService;
-import cn.mxleader.quickdoc.web.domain.FolderTreeNode;
+import cn.mxleader.quickdoc.web.domain.TreeNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
@@ -26,8 +27,8 @@ public class FolderRestController {
 
     @RequestMapping(value = "/tree", method = RequestMethod.GET)
     @ApiOperation(value = "根据磁盘ID号获取目录树信息")
-    public List<FolderTreeNode> getFolderTree(@RequestParam String parentId) {
-        return folderService.getFolderTree(new ParentLink(new ObjectId(parentId), ParentLink.PType.DISK));
+    public List<TreeNode> getFolderTree(@RequestParam String parentId) {
+        return folderService.getFolderTree(new ParentLink(new ObjectId(parentId), AuthTarget.DISK));
     }
 
 /*

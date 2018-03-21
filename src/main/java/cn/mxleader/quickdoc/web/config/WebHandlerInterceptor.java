@@ -2,8 +2,6 @@ package cn.mxleader.quickdoc.web.config;
 
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.entities.SysUser;
-import cn.mxleader.quickdoc.web.domain.WebFile;
-import cn.mxleader.quickdoc.web.domain.WebFolder;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -12,37 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.*;
 
 public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
 
     public static final String FILES_ATTRIBUTE = "files";
-    public static final String FOLDERS_ATTRIBUTE = "folders";
-
-    private Map<AccessAuthorization.Type, String> getOwnerTypeMap() {
-        Map<AccessAuthorization.Type, String> ownerTypeMap = new HashMap<>();
-        ownerTypeMap.put(AccessAuthorization.Type.TYPE_GROUP, "组权限");
-        ownerTypeMap.put(AccessAuthorization.Type.TYPE_PRIVATE, "个人权限");
-        return ownerTypeMap;
-    }
-
-    private Map<Integer, String> getPrivilegeMap() {
-        Map<Integer, String> privilegeMap = new HashMap<>();
-        privilegeMap.put(1, "读");
-        privilegeMap.put(2, "写");
-        privilegeMap.put(3, "读写");
-        privilegeMap.put(4, "删");
-        privilegeMap.put(5, "读删");
-        privilegeMap.put(6, "写删");
-        privilegeMap.put(7, "读写删");
-        return privilegeMap;
-    }
 
     /**
      * 重写preHandle方法，在请求发生之前执行
@@ -59,8 +34,6 @@ public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
                              Object handler) throws Exception {
 
         request.setAttribute("title", HOME_TITLE);
-        request.setAttribute("ownerTypeMap", getOwnerTypeMap());
-        request.setAttribute("privilegeMap", getPrivilegeMap());
 
         return super.preHandle(request, response, handler);
     }

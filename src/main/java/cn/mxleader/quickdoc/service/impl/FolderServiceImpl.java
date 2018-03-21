@@ -2,15 +2,14 @@ package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.dao.SysFolderRepository;
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.service.FolderService;
-import cn.mxleader.quickdoc.web.domain.FolderTreeNode;
+import cn.mxleader.quickdoc.web.domain.TreeNode;
 import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -20,12 +19,9 @@ import java.util.stream.Collectors;
 public class FolderServiceImpl implements FolderService {
 
     private final SysFolderRepository sysFolderRepository;
-    private final MongoTemplate mongoTemplate;
 
-    FolderServiceImpl(SysFolderRepository sysFolderRepository,
-                      MongoTemplate mongoTemplate) {
+    FolderServiceImpl(SysFolderRepository sysFolderRepository) {
         this.sysFolderRepository = sysFolderRepository;
-        this.mongoTemplate = mongoTemplate;
     }
 
     @Override
@@ -34,14 +30,13 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public List<FolderTreeNode> getFolderTree(ParentLink parent) {
+    public List<TreeNode> getFolderTree(ParentLink parent) {
         return sysFolderRepository.findAllByParentsContains(parent)
                 .stream()
-                .map(sysFolder -> new FolderTreeNode(sysFolder.getId().toString(),
+                .map(sysFolder -> new TreeNode(sysFolder.getId().toString(),
                         sysFolder.getName(),
                         parent.getId().toString(),
-                        getFolderTree(new ParentLink(sysFolder.getId(),
-                                ParentLink.PType.FOLDER)))
+                        getFolderTree(new ParentLink(sysFolder.getId(), AuthTarget.FOLDER)))
                 )
                 .collect(Collectors.toList());
     }

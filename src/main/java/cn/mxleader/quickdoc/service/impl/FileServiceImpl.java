@@ -29,8 +29,6 @@ import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.checkAuthentication;
-
 @Service
 public class FileServiceImpl implements FileService {
 
@@ -86,6 +84,7 @@ public class FileServiceImpl implements FileService {
         return StreamSupport.stream(switchWebFiles(fsFiles).spliterator(), false)
                 .collect(Collectors.toList());
     }
+
     /**
      * 根据文件名进行模糊查询
      *
@@ -129,9 +128,7 @@ public class FileServiceImpl implements FileService {
         File file = ResourceUtils.getFile(resourceLocation);
         String fileType = FileUtils.guessMimeType(file.getName());
         Metadata metadata = new Metadata(fileType, null,
-                Arrays.asList(new AccessAuthorization("users",
-                        AccessAuthorization.Type.TYPE_GROUP,
-                        AccessAuthorization.Action.READ)),
+                Arrays.asList(new AccessAuthorization("users", AuthType.GROUP, AuthAction.READ)),
                 null);
         return gridFsAssistant.store(new FileInputStream(file), file.getName(), metadata);
     }
@@ -147,7 +144,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public GridFSFile addParent(ObjectId fileId, ParentLink parent) {
-        GridFSFile file = gridFsAssistant.findOne( Query.query(Criteria.where("_id").is(fileId)));
+        GridFSFile file = gridFsAssistant.findOne(Query.query(Criteria.where("_id").is(fileId)));
         Metadata metadata = converter.read(Metadata.class, file.getMetadata());
         metadata.getParents().add(parent);
         return gridFsAssistant.updateMetadata(fileId, metadata);
@@ -215,8 +212,8 @@ public class FileServiceImpl implements FileService {
         List<SysFolder> folders = mongoTemplate.find(
                 Query.query(Criteria.where("parentId").is(folder.getId())),
                 SysFolder.class).stream()
-                .filter(quickDocFolder -> checkAuthentication(quickDocFolder.getAuthorizations(),
-                        activeUser, AccessAuthorization.Action.READ))
+/*                .filter(quickDocFolder -> checkAuthentication(quickDocFolder.getAuthorizations(),
+                        activeUser, AuthAction.READ))*/
                 .collect(Collectors.toList());
         if (folders != null && folders.size() > 0) {
             for (SysFolder subFolder : folders) {

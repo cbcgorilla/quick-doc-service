@@ -1,5 +1,6 @@
 package cn.mxleader.quickdoc.web;
 
+import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysDisk;
 import cn.mxleader.quickdoc.service.DiskService;
@@ -38,7 +39,7 @@ public class DiskController {
             ObjectMapper mapper = new ObjectMapper();
             model.addAttribute("folderTree",
                     mapper.writeValueAsString(folderService.getFolderTree(
-                            new ParentLink(diskId, ParentLink.PType.DISK))));
+                            new ParentLink(diskId, AuthTarget.DISK))));
         }
         return "disk";
     }

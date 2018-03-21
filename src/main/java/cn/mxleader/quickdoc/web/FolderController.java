@@ -17,7 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpSession;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
-import static cn.mxleader.quickdoc.web.config.AuthenticationToolkit.checkAuthentication;
 
 @Controller
 @RequestMapping("/folders")
@@ -74,10 +73,10 @@ public class FolderController {
                 new ObjectId(folderIdRef) : new ObjectId(parentId);
         SysFolder folder = folderService.findById(folderId).get();
         // 鉴权检查
-        if (checkAuthentication(folder.getAuthorizations(),
+       /* if (checkAuthentication(folder.getAuthorizations(),
                 activeUser, AccessAuthorization.Action.WRITE)) {
 
-            /*if (folderIdRef != null && folderIdRef.trim().length() > 0) {
+            if (folderIdRef != null && folderIdRef.trim().length() > 0) {
                 // folderIdRef字段有数据则修改现有目录的数据
                 folderService.save(new ObjectId(folderIdRef), path,
                         translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
@@ -85,7 +84,7 @@ public class FolderController {
                 // folderIdRef字段无数据则增加新的子目录
                 folderService.save(path, new ObjectId(parentId),
                         translateShareSetting(activeUser, shareSetting, shareGroups)).subscribe();
-            }*/
+            }
             // 发送MQ消息
             streamService.sendMessage("用户" + activeUser.getUsername() +
                     "成功保存目录： " + path);
@@ -94,7 +93,7 @@ public class FolderController {
         } else {
             redirectAttributes.addFlashAttribute("message",
                     "您无此目录的权限： " + folder.getName() + "，请联系管理员获取！");
-        }
+        }*/
         return "redirect:/#folders";
     }
 

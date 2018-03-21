@@ -1,5 +1,6 @@
 package cn.mxleader.quickdoc.web.rest;
 
+import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.web.domain.LayuiTable;
@@ -34,7 +35,7 @@ public class FileRestController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value = "根据上级目录ID获取文件列表")
     public LayuiTable<WebFile> list(@RequestParam ObjectId parentId,
-                                    @RequestParam ParentLink.PType parentType,
+                                    @RequestParam AuthTarget parentType,
                                     @RequestParam Integer page,
                                     @RequestParam Integer limit) {
         List<WebFile> webFileList = fileService.list(new ParentLink(parentId, parentType));
