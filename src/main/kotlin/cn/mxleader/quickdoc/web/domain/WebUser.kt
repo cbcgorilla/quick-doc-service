@@ -2,9 +2,11 @@ package cn.mxleader.quickdoc.web.domain
 
 import cn.mxleader.quickdoc.entities.SysUser
 
-data class WebUser(val id: String, val username: String, val title: String,
-                   val avatarId: String, val email: String? = null,
-                   var groups: List<String>) {
-    constructor(user: SysUser) : this(user.id.toString(), user.username,
-            user.title, user.avatarId.toString(), user.email, user.groups)
+data class WebUser(val id: String,
+var username: String,
+var title: String,
+var avatarId: String,
+var groups: List<String>,
+var email: String? = null) {
+    constructor(user:SysUser):this(user.id.toString(),user.username,user.title,user.avatarId.toString(),user.groups,user.email)
 }
