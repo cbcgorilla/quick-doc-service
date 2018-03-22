@@ -14,7 +14,7 @@
 
                                 <div class="layui-btn-group disk-table">
                                     <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
-                                            data-target="#uploadModal">
+                                            data-target="#addDisk">
                                         <i class="fas fa-cloud-upload-alt"></i>新建
                                     </button>
 
@@ -51,7 +51,7 @@
 </div>
 
 <!-- 模态框 -->
-<div class="modal fade" id="uploadModal">
+<div class="modal fade" id="addDisk">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
@@ -70,7 +70,6 @@
                                 <td align="right">磁盘空间名:</td>
                                 <td>
                                     <div class="template-input-icon-container">
-                                        <i class="far fa-hdd"></i>
                                         <input type="text" class="form-control"
                                                placeholder="磁盘空间名"
                                                required="required"
@@ -105,10 +104,6 @@
         </div>
     </div>
 </div>
-
-
-<link href="./css/bootstrap-treeview.min.css" rel="stylesheet">
-<script src="./js/bootstrap-treeview.min.js"></script>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
