@@ -1,10 +1,197 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-align-justify"></i>空间管理
+                </div>
+                <div class="card-body">
 
-</body>
-</html>
+                    <div class=" form-horizontal">
+                        <div class="row">
+
+                            <div class="col-md-9">
+
+                                <div class="layui-btn-group disk-table">
+                                    <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
+                                            data-target="#uploadModal">
+                                        <i class="fas fa-cloud-upload-alt"></i>新建
+                                    </button>
+
+                                </div>
+
+                                <table class="layui-table" id="LAY_table_disks" lay-filter="disk-table">
+                                </table>
+
+                                <script type="text/html" id="diskOpsBar">
+                                    <div class="layui-btn-group">
+                                        <button class="layui-btn layui-btn-sm" lay-event="download">
+                                            <i class="fas fa-cloud-download-alt" title="编辑"></i>
+                                        </button>
+                                        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
+                                            <i class="fas fa-trash-alt" title="删除"></i>
+                                        </button>
+                                    </div>
+                                </script>
+
+                            </div>
+
+                            <div class="col-md-3" style="float: right">
+                                <div id="diskTree"></div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--/.row-->
+        </div>
+    </div>
+</div>
+
+<!-- 模态框 -->
+<div class="modal fade" id="uploadModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">磁盘空间</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <div class="table-responsive" style="text-align: center">
+                    <form method="POST" th:action="@{'./disk/save'}">
+                        <table class="table table-hover">
+                            <tr>
+                                <td align="right">磁盘空间名:</td>
+                                <td>
+                                    <div class="template-input-icon-container">
+                                        <i class="far fa-hdd"></i>
+                                        <input type="text" class="form-control"
+                                               placeholder="磁盘空间名"
+                                               required="required"
+                                               id="diskName" name="diskName"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">共享组:</td>
+                                <td>
+                                    <select id="shareGroups" name="shareGroups"
+                                            class="select custom-select"
+                                            multiple="multiple">
+                                        <option th:each="group : ${session.ActiveUser.groups}"
+                                                th:value="${group}"
+                                                th:text="${group}">共享组
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                        <input type="submit" value="保存" class="btn btn-success"/>
+                    </form>
+                </div>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<link href="./css/bootstrap-treeview.min.css" rel="stylesheet">
+<script src="./js/bootstrap-treeview.min.js"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    layui.use('table', function () {
+        var table = layui.table;
+        var opt = {
+            elem: '#LAY_table_disks',
+            id: 'disk-data',
+            url: '/api/disk/list',
+            height: '510',
+            cellMinWidth: 120,
+            page: true, //开启分页,
+            limit: 10,
+            limits: [10, 20, 50, 100],
+            cols: [
+                [
+                    {type: 'checkbox'},
+                    {field: 'id', title: 'ID'},
+                    {field: 'name', title: '磁盘名称'},
+                    {
+                        title: '操作',
+                        width: 160,
+                        align: 'center',
+                        toolbar: '#diskOpsBar'
+                    }
+                ]
+            ],
+            done: function (res, curr, count) {
+                $("[data-field='id']").css('display', 'none');
+            }
+        };
+        //方法级渲染
+        table.render(opt);
+
+        //监听表格复选框选择
+        /*table.on('checkbox(disk-table)', function (obj) {
+            console.log(obj)
+        });*/
+        //监听工具条
+        table.on('tool(disk-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'download') {
+                layer.msg('文件ID号：' + data.id + '名称：' + data.name);
+                //window.open('file/download/' + data.id);
+            } else if (obj.event === 'delete') {
+                layer.confirm('真的删除磁盘: '+data.name+' 吗？', {title: "删除确认"}, function (index) {
+                    postJSON("/api/disk/delete", data.id)
+                            .catch(error => {
+
+                                })
+                            .then(value => {
+                                    var result=JSON.parse(value);
+                                if (result == true) {
+                                    layer.alert('磁盘【'+data.name+'】删除成功!', {
+                                        icon: 6, btn: ['确认'], yes: function (index) {
+                                            obj.del();
+                                            layer.close(index);
+                                            var tableIns=table.render(opt);
+                                            tableIns.reload();
+                                        }
+                                    });
+                                } else {
+                                    layer.alert("文件删除失败!", {icon: 2});
+                                }
+                                layer.close(index);
+                            });
+                });
+            }
+        });
+
+        var $ = layui.$, active = {
+            downloadSelectedFiles: function () { //下载选中的文件
+                var checkStatus = table.checkStatus('disk-data')
+                    , data = checkStatus.data;
+                layer.alert(JSON.stringify(data));
+            }
+        };
+
+        $('.disk-table .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        /*]]>*/
+    });
+</script>

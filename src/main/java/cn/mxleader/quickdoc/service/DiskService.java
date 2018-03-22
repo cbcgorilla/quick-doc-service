@@ -12,11 +12,14 @@ import java.util.Optional;
 
 public interface DiskService {
 
+    List<SysDisk> list();
+
     List<SysDisk> list(AccessAuthorization authorization);
 
     @PreAuth(target = AuthTarget.DISK)
     Optional<SysDisk> get(ObjectId id);
     SysDisk save(String name, AccessAuthorization authorization);
+    SysDisk save(String name, List<AccessAuthorization> authorizations);
     SysDisk rename(ObjectId id, String newName);
 
     /**

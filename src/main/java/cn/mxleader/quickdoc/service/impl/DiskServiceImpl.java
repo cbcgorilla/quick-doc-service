@@ -20,6 +20,11 @@ public class DiskServiceImpl implements DiskService {
     }
 
     @Override
+    public List<SysDisk> list() {
+        return sysDiskRepository.findAll();
+    }
+
+    @Override
     public List<SysDisk> list(AccessAuthorization authorization) {
         return sysDiskRepository.findAllByAuthorizationsContains(authorization);
     }
@@ -31,7 +36,12 @@ public class DiskServiceImpl implements DiskService {
 
     @Override
     public SysDisk save(String name, AccessAuthorization authorization) {
-        return sysDiskRepository.save(new SysDisk(ObjectId.get(), name, Arrays.asList(authorization)));
+        return save(name, Arrays.asList(authorization));
+    }
+
+    @Override
+    public SysDisk save(String name, List<AccessAuthorization> authorizations) {
+        return sysDiskRepository.save(new SysDisk(ObjectId.get(), name, authorizations));
     }
 
     @Override

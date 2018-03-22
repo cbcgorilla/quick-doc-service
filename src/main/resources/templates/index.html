@@ -109,6 +109,9 @@
                     系统设置
                 </li>
                 <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">
+                    <a class="nav-link" href="disk/space"><i class="fas fa-cogs"></i>系统空间</a>
+                </li>
+                <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">
                     <a class="nav-link" href="users"><i class="fas fa-users"></i>系统用户</a>
                 </li>
             </ul>
