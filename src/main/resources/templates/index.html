@@ -105,7 +105,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-title">
+                <li class="nav-title" th:if="${session.ActiveUser.isAdmin()}">
                     系统设置
                 </li>
                 <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">

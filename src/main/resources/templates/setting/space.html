@@ -149,27 +149,30 @@
                 layer.msg('文件ID号：' + data.id + '名称：' + data.name);
                 //window.open('file/download/' + data.id);
             } else if (obj.event === 'delete') {
-                layer.confirm('真的删除磁盘: '+data.name+' 吗？', {title: "删除确认"}, function (index) {
-                    postJSON("/api/disk/delete", data.id)
-                            .catch(error => {
-
-                                })
-                            .then(value => {
-                                    var result=JSON.parse(value);
-                                if (result == true) {
-                                    layer.alert('磁盘【'+data.name+'】删除成功!', {
-                                        icon: 6, btn: ['确认'], yes: function (index) {
-                                            obj.del();
-                                            layer.close(index);
-                                            var tableIns=table.render(opt);
-                                            tableIns.reload();
-                                        }
-                                    });
-                                } else {
-                                    layer.alert("文件删除失败!", {icon: 2});
-                                }
-                                layer.close(index);
-                            });
+                layer.confirm('真的删除磁盘: ' + data.name + ' 吗？', {title: "删除确认"}, function (index) {
+                    $.ajax({
+                        type: "POST",
+                        url: "http://localhost:8000/api/disk/delete",
+                        data: data.id, //可选参数
+                        dataType: "json",
+                        success: function (value) {
+                            console.log(value);
+                            var result = JSON.parse(value);
+                            if (result == true) {
+                                layer.alert('磁盘【' + data.name + '】删除成功!', {
+                                    icon: 6, btn: ['确认'], yes: function (index) {
+                                        obj.del();
+                                        layer.close(index);
+                                        var tableIns = table.render(opt);
+                                        tableIns.reload();
+                                    }
+                                });
+                            } else {
+                                layer.alert("文件删除失败!", {icon: 2});
+                            }
+                            layer.close(index);
+                        }
+                    });
                 });
             }
         });
