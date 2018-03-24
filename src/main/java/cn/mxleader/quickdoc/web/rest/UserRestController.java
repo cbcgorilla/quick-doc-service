@@ -8,6 +8,7 @@ import cn.mxleader.quickdoc.web.domain.SuccessResponse;
 import cn.mxleader.quickdoc.web.domain.WebUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -56,9 +57,8 @@ public class UserRestController {
 
     @PostMapping(value = "/delete")
     @ApiOperation(value = "删除系统用户")
-    public Boolean deleteUser(@RequestBody String username) {
-        username=username.replaceAll("\"","");
-        reactiveUserService.deleteUserByUsername(username);
+    public Boolean deleteUser(@RequestBody String userId) {
+        reactiveUserService.deleteUserById(new ObjectId(userId));
         return true;
     }
 

@@ -52,8 +52,8 @@
                                     [
                                         {type: 'checkbox'},
                                         {field: 'id', title: 'ID'},
-                                        {field: 'username', title: '用户名',width:160},
-                                        {field: 'title', title: '显示名',width:160},
+                                        {field: 'username', title: '用户名', width: 160},
+                                        {field: 'title', title: '显示名', width: 160},
                                         {
                                             field: 'avatarId',
                                             title: '头像',
@@ -88,19 +88,22 @@
                                 if (obj.event === 'detail') {
                                     layer.msg('用户ID号：' + data.id + '\n 显示名称：' + data.title);
                                 } else if (obj.event === 'del') {
-                                    layer.confirm('真的删除用户: '+data.username+' 吗？', {title: "删除确认"}, function (index) {
-                                        postJSON("/api/user/delete", data.username)
-                                            .catch(error => {
-
-                                            })
-                                            .then(value => {
-                                                    var result=JSON.parse(value);
+                                    layer.confirm('真的删除用户: ' + data.username + ' 吗？', {title: "删除确认"}, function (index) {
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "/api/user/delete",
+                                            contentType: 'application/json; charset=utf-8',
+                                            data: data.id, //可选参数
+                                            dataType: "json",
+                                            success: function (value) {
+                                                console.log(value);
+                                                var result = JSON.parse(value);
                                                 if (result == true) {
-                                                    layer.alert('用户'+data.username+'删除成功!', {
+                                                    layer.alert('用户' + data.username + '删除成功!', {
                                                         icon: 6, btn: ['确认'], yes: function (index) {
                                                             obj.del();
                                                             layer.close(index);
-                                                            var tableIns=table.render(opt);
+                                                            var tableIns = table.render(opt);
                                                             tableIns.reload();
                                                         }
                                                     });
@@ -108,7 +111,8 @@
                                                     layer.alert("用户删除失败!", {icon: 2});
                                                 }
                                                 layer.close(index);
-                                            });
+                                            }
+                                        });
                                     });
 
                                 } else if (obj.event === 'edit') {
@@ -248,7 +252,6 @@
     </div>
 </div>
 
-<script src="/js/ajaxutils.js" th:inline="javascript"></script>
 <script th:inline="javascript">
     //<![CDATA[
     $(document).on("click", ".addMemberDialogModal", function () {

@@ -41,11 +41,10 @@ public class DiskRestController {
 
     @PostMapping(value = "/delete")
     @ApiOperation(value = "根据磁盘ID删除库内磁盘信息")
-    public Boolean delete(@RequestBody ObjectId diskId) {
-        //username=username.replaceAll("\"","");
+    public Boolean delete(@RequestBody String diskId) {
         try {
-            diskService.delete(diskId);
-        }catch (Exception exp){
+            diskService.delete(new ObjectId(diskId));
+        } catch (Exception exp) {
             //System.out.println(exp.getMessage());
             return false;
         }

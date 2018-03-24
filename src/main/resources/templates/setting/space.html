@@ -152,7 +152,8 @@
                 layer.confirm('真的删除磁盘: ' + data.name + ' 吗？', {title: "删除确认"}, function (index) {
                     $.ajax({
                         type: "POST",
-                        url: "http://localhost:8000/api/disk/delete",
+                        url: "/api/disk/delete",
+                        contentType: 'application/json; charset=utf-8',
                         data: data.id, //可选参数
                         dataType: "json",
                         success: function (value) {

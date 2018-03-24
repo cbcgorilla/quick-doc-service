@@ -102,8 +102,8 @@
                                 </td>
                             </tr>
                         </table>
-                        <input type="hidden" id="containerId" name="containerId" />
-                        <input type="hidden" id="containerType" name="containerType" />
+                        <input type="hidden" id="containerId" name="containerId"/>
+                        <input type="hidden" id="containerType" name="containerType"/>
                         <input type="submit" value="上传" class="btn btn-success"/>
                     </form>
                 </div>
@@ -131,7 +131,7 @@
         var opt = {
             elem: '#LAY_table_files',
             id: 'file-data',
-            url: '/api/file/list?parentId='+[[${disk.id.toString()}]]+'&parentType=DISK',
+            url: '/api/file/list?parentId=' + [[${disk.id.toString()}]] + '&parentType=DISK',
             height: '510',
             cellMinWidth: 120,
             page: true, //开启分页,
@@ -144,7 +144,7 @@
                     {field: 'filename', title: '文件名'},
                     {field: 'length', title: '文件大小'},
                     {field: 'type', title: '文件类型'},
-                    {field: 'uploadDate', title: '上传日期',width:240},
+                    {field: 'uploadDate', title: '上传日期', width: 240},
                     {
                         title: '操作',
                         width: 160,
@@ -171,27 +171,31 @@
                 //layer.msg('文件ID号：' + data.id + '名称：' + data.filename);
                 window.open('file/download/' + data.id);
             } else if (obj.event === 'delete') {
-                layer.confirm('真的删除文件: '+data.filename+' 吗？', {title: "删除确认"}, function (index) {
-                    postJSON("/api/file/delete", data.id)
-                            .catch(error => {
-
-                            })
-                            .then(value => {
-                                    var result=JSON.parse(value);
-                                if (result == true) {
-                                    layer.alert('文件【'+data.filename+'】删除成功!', {
-                                        icon: 6, btn: ['确认'], yes: function (index) {
-                                            obj.del();
-                                            layer.close(index);
-                                            var tableIns=table.render(opt);
-                                            tableIns.reload();
-                                        }
-                                    });
-                                } else {
-                                    layer.alert("文件删除失败!", {icon: 2});
-                                }
-                                layer.close(index);
-                            });
+                layer.confirm('真的删除文件: ' + data.filename + ' 吗？', {title: "删除确认"}, function (index) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/file/delete",
+                        contentType: 'application/json; charset=utf-8',
+                        data: data.id, //可选参数
+                        dataType: "json",
+                        success: function (value) {
+                            console.log(value);
+                            var result = JSON.parse(value);
+                            if (result == true) {
+                                layer.alert('文件【' + data.filename + '】删除成功!', {
+                                    icon: 6, btn: ['确认'], yes: function (index) {
+                                        obj.del();
+                                        layer.close(index);
+                                        var tableIns = table.render(opt);
+                                        tableIns.reload();
+                                    }
+                                });
+                            } else {
+                                layer.alert("文件删除失败!", {icon: 2});
+                            }
+                            layer.close(index);
+                        }
+                    });
                 });
             }
         });
@@ -211,19 +215,19 @@
 
         $('#diskTree').treeview({
             data: [[${folderTree}]],
-            levels:5,
+            levels: 5,
             expandIcon: 'fas fa-folder',
             collapseIcon: 'fas fa-folder-open',
             nodeIcon: "fas fa-film",
-            onNodeSelected: function(event, data) {
+            onNodeSelected: function (event, data) {
                 containerId = data.id;
                 containerType = 'FOLDER';
-                reloadFileTable('/api/file/list',containerId,containerType);
+                reloadFileTable('/api/file/list', containerId, containerType);
             },
-            onNodeUnselected: function(event, data) {
+            onNodeUnselected: function (event, data) {
                 containerId = [[${disk.id.toString()}]];
                 containerType = 'DISK';
-                reloadFileTable('/api/file/list',containerId,containerType);
+                reloadFileTable('/api/file/list', containerId, containerType);
             }
         });
 
@@ -232,7 +236,7 @@
             $("#containerType").val(containerType);
         });
 
-        function reloadFileTable(restUrl, parentId,parentType){
+        function reloadFileTable(restUrl, parentId, parentType) {
             table.reload('file-data', {
                 url: restUrl,
                 page: {
@@ -240,10 +244,11 @@
                 },
                 where: {
                     parentId: parentId,
-                    parentType:parentType
+                    parentType: parentType
                 }
             });
         }
+
         /*]]>*/
     });
 </script>
