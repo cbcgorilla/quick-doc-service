@@ -27,6 +27,10 @@
                                         <i class="fas fa-cloud-upload-alt"></i>上传文件
                                     </button>
 
+                                    <button type="button" class="layui-btn" id="upload-file">
+                                        <i class="fas fa-cloud-upload-alt"></i>上传文件
+                                    </button>
+
                                 </div>
 
                                 <table class="layui-table" id="LAY_table_files" lay-filter="file-table">
@@ -124,10 +128,28 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    layui.use('table', function () {
-        var table = layui.table;
+    layui.use(['table', 'upload'], function () {
+        var table = layui.table,
+            upload = layui.upload;
+
         var containerId = [[${disk.id.toString()}]],
             containerType = 'DISK';
+
+        var uploadInst = upload.render({
+            elem: '#upload-file',
+            url: '/api/file/upload',
+            data:{
+                containerId:containerId,
+                containerType:containerType
+            },
+            done: function(res){
+                //上传完毕回调
+            },
+            error: function(){
+                //请求异常回调
+            }
+        });
+
         var opt = {
             elem: '#LAY_table_files',
             id: 'file-data',

@@ -3,13 +3,16 @@ package cn.mxleader.quickdoc.web.rest;
 import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.service.FileService;
+import cn.mxleader.quickdoc.web.domain.LayuiResponse;
 import cn.mxleader.quickdoc.web.domain.LayuiTable;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -40,6 +43,16 @@ public class FileRestController {
                                     @RequestParam Integer limit) {
         List<WebFile> webFileList = fileService.list(new ParentLink(parentId, parentType));
         return new LayuiTable<>(0, "", webFileList.size(), webFileList);
+    }
+
+    @PostMapping(value="/upload")
+    public LayuiResponse<Boolean> upload(@RequestParam("file") MultipartFile file,
+                                         @RequestParam("containerId") ObjectId containerId,
+                                         @RequestParam("containerType") AuthTarget containerType,
+                                         HttpSession session){
+        System.out.println(containerId);
+        System.out.println(containerType);
+        return new LayuiResponse<>(0,"",true);
     }
 
     @PostMapping(value = "/delete")
