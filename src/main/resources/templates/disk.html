@@ -138,14 +138,18 @@
         var uploadInst = upload.render({
             elem: '#upload-file',
             url: '/api/file/upload',
-            data:{
-                containerId:containerId,
-                containerType:containerType
+            accept: 'file',
+            before: function (obj) {
+                this.data = {
+                    containerId: containerId,
+                    containerType: containerType
+                };
+                //this.data.params = JSON.stringify(this.data.params);
             },
-            done: function(res){
+            done: function (res) {
                 //上传完毕回调
             },
-            error: function(){
+            error: function () {
                 //请求异常回调
             }
         });
