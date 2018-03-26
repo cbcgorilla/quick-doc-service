@@ -48,7 +48,7 @@ public class FolderServiceImpl implements FolderService {
      * @return
      */
     @Override
-    public Optional<SysFolder> findById(ObjectId id) {
+    public Optional<SysFolder> get(ObjectId id) {
         return sysFolderRepository.findById(id);
     }
 

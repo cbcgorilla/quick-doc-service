@@ -1,8 +1,10 @@
 package cn.mxleader.quickdoc.web.rest;
 
-import cn.mxleader.quickdoc.entities.AuthTarget;
-import cn.mxleader.quickdoc.entities.ParentLink;
+import cn.mxleader.quickdoc.common.utils.FileUtils;
+import cn.mxleader.quickdoc.entities.*;
+import cn.mxleader.quickdoc.service.DiskService;
 import cn.mxleader.quickdoc.service.FileService;
+import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.LayuiResponse;
 import cn.mxleader.quickdoc.web.domain.LayuiTable;
 import cn.mxleader.quickdoc.web.domain.WebFile;
@@ -12,8 +14,10 @@ import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/file")
@@ -21,9 +25,15 @@ import java.util.List;
 public class FileRestController {
 
     private final FileService fileService;
+    private final FolderService folderService;
+    private final DiskService diskService;
 
-    FileRestController(FileService fileService) {
+    FileRestController(FileService fileService,
+                       FolderService folderService,
+                       DiskService diskService) {
         this.fileService = fileService;
+        this.folderService = folderService;
+        this.diskService = diskService;
     }
 
     /**
@@ -45,14 +55,38 @@ public class FileRestController {
         return new LayuiTable<>(0, "", webFileList.size(), webFileList);
     }
 
-    @PostMapping(value="/upload")
+    @PostMapping(value = "/upload")
     public LayuiResponse<Boolean> upload(@RequestParam("file") MultipartFile file,
                                          @RequestParam("containerId") ObjectId containerId,
-                                         @RequestParam("containerType") AuthTarget containerType,
-                                         HttpSession session){
-        System.out.println(containerId);
-        System.out.println(containerType);
-        return new LayuiResponse<>(0,"",true);
+                                         @RequestParam("containerType") AuthTarget containerType) throws IOException {
+        //SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
+        String filename = FileUtils.getFilename(file.getOriginalFilename());
+        String fileType = FileUtils.guessMimeType(filename);
+
+        ParentLink parent = new ParentLink(containerId, containerType);
+        if (fileService.getStoredFile(filename, parent) != null) {
+            return new LayuiResponse<>(1, "文件名冲突", false);
+        }
+        Metadata metadata = new Metadata(fileType, Arrays.asList(parent),
+                getParentAuthorization(parent), null);
+
+        ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
+        return new LayuiResponse<>(0, "", true);
+    }
+
+    private List<AccessAuthorization> getParentAuthorization(ParentLink parent) {
+        if (parent.getTarget().equals(AuthTarget.FOLDER)) {
+            Optional<SysFolder> optionalSysFolder = folderService.get(parent.getId());
+            if (optionalSysFolder.isPresent()) {
+                return optionalSysFolder.get().getAuthorizations();
+            }
+        } else if (parent.getTarget().equals(AuthTarget.DISK)) {
+            Optional<SysDisk> optionalSysDisk = diskService.get(parent.getId());
+            if (optionalSysDisk.isPresent()) {
+                return optionalSysDisk.get().getAuthorizations();
+            }
+        }
+        return null;
     }
 
     @PostMapping(value = "/delete")
@@ -60,7 +94,7 @@ public class FileRestController {
     public Boolean delete(@RequestBody String fileId) {
         try {
             fileService.delete(new ObjectId(fileId));
-        }catch (Exception exp){
+        } catch (Exception exp) {
             //System.out.println(exp.getMessage());
             return false;
         }

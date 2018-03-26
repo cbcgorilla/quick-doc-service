@@ -19,7 +19,7 @@ public interface FileService {
 
     WebFile getStoredFile(ObjectId fileId);
 
-    WebFile getStoredFile(String filename, ObjectId folderId);
+    WebFile getStoredFile(String filename, ParentLink parent);
 
     Stream<WebFile> getWebFiles(ObjectId folderId);
 

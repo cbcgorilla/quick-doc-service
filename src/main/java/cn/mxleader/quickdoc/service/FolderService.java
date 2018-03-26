@@ -29,7 +29,7 @@ public interface FolderService {
      * @param id 文件目录ID
      * @return
      */
-    Optional<SysFolder> findById(ObjectId id);
+    Optional<SysFolder> get(ObjectId id);
 
     /**
      * 新增文件目录；

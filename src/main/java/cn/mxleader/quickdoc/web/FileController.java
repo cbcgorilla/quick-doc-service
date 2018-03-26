@@ -236,12 +236,6 @@ public class FileController {
         MimetypesFileTypeMap m = new MimetypesFileTypeMap();
         String fileType = m.getContentType(filename);*/
 
-        SysFolder sysFolder = folderService.findById(containerId).get();
-        if (fileService.getStoredFile(filename, containerId) != null) {
-            redirectAttributes.addFlashAttribute("message",
-                    "该目录： " + sysFolder.getName() + "中已存在同名文件，请核对文件信息是否重复！");
-            return "redirect:/#file/folder@" + containerId;
-        }
         // 鉴权检查
         /*if (checkAuthentication(sysFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
             Metadata metadata = new Metadata(fileType, folderId,

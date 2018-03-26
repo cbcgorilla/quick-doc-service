@@ -70,7 +70,7 @@ public class FolderController {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         ObjectId folderId = folderIdRef != null && folderIdRef.trim().length() > 0 ?
                 new ObjectId(folderIdRef) : new ObjectId(parentId);
-        SysFolder folder = folderService.findById(folderId).get();
+        SysFolder folder = folderService.get(folderId).get();
         // 鉴权检查
        /* if (checkAuthentication(folder.getAuthorizations(),
                 activeUser, AccessAuthorization.Action.WRITE)) {

@@ -54,12 +54,12 @@ public class FileServiceImpl implements FileService {
      * 在指定目录内查找相应名字的文件
      *
      * @param filename 输入文件名
-     * @param folderId 所在目录ID
+     * @param parent 容器信息（容器ID， 容器类型：磁盘，文件夹）
      * @return
      */
-    public WebFile getStoredFile(String filename, ObjectId folderId) {
+    public WebFile getStoredFile(String filename, ParentLink parent) {
         Query query = Query.query(GridFsCriteria.whereFilename().is(filename));
-        query.addCriteria(GridFsCriteria.whereMetaData("folderId").is(folderId));
+        query.addCriteria(GridFsCriteria.whereMetaData("parents").in(parent));
         return switchWebFile(gridFsAssistant.findOne(query));
     }
 
@@ -114,7 +114,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    @Async
+    //@Async
     public ObjectId store(InputStream file,
                           String filename,
                           Metadata metadata) {

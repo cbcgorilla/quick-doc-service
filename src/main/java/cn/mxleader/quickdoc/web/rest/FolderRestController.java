@@ -59,7 +59,7 @@ public class FolderRestController {
     @ApiOperation(value = "更改目录名称")
     public Mono<RestResponse> rename(@PathVariable("folderId") ObjectId folderId,
                                      @RequestBody String newPath) {
-        Optional<SysFolder> folderOptional = folderService.findById(folderId).blockOptional();
+        Optional<SysFolder> folderOptional = folderService.get(folderId).blockOptional();
         if (folderOptional.isPresent()) {
             return folderService.rename(folderOptional.get(), newPath)
                     .map(folder -> new SuccessResponse<>("目录改名成功！"));
@@ -74,7 +74,7 @@ public class FolderRestController {
     public Mono<RestResponse> move
             (@PathVariable("folderId") ObjectId folderId,
              @RequestBody String newFolderId) {
-        Optional<SysFolder> folderOptional = folderService.findById(folderId).blockOptional();
+        Optional<SysFolder> folderOptional = folderService.get(folderId).blockOptional();
         if (folderOptional.isPresent()) {
             return folderService.move(folderId, new ObjectId(newFolderId))
                     .map(folder -> new SuccessResponse<>("目录转移成功！"));

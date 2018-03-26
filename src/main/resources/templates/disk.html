@@ -22,12 +22,7 @@
                                         <i class="fas fa-cloud-download-alt"></i>下载
                                     </button>
 
-                                    <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
-                                            data-target="#uploadModal">
-                                        <i class="fas fa-cloud-upload-alt"></i>上传文件
-                                    </button>
-
-                                    <button type="button" class="layui-btn" id="upload-file">
+                                    <button type="button" class="layui-btn layui-btn-normal" id="upload-file">
                                         <i class="fas fa-cloud-upload-alt"></i>上传文件
                                     </button>
 
@@ -59,70 +54,6 @@
     </div>
 </div>
 
-<!-- 模态框 -->
-<div class="modal fade" id="uploadModal">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-
-            <!-- 模态框头部 -->
-            <div class="modal-header">
-                <h4 class="modal-title">上传文件</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-
-            <!-- 模态框主体 -->
-            <div class="modal-body">
-                <div class="table-responsive" style="text-align: center">
-                    <form method="POST" enctype="multipart/form-data"
-                          th:action="@{'./file/upload'}">
-                        <table class="table table-hover">
-                            <tr>
-                                <td align="right">需要上传的文件:</td>
-                                <td><input type="file" name="file"
-                                           class="input custom-file"/></td>
-                            </tr>
-                            <tr>
-                                <td align="right">访问权限:</td>
-                                <td>
-                                    <label><input id="shareSetting_PublicMode"
-                                                  name="shareSetting" type="checkbox"
-                                                  value="PublicMode"/>公开访问</label>
-                                    <label><input id="shareSetting_GroupMode"
-                                                  name="shareSetting" type="checkbox"
-                                                  value="GroupMode"/>组内共享</label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td align="right">共享组:</td>
-                                <td>
-                                    <select id="shareGroups" name="shareGroups"
-                                            class="select custom-select"
-                                            multiple="multiple">
-                                        <option th:each="group : ${session.ActiveUser.groups}"
-                                                th:value="${group}"
-                                                th:text="${group}">共享组
-                                        </option>
-                                    </select>
-                                </td>
-                            </tr>
-                        </table>
-                        <input type="hidden" id="containerId" name="containerId"/>
-                        <input type="hidden" id="containerType" name="containerType"/>
-                        <input type="submit" value="上传" class="btn btn-success"/>
-                    </form>
-                </div>
-            </div>
-            <!-- 模态框底部 -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭
-                </button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-
 <link href="./css/bootstrap-treeview.min.css" rel="stylesheet">
 <script src="./js/bootstrap-treeview.min.js"></script>
 
@@ -139,6 +70,7 @@
             elem: '#upload-file',
             url: '/api/file/upload',
             accept: 'file',
+            multiple: true,
             before: function (obj) {
                 this.data = {
                     containerId: containerId,
@@ -148,9 +80,11 @@
             },
             done: function (res) {
                 //上传完毕回调
+                reloadFileTable('/api/file/list', containerId, containerType);
             },
             error: function () {
                 //请求异常回调
+                layer.alert("文件上传失败!", {icon: 2});
             }
         });
 
@@ -167,9 +101,9 @@
                 [
                     {type: 'checkbox'},
                     {field: 'id', title: 'ID'},
-                    {field: 'filename', title: '文件名'},
-                    {field: 'length', title: '文件大小'},
-                    {field: 'type', title: '文件类型'},
+                    {field: 'filename', title: '文件名', width: 320},
+                    {field: 'length', title: '文件大小', width: 120},
+                    {field: 'type', title: '文件类型', width: 200},
                     {field: 'uploadDate', title: '上传日期', width: 240},
                     {
                         title: '操作',
@@ -228,9 +162,11 @@
 
         var $ = layui.$, active = {
             downloadSelectedFiles: function () { //下载选中的文件
-                var checkStatus = table.checkStatus('file-data')
-                    , data = checkStatus.data;
-                layer.alert(JSON.stringify(data));
+                var checkStatus = table.checkStatus('file-data'),
+                    data = checkStatus.data;
+                if (data.length > 0) {
+                    layer.alert(JSON.stringify(data));
+                }
             }
         };
 
