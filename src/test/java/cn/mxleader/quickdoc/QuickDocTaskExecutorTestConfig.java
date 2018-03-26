@@ -1,7 +1,6 @@
 package cn.mxleader.quickdoc;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
-import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +58,7 @@ public class QuickDocTaskExecutorTestConfig {
                                                 false,
                                                 getRandomOwners(), null);
 */
-                                        fileService.store(new FileInputStream(file), file.getName(), fileType);
+                                        fileService.store(new FileInputStream(file), file.getName(), null);
                                     } catch (IOException exp) {
                                         exp.printStackTrace();
                                     }

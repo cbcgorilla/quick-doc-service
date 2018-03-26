@@ -7,39 +7,34 @@
                 </div>
                 <div class="card-body">
 
-                    <div class=" form-horizontal">
-                        <div class="row">
+                    <div class="layui-row">
+                        <div class="layui-col-md6">
 
-                            <div class="col-md-9">
+                            <div class="layui-btn-group disk-table">
+                                <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
+                                        data-target="#addDisk">
+                                    <i class="fas fa-cloud-upload-alt"></i>新建
+                                </button>
 
-                                <div class="layui-btn-group disk-table">
-                                    <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
-                                            data-target="#addDisk">
-                                        <i class="fas fa-cloud-upload-alt"></i>新建
+                            </div>
+
+                            <table class="layui-table" id="LAY_table_disks" lay-filter="disk-table">
+                            </table>
+
+                            <script type="text/html" id="diskOpsBar">
+                                <div class="layui-btn-group">
+                                    <button class="layui-btn layui-btn-sm" lay-event="download">
+                                        <i class="fas fa-cloud-download-alt" title="编辑"></i>
                                     </button>
-
+                                    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
+                                        <i class="fas fa-trash-alt" title="删除"></i>
+                                    </button>
                                 </div>
+                            </script>
 
-                                <table class="layui-table" id="LAY_table_disks" lay-filter="disk-table">
-                                </table>
-
-                                <script type="text/html" id="diskOpsBar">
-                                    <div class="layui-btn-group">
-                                        <button class="layui-btn layui-btn-sm" lay-event="download">
-                                            <i class="fas fa-cloud-download-alt" title="编辑"></i>
-                                        </button>
-                                        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
-                                            <i class="fas fa-trash-alt" title="删除"></i>
-                                        </button>
-                                    </div>
-                                </script>
-
-                            </div>
-
-                            <div class="col-md-3" style="float: right">
-                                <div id="diskTree"></div>
-                            </div>
-
+                        </div>
+                        <div class="layui-col-md6">
+                            你的内容 3/12
                         </div>
                     </div>
 

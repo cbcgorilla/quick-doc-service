@@ -53,7 +53,7 @@ public class UserController {
     @GetMapping()
     public String index(Model model) {
         //model.addAttribute("users", userService.findAllUsers());
-        return "users";
+        return "setting/users";
     }
 
     @PostMapping("/save")
