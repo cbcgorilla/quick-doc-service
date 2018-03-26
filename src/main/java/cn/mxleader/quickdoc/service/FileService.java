@@ -19,6 +19,7 @@ public interface FileService {
 
     WebFile getStoredFile(ObjectId fileId);
 
+    @PreAuth(field = ParentLink.class)
     WebFile getStoredFile(String filename, ParentLink parent);
 
     Stream<WebFile> getWebFiles(ObjectId folderId);
@@ -34,9 +35,8 @@ public interface FileService {
      */
     Stream<WebFile> searchFilesContaining(String filename);
 
-    ObjectId store(InputStream file, String filename, String contentType);
-
-    ObjectId store(InputStream file, String filename, Metadata metadata);
+    @PreAuth(field = ParentLink.class, action = AuthAction.WRITE)
+    ObjectId store(InputStream file, String filename, ParentLink parent);
 
     ObjectId storeServerFile(String resourceLocation) throws FileNotFoundException;
 

@@ -31,12 +31,6 @@
     </button>
 
     <ul class="nav navbar-nav d-md-down-none">
-        <li class="nav-item px-3">
-            <a class="nav-link" href="files">我的文件</a>
-        </li>
-        <li class="nav-item px-3">
-            <a class="nav-link" href="files">共享文件</a>
-        </li>
         <li class="nav-item px-3" th:if="${session.ActiveUser.isAdmin()}">
             <a class="nav-link" href="folders">目录管理</a>
         </li>

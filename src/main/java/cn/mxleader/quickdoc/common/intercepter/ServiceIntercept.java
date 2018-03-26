@@ -59,6 +59,7 @@ public class ServiceIntercept {
                 && RequestContextHolder.getRequestAttributes() != null) {
             PreAuth preAuth = m.getAnnotation(PreAuth.class);
 
+            System.out.println("鉴权拦截对象名称：" + m.toString());
             HttpServletRequest request = ((ServletRequestAttributes)
                     RequestContextHolder.getRequestAttributes()).getRequest();
             SysUser sysUser = (SysUser) request.getSession().getAttribute("ActiveUser");

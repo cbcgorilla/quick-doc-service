@@ -1,7 +1,5 @@
 package cn.mxleader.quickdoc.security.handler;
 
-import cn.mxleader.quickdoc.web.domain.ErrorResponse;
-import cn.mxleader.quickdoc.web.domain.RestResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +34,8 @@ public class ApiAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        RestResponse entity = new ErrorResponse(0,
-                "访问路径：" + request.getRequestURI() +
-                        "无授权，请核对您访问的路径与权限是否匹配！");
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getWriter(), entity);
+        mapper.writeValue(response.getWriter(), "访问路径：" + request.getRequestURI() +
+                "无授权，请核对您访问的路径与权限是否匹配！");
     }
 }

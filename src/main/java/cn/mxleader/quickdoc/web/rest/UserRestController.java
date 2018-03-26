@@ -2,10 +2,7 @@ package cn.mxleader.quickdoc.web.rest;
 
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.UserService;
-import cn.mxleader.quickdoc.web.domain.LayuiTable;
-import cn.mxleader.quickdoc.web.domain.RestResponse;
-import cn.mxleader.quickdoc.web.domain.SuccessResponse;
-import cn.mxleader.quickdoc.web.domain.WebUser;
+import cn.mxleader.quickdoc.web.domain.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
@@ -31,12 +28,12 @@ public class UserRestController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value = "返回所有用户信息清单")
-    public LayuiTable<WebUser> listAllUsers() {
+    public LayuiData<List<WebUser>> listAllUsers() {
         List<WebUser> users = reactiveUserService.findAllUsers()
                 .stream()
                 .map(WebUser::new)
                 .collect(Collectors.toList());
-        return new LayuiTable<>(0, "", users.size(), users);
+        return new LayuiData<>(0, "", users.size(), users);
     }
 
     // -------------------Retrieve Single User------------------------------------------
@@ -46,7 +43,7 @@ public class UserRestController {
     public SysUser getUser(@PathVariable("username") String username) {
         return reactiveUserService.findUser(username);
     }
-
+/*
     @PostMapping(value = "/save",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "新增或保存系统用户")
@@ -60,6 +57,6 @@ public class UserRestController {
     public Boolean deleteUser(@RequestBody String userId) {
         reactiveUserService.deleteUserById(new ObjectId(userId));
         return true;
-    }
+    }*/
 
 }

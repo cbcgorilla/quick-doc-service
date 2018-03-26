@@ -1,6 +1,8 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
+import cn.mxleader.quickdoc.dao.SysDiskRepository;
+import cn.mxleader.quickdoc.dao.SysFolderRepository;
 import cn.mxleader.quickdoc.dao.ext.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.FileService;
@@ -15,13 +17,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsCriteria;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,13 +37,19 @@ public class FileServiceImpl implements FileService {
     private static final int BUFFER_SIZE = 8192;
 
     private final GridFsAssistant gridFsAssistant;
+    private final SysDiskRepository sysDiskRepository;
+    private final SysFolderRepository sysFolderRepository;
     private final MongoTemplate mongoTemplate;
     private final MongoConverter converter;
 
     FileServiceImpl(GridFsAssistant gridFsAssistant,
+                    SysDiskRepository sysDiskRepository,
+                    SysFolderRepository sysFolderRepository,
                     MongoTemplate mongoTemplate,
                     MongoConverter converter) {
         this.gridFsAssistant = gridFsAssistant;
+        this.sysDiskRepository = sysDiskRepository;
+        this.sysFolderRepository = sysFolderRepository;
         this.mongoTemplate = mongoTemplate;
         this.converter = converter;
     }
@@ -54,7 +62,7 @@ public class FileServiceImpl implements FileService {
      * 在指定目录内查找相应名字的文件
      *
      * @param filename 输入文件名
-     * @param parent 容器信息（容器ID， 容器类型：磁盘，文件夹）
+     * @param parent   容器信息（容器ID， 容器类型：磁盘，文件夹）
      * @return
      */
     public WebFile getStoredFile(String filename, ParentLink parent) {
@@ -100,27 +108,34 @@ public class FileServiceImpl implements FileService {
     /**
      * 存储文件， 如同名文件已存在则更新文件内容
      *
-     * @param file        文件内容输入流
-     * @param filename    文件名
-     * @param contentType 文件类型
+     * @param file     文件内容输入流
+     * @param filename 文件名
+     * @param parent   文件类型
      * @return
      */
     @Override
-    @Async
-    public ObjectId store(InputStream file,
-                          String filename,
-                          String contentType) {
-        return gridFsAssistant.store(file, filename, contentType);
-    }
-
-    @Override
     //@Async
-    public ObjectId store(InputStream file,
-                          String filename,
-                          Metadata metadata) {
+    public ObjectId store(InputStream file, String filename, ParentLink parent) {
+        String fileType = FileUtils.guessMimeType(filename);
+        Metadata metadata = new Metadata(fileType, Arrays.asList(parent),
+                getParentAuthorization(parent), null);
         return gridFsAssistant.store(file, filename, metadata);
     }
 
+    private List<AccessAuthorization> getParentAuthorization(ParentLink parent) {
+        if (parent.getTarget().equals(AuthTarget.FOLDER)) {
+            Optional<SysFolder> optionalSysFolder = sysFolderRepository.findById(parent.getId());
+            if (optionalSysFolder.isPresent()) {
+                return optionalSysFolder.get().getAuthorizations();
+            }
+        } else if (parent.getTarget().equals(AuthTarget.DISK)) {
+            Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(parent.getId());
+            if (optionalSysDisk.isPresent()) {
+                return optionalSysDisk.get().getAuthorizations();
+            }
+        }
+        return null;
+    }
 
     @Override
     //@Async
