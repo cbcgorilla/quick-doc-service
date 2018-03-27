@@ -111,6 +111,7 @@ public class QuickDocConfiguration {
                 ObjectId id1 = folderService.save("一级目录", new ParentLink(id, AuthTarget.DISK,id),
                         new AccessAuthorization("admin",
                                 AuthType.PRIVATE, AuthAction.READ)).getId();
+                folderService.addParent(id1,new ParentLink(gId, AuthTarget.DISK,gId));
                 ObjectId id2 = folderService.save("二级目录", new ParentLink(id1, AuthTarget.FOLDER,id),
                         new AccessAuthorization("admin",
                                 AuthType.PRIVATE, AuthAction.READ)).getId();

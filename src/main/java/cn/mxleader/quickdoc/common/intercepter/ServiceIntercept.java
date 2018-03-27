@@ -19,6 +19,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -26,7 +29,7 @@ import java.util.List;
 @Aspect
 @Component
 public class ServiceIntercept {
-
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final GridFsAssistant gridFsAssistant;
     private final SysDiskRepository sysDiskRepository;
     private final SysFolderRepository sysFolderRepository;
@@ -59,7 +62,8 @@ public class ServiceIntercept {
                 && RequestContextHolder.getRequestAttributes() != null) {
             PreAuth preAuth = m.getAnnotation(PreAuth.class);
 
-            System.out.println("鉴权拦截对象名称：" + m.toString());
+            log.debug("鉴权拦截对象名称：" + m.toString());
+
             HttpServletRequest request = ((ServletRequestAttributes)
                     RequestContextHolder.getRequestAttributes()).getRequest();
             SysUser sysUser = (SysUser) request.getSession().getAttribute("ActiveUser");
@@ -95,8 +99,10 @@ public class ServiceIntercept {
                     } else {
                         // System.out.println("目标类名称：" + joinPoint.getTarget().getClass().getName());
                         // System.out.println("方法名称：" + joinPoint.getSignature().getName());
-                        throw new Exception("用户：" + sysUser.getUsername() +
-                                " 未获得：" + m.toString() + "的" + preAuth.action() + "访问授权");
+                        String msg = "用户：" + sysUser.getUsername() + " 未获得："
+                                + m.toString() + "的 {" + preAuth.action() + "} 访问授权";
+                        log.warn(msg);
+                        throw new Exception(msg);
                     }
                 }
             }

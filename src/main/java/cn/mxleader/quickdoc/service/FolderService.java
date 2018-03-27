@@ -2,6 +2,7 @@ package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.common.annotation.PreAuth;
 import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.web.domain.TreeNode;
@@ -19,6 +20,9 @@ public interface FolderService {
      * @return
      */
     List<SysFolder> list(ParentLink parent);
+
+    @PreAuth(target = AuthTarget.DISK)
+    List<SysFolder> listFoldersInDisk(ObjectId diskId);
 
     @PreAuth(field = ParentLink.class)
     List<TreeNode> getFolderTree(ParentLink parent);

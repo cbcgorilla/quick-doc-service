@@ -45,7 +45,7 @@ public class DiskController {
             ObjectMapper mapper = new ObjectMapper();
             model.addAttribute("folderTree",
                     mapper.writeValueAsString(folderService.getFolderTree(
-                            new ParentLink(diskId, AuthTarget.DISK))));
+                            new ParentLink(diskId, AuthTarget.DISK, diskId))));
         }
         return "disk";
     }

@@ -26,17 +26,21 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public List<SysFolder> list(ParentLink parent) {
-        return sysFolderRepository.findAllByParentsContains(parent);
+        return sysFolderRepository.findAllByParentsContaining(parent);
+    }
+
+    @Override
+    public List<SysFolder> listFoldersInDisk(ObjectId diskId) {
+        return sysFolderRepository.findAllByParentsDiskId(diskId);
     }
 
     @Override
     public List<TreeNode> getFolderTree(ParentLink parent) {
-        return sysFolderRepository.findAllByParentsContains(parent)
+        return sysFolderRepository.findAllByParentsContaining(parent)
                 .stream()
-                .map(sysFolder -> new TreeNode(sysFolder.getId().toString(),
-                        sysFolder.getName(),
+                .map(sysFolder -> new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),
                         parent.getId().toString(),
-                        getFolderTree(new ParentLink(sysFolder.getId(), AuthTarget.FOLDER)))
+                        getFolderTree(new ParentLink(sysFolder.getId(), AuthTarget.FOLDER, parent.getDiskId())))
                 )
                 .collect(Collectors.toList());
     }

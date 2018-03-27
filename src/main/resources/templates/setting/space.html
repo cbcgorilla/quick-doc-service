@@ -34,7 +34,21 @@
 
                         </div>
                         <div class="layui-col-md6">
-                            你的内容 3/12
+
+                            <table class="layui-table" id="LAY_table_folders" lay-filter="folder-table">
+                            </table>
+
+                            <script type="text/html" id="folderOpsBar">
+                                <div class="layui-btn-group">
+                                    <button class="layui-btn layui-btn-sm" lay-event="download">
+                                        <i class="fas fa-cloud-download-alt" title="编辑"></i>
+                                    </button>
+                                    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
+                                        <i class="fas fa-trash-alt" title="删除"></i>
+                                    </button>
+                                </div>
+                            </script>
+
                         </div>
                     </div>
 
@@ -102,9 +116,19 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    layui.use('table', function () {
-        var table = layui.table;
-        var opt = {
+
+    layui.config({
+        base: '../lib/layui/treegrid/'
+    }).use(['laytpl', 'treegrid', "table"], function () {
+        var laytpl = layui.laytpl,
+            table = layui.table,
+            treegrid = layui.treegrid;
+        treegrid.config.render = function (viewid, data) {
+            var view = document.getElementById(viewid).innerHTML;
+            return laytpl(view).render(data) || '';
+        };
+
+        var optDisk = {
             elem: '#LAY_table_disks',
             id: 'disk-data',
             url: '/api/disk/list',
@@ -130,8 +154,12 @@
                 $("[data-field='id']").css('display', 'none');
             }
         };
+
+        var optFolder = {
+
+        }
         //方法级渲染
-        table.render(opt);
+        table.render(optDisk);
 
         //监听表格复选框选择
         /*table.on('checkbox(disk-table)', function (obj) {
