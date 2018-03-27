@@ -101,44 +101,38 @@ public class QuickDocConfiguration {
                                 AuthType.PRIVATE, AuthAction.READ)).getId();
 
                 // ============================以下为测试数据 @TODO 待删除
-                ObjectId gId1 = folderService.save("一级目录", new ParentLink(gId, AuthTarget.DISK),
+                ObjectId gId1 = folderService.save("一级目录", new ParentLink(gId, AuthTarget.DISK,gId),
                         new AccessAuthorization("administrators",
                                 AuthType.GROUP, AuthAction.READ)).getId();
-                folderService.save("一级目录2WRITE", new ParentLink(gId, AuthTarget.DISK),
+                folderService.save("一级目录2WRITE", new ParentLink(gId, AuthTarget.DISK,gId),
                         new AccessAuthorization("administrators",
                                 AuthType.GROUP, AuthAction.WRITE)).getId();
 
-                ObjectId id1 = folderService.save("一级目录", new ParentLink(id, AuthTarget.DISK),
+                ObjectId id1 = folderService.save("一级目录", new ParentLink(id, AuthTarget.DISK,id),
                         new AccessAuthorization("admin",
                                 AuthType.PRIVATE, AuthAction.READ)).getId();
-                ObjectId id2 = folderService.save("二级目录", new ParentLink(id1, AuthTarget.FOLDER),
+                ObjectId id2 = folderService.save("二级目录", new ParentLink(id1, AuthTarget.FOLDER,id),
                         new AccessAuthorization("admin",
                                 AuthType.PRIVATE, AuthAction.READ)).getId();
-                ObjectId id3 = folderService.save("三级目录", new ParentLink(id2, AuthTarget.FOLDER),
-                        new AccessAuthorization("admin",
-                                AuthType.PRIVATE, AuthAction.READ)).getId();
-                ObjectId id4 = folderService.save("四级目录", new ParentLink(id3, AuthTarget.FOLDER),
-                        new AccessAuthorization("admin",
-                                AuthType.PRIVATE, AuthAction.READ)).getId();
-                folderService.save("五级目录", new ParentLink(id4, AuthTarget.FOLDER),
+                ObjectId id3 = folderService.save("三级目录", new ParentLink(id2, AuthTarget.FOLDER,id),
                         new AccessAuthorization("admin",
                                 AuthType.PRIVATE, AuthAction.READ)).getId();
 
                 fileService.saveMetadata(sysProfile.getIconMap().get("AWARD"),
                         new Metadata("application/octet-stream",
-                                Arrays.asList(new ParentLink(id4, AuthTarget.FOLDER)),
+                                Arrays.asList(new ParentLink(id3, AuthTarget.FOLDER,id)),
                                 Arrays.asList(new AccessAuthorization("admin",
                                         AuthType.PRIVATE, AuthAction.READ)),
                                 null));
 
                 fileService.saveMetadata(sysProfile.getIconMap().get("SYS_LOGO"),
                         new Metadata("application/octet-stream",
-                                Arrays.asList(new ParentLink(gId1, AuthTarget.FOLDER)),
+                                Arrays.asList(new ParentLink(gId1, AuthTarget.FOLDER,gId)),
                                 Arrays.asList(new AccessAuthorization("administrators",
                                         AuthType.GROUP, AuthAction.READ)),
                                 null));
                 fileService.addParent(sysProfile.getIconMap().get("SYS_LOGO"),
-                        new ParentLink(gId, AuthTarget.DISK));
+                        new ParentLink(gId, AuthTarget.DISK,gId));
                 // ==================测试数据结束
 
                 // 初始化成功标记

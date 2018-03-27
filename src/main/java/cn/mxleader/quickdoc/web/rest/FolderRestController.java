@@ -28,7 +28,8 @@ public class FolderRestController {
     @RequestMapping(value = "/tree", method = RequestMethod.GET)
     @ApiOperation(value = "根据磁盘ID号获取目录树信息")
     public List<TreeNode> getFolderTree(@RequestParam String parentId) {
-        return folderService.getFolderTree(new ParentLink(new ObjectId(parentId), AuthTarget.DISK));
+        return folderService.getFolderTree(new ParentLink(new ObjectId(parentId),
+                AuthTarget.DISK, new ObjectId(parentId)));
     }
 
 /*
