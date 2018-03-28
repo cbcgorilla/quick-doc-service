@@ -5,6 +5,8 @@ import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.TreeNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
@@ -35,9 +37,9 @@ public class FolderRestController {
                 AuthTarget.DISK, new ObjectId(parentId)));
     }
 
-    @RequestMapping(value = "/of-disk", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value = "根据磁盘ID号获取目录列表")
-    public List<TreeNode> getFoldersOfDisk(@RequestParam String diskId) {
+    public List<TreeNode> getFoldersOfDisk(@RequestParam String diskId) throws JsonProcessingException {
         return folderService.listFoldersInDisk(new ObjectId(diskId))
                 .stream()
                 .map(sysFolder -> new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),

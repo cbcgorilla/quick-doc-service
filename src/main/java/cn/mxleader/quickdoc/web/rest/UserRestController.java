@@ -43,20 +43,12 @@ public class UserRestController {
     public SysUser getUser(@PathVariable("username") String username) {
         return reactiveUserService.findUser(username);
     }
-/*
-    @PostMapping(value = "/save",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "新增或保存系统用户")
-    public RestResponse addUser(
-            @RequestBody SysUser sysUser) {
-        return new SuccessResponse<>(reactiveUserService.saveUser(sysUser));
-    }
 
     @PostMapping(value = "/delete")
     @ApiOperation(value = "删除系统用户")
     public Boolean deleteUser(@RequestBody String userId) {
         reactiveUserService.deleteUserById(new ObjectId(userId));
         return true;
-    }*/
+    }
 
 }

@@ -9,7 +9,7 @@
 }
 
 .layui-table th {
-    text-align:inherit;
+    /*text-align:inherit;*/
 }
 tr.selected td {
     background-color:#f2f2f2;

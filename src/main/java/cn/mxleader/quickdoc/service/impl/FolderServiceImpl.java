@@ -84,7 +84,7 @@ public class FolderServiceImpl implements FolderService {
         if (optionalSysFolder.isPresent()) {
             SysFolder folder = optionalSysFolder.get();
             folder.getParents().add(parent);
-            sysFolderRepository.save(folder);
+            return sysFolderRepository.save(folder);
         }
         return null;
     }
@@ -102,13 +102,23 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public SysFolder addAuthorization(ObjectId id, AccessAuthorization authorization) {
-        // @TODO 待实现。。。。。
+        Optional<SysFolder> optionalSysFolder = sysFolderRepository.findById(id);
+        if (optionalSysFolder.isPresent()) {
+            SysFolder folder = optionalSysFolder.get();
+            folder.getAuthorizations().add(authorization);
+            return sysFolderRepository.save(folder);
+        }
         return null;
     }
 
     @Override
     public SysFolder removeAuthorization(ObjectId id, AccessAuthorization authorization) {
-        // @TODO 待实现。。。。。
+        Optional<SysFolder> optionalSysFolder = sysFolderRepository.findById(id);
+        if (optionalSysFolder.isPresent()) {
+            SysFolder folder = optionalSysFolder.get();
+            folder.getAuthorizations().remove(authorization);
+            return sysFolderRepository.save(folder);
+        }
         return null;
     }
 

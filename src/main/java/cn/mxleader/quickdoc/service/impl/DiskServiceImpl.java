@@ -57,11 +57,23 @@ public class DiskServiceImpl implements DiskService {
 
     @Override
     public SysDisk addAuthorization(ObjectId id, AccessAuthorization authorization) {
+        Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(id);
+        if (optionalSysDisk.isPresent()) {
+            SysDisk disk = optionalSysDisk.get();
+            disk.getAuthorizations().add(authorization);
+            return sysDiskRepository.save(disk);
+        }
         return null;
     }
 
     @Override
     public SysDisk removeAuthorization(ObjectId id, AccessAuthorization authorization) {
+        Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(id);
+        if (optionalSysDisk.isPresent()) {
+            SysDisk disk = optionalSysDisk.get();
+            disk.getAuthorizations().remove(authorization);
+            return sysDiskRepository.save(disk);
+        }
         return null;
     }
 

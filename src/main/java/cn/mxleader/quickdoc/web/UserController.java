@@ -1,7 +1,11 @@
 package cn.mxleader.quickdoc.web;
 
+import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.entities.AuthAction;
+import cn.mxleader.quickdoc.entities.AuthType;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.ConfigService;
+import cn.mxleader.quickdoc.service.DiskService;
 import cn.mxleader.quickdoc.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +27,15 @@ import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 public class UserController {
 
     private final UserService userService;
+    private final DiskService diskService;
     private final ConfigService configService;
 
     @Autowired
-    public UserController(UserService userService, ConfigService configService) {
+    public UserController(UserService userService,
+                          DiskService diskService,
+                          ConfigService configService) {
         this.userService = userService;
+        this.diskService = diskService;
         this.configService = configService;
     }
 
@@ -73,7 +81,9 @@ public class UserController {
                 email);
         if (userService.findUser(username) == null) {
             userService.saveUser(sysUser);
-
+            ObjectId diskId = diskService.save("我的磁盘1",
+                    new AccessAuthorization(username, AuthType.PRIVATE, AuthAction.READ)).getId();
+            diskService.addAuthorization(diskId, new AccessAuthorization(username, AuthType.PRIVATE, AuthAction.WRITE));
             redirectAttributes.addFlashAttribute("message",
                     "保存用户信息成功： " + username);
         }

@@ -10,45 +10,44 @@
                     <div class="layui-row">
                         <div class="layui-col-md6">
 
-                            <div class="layui-btn-group disk-table">
-                                <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
-                                        data-target="#addDisk">
-                                    <i class="fas fa-cloud-upload-alt"></i>新建
-                                </button>
+                            <div class="container">
+                                <div class="layui-btn-group">
+                                    <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
+                                            data-target="#addDisk">
+                                        <i class="fas fa-cloud-upload-alt"></i>新建
+                                    </button>
+                                </div>
 
+                                <table class="layui-table" id="LAY_table_disks" lay-filter="disk">
+                                </table>
+
+                                <script type="text/html" id="diskOpsBar">
+                                    <div class="layui-btn-group">
+                                        <button class="layui-btn layui-btn-sm" lay-event="download">
+                                            <i class="fas fa-cloud-download-alt" title="编辑"></i>
+                                        </button>
+                                        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
+                                            <i class="fas fa-trash-alt" title="删除"></i>
+                                        </button>
+                                    </div>
+                                </script>
                             </div>
-
-                            <table class="layui-table" id="LAY_table_disks" lay-filter="disk-table">
-                            </table>
-
-                            <script type="text/html" id="diskOpsBar">
-                                <div class="layui-btn-group">
-                                    <button class="layui-btn layui-btn-sm" lay-event="download">
-                                        <i class="fas fa-cloud-download-alt" title="编辑"></i>
-                                    </button>
-                                    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
-                                        <i class="fas fa-trash-alt" title="删除"></i>
-                                    </button>
-                                </div>
-                            </script>
-
                         </div>
-                        <div class="layui-col-md6">
+                        <div class="layui-col-md6" style="float: right">
 
-                            <table class="layui-table" id="LAY_table_folders" lay-filter="folder-table">
-                            </table>
-
-                            <script type="text/html" id="folderOpsBar">
+                            <div class="container">
                                 <div class="layui-btn-group">
-                                    <button class="layui-btn layui-btn-sm" lay-event="download">
-                                        <i class="fas fa-cloud-download-alt" title="编辑"></i>
+                                    <button type="button" class="layui-btn" data-toggle="modal"
+                                            data-target="#addDisk">
+                                        <i class="fas fa-cloud-upload-alt"></i>新建
                                     </button>
-                                    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
-                                        <i class="fas fa-trash-alt" title="删除"></i>
-                                    </button>
+                                    <a class="layui-btn" lay-filter="addChild">添加子目录</a>
+                                    <a class="layui-btn" lay-filter="update">修改目录名</a>
+                                    <a class="layui-btn" lay-filter="delete">删除目录及其子目录</a>
                                 </div>
-                            </script>
-
+                                <table class="layui-table" id="LAY_table_folders" lay-filter="folder">
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -132,16 +131,14 @@
             elem: '#LAY_table_disks',
             id: 'disk-data',
             url: '/api/disk/list',
-            height: '510',
             cellMinWidth: 120,
             page: true, //开启分页,
             limit: 10,
             limits: [10, 20, 50, 100],
             cols: [
                 [
-                    {type: 'checkbox'},
                     {field: 'id', title: 'ID'},
-                    {field: 'name', title: '磁盘名称'},
+                    {field: 'name', title: '磁盘名称', event: 'diskName'},
                     {
                         title: '操作',
                         width: 160,
@@ -155,11 +152,39 @@
             }
         };
 
-        var optFolder = {
-
-        }
         //方法级渲染
         table.render(optDisk);
+
+        table.on('tool(disk)', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event == "diskName") {
+                $.ajax({
+                    type: "GET",
+                    url: "/api/folder/list?diskId=" + data.id,
+                    contentType: 'application/json; charset=utf-8',
+                    //data: data.id, //可选参数
+                    dataType: "json",
+                    success: function (value) {
+                        console.log(value);
+                        if (value.length != 0) {
+                            var folderTreeGrid = treegrid.createNew({
+                                elem: 'LAY_table_folders',
+                                view: 'folderView',
+                                data: {rows: value},
+                                id: 'id',
+                                root: data.id,
+                                parentid: 'parentId',
+                                singleSelect: true
+                            });
+                            folderTreeGrid.build();
+                        } else {
+                            layer.msg('该磁盘内无子目录！');
+                        }
+                    }
+                });
+            }
+        });
 
         //监听表格复选框选择
         /*table.on('checkbox(disk-table)', function (obj) {
@@ -217,3 +242,21 @@
         /*]]>*/
     });
 </script>
+<!--模板 js start-->
+<script id="folderView" type="text/html">
+    <table class="layui-table">
+        <thead>
+        <tr>
+            <th>目录名称</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{# layui.each(d.rows,function(index,r){ }}
+        <tr>
+            <td><input type="checkbox"/>{{r.text}}</td>
+        </tr>
+        {{# }); }}
+        </tbody>
+    </table>
+</script>
+<!--模板 end-->
