@@ -8,16 +8,17 @@
                 <div class="card-body">
 
                     <div class="layui-btn-group userTable">
-                        <button class="layui-btn" data-type="getCheckData">
-                            <i class="fas fa-users"></i>加入组
-                        </button>
-                        <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
-                        <button class="layui-btn" data-type="isAll">验证是否全选</button>
-                        <button class="addMemberDialogModal layui-btn btn-success"
+                        <button class="addMemberDialogModal layui-btn"
                                 type="button"
                                 data-toggle="modal"
                                 data-target="#addMemberDialogModal">
                             <i class="fas fa-user-plus" aria-hidden="true"></i> 添加成员
+                        </button>
+                        <button class="layui-btn" data-type="batchAddGroup">
+                            <i class="fas fa-users"></i> <i class="fas fa-plus-circle"></i> 加入组
+                        </button>
+                        <button class="layui-btn layui-btn-danger" data-type="batchRemoveGroup">
+                            <i class="fas fa-users"></i> <i class="fas fa-minus-circle"></i> 移除组
                         </button>
                     </div>
 
@@ -43,7 +44,7 @@
                             var table = layui.table;
                             var opt = {
                                 elem: '#LAY_table_user',
-                                id: 'reloadUserData',
+                                id: 'user-data',
                                 url: '/api/user/list',
                                 height: '510',
                                 cellMinWidth: 120,
@@ -123,37 +124,77 @@
                             });
 
                             var $ = layui.$, active = {
-                                getCheckData: function () { //获取选中数据
-                                    var checkStatus = table.checkStatus('reloadUserData')
+                                batchAddGroup: function () {
+                                    var checkStatus = table.checkStatus('user-data')
                                         , data = checkStatus.data;
                                     //layer.alert(JSON.stringify(data));
                                     console.log(data);
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "/api/user/addGroup?group=users",
-                                        contentType: 'application/json; charset=utf-8',
-                                        data: JSON.stringify(data), //可选参数
-                                        dataType: "json",
-                                        success: function (value) {
-                                            console.log(value);
-                                        }
-                                    });
-                                }
-                                , getCheckLength: function () { //获取选中数目
-                                    var checkStatus = table.checkStatus('reloadUserData')
+                                    if (data.length == 0) {
+                                        layer.msg('请选择待加入组的用户！');
+                                    } else {
+                                        postGroupService('/api/user/addGroup', data);
+                                    }
+                                },
+                                batchRemoveGroup: function () {
+                                    var checkStatus = table.checkStatus('user-data')
                                         , data = checkStatus.data;
-                                    layer.msg('选中了：' + data.length + ' 个');
+                                    //layer.alert(JSON.stringify(data));
+                                    console.log(data);
+                                    if (data.length == 0) {
+                                        layer.msg('请选择待移除组的用户！');
+                                    } else {
+                                        postGroupService('/api/user/removeGroup', data);
+                                    }
                                 }
-                                , isAll: function () { //验证是否全选
-                                    var checkStatus = table.checkStatus('reloadUserData');
-                                    layer.msg(checkStatus.isAll ? '全选' : '未全选')
-                                }
+
                             };
 
                             $('.userTable .layui-btn').on('click', function () {
                                 var type = $(this).data('type');
                                 active[type] ? active[type].call(this) : '';
                             });
+
+                            function postGroupService(url, postData) {
+                                layer.prompt(
+                                    {
+                                        title: '请输入组名',
+                                        success: function(layerInput) {
+                                            layerInput.find('input').on('keydown', function() {
+                                                if (event.keyCode === 13) {
+                                                    prompt_service(event.target.value);
+                                                }
+                                            })
+                                        },
+                                    },
+                                    function(value) {
+                                        prompt_service(value);
+                                    }
+                                );
+                                function prompt_service(value) {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: url + "?group=" + value,
+                                        contentType: 'application/json; charset=utf-8',
+                                        data: JSON.stringify(postData), //可选参数
+                                        dataType: "json",
+                                        success: function (value) {
+                                            console.log(value);
+                                            reloadUserTable('/api/user/list');
+                                        }
+                                    });
+                                    layer.closeAll();
+                                }
+                            }
+
+                            function reloadUserTable(restUrl) {
+                                table.reload('user-data', {
+                                    url: restUrl,
+                                    page: {
+                                        curr: 1 //重新从第 1 页开始
+                                    }
+                                });
+                            }
+
                         });
                     </script>
 

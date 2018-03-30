@@ -51,11 +51,21 @@ public class UserRestController {
     }
 
     @PostMapping("/addGroup")
-    @ApiOperation("")
+    @ApiOperation("批量添加用户组")
     public Boolean addGroup(@RequestParam String group,
                             @RequestBody List<WebUser> webUserList) {
         for (WebUser user : webUserList) {
             userService.addGroup(new ObjectId(user.getId()), group);
+        }
+        return true;
+    }
+
+    @PostMapping("/removeGroup")
+    @ApiOperation("批量删除用户组")
+    public Boolean removeGroup(@RequestParam String group,
+                            @RequestBody List<WebUser> webUserList) {
+        for (WebUser user : webUserList) {
+            userService.removeGroup(new ObjectId(user.getId()), group);
         }
         return true;
     }
