@@ -12,6 +12,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -19,12 +21,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Set;
 
 @Aspect
 @Component
@@ -82,7 +81,7 @@ public class ServiceIntercept {
                     switch (authTarget) {
                         case DISK:
                             auth = checkAuthentication(sysDiskRepository.findById(id)
-                                    .get().getAuthorizations(), sysUser, preAuth.action());
+                                    .get().getAuthorization(), sysUser, preAuth.action());
                             break;
                         case FOLDER:
                             auth = checkAuthentication(sysFolderRepository.findById(id)
@@ -126,14 +125,14 @@ public class ServiceIntercept {
      * @param action         待校验权限级别（READ，WRITE，DELETE）
      * @return 鉴权通过返回True，否则返回False
      */
-    private Boolean checkAuthentication(List<AccessAuthorization> authorizations,
+    private Boolean checkAuthentication(Set<Authorization> authorizations,
                                         SysUser sysUser, AuthAction action) {
         // 管理员默认可访问所有目录和文件
         if (sysUser.isAdmin()) {
             return true;
         }
         if (authorizations != null && authorizations.size() > 0) {
-            for (AccessAuthorization authorization : authorizations) {
+            for (Authorization authorization : authorizations) {
                 if (checkAuthentication(authorization, sysUser, action)) {
                     return true;
                 }
@@ -150,13 +149,13 @@ public class ServiceIntercept {
      * @param action        待校验权限级别（READ，WRITE，DELETE）
      * @return 鉴权通过返回True，否则返回False
      */
-    private Boolean checkAuthentication(AccessAuthorization authorization,
+    private Boolean checkAuthentication(Authorization authorization,
                                         SysUser sysUser, AuthAction action) {
         // 管理员默认可访问所有目录和文件
         if (sysUser.isAdmin()) {
             return true;
         }
-        if (authorization.getAction().equals(action)) {
+        if (authorization.getActions().contains(action)) {
             switch (authorization.getType()) {
                 case GROUP:
                     for (String group : sysUser.getGroups()) {

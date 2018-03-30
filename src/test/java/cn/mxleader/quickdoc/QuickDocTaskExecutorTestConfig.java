@@ -52,7 +52,7 @@ public class QuickDocTaskExecutorTestConfig {
                         .map(
                                 file -> {
                                     try {
-                                        String fileType = FileUtils.guessMimeType(file.getName());
+                                        String fileType = FileUtils.getContentType(file.getName());
                                        /* Metadata metadata = new Metadata("音乐",
                                                 new ObjectId("5a6966f7ae3e442518745836"),
                                                 false,

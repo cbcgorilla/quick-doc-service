@@ -13,5 +13,7 @@ public interface UserService {
     Boolean validateUser(String username, String password);
     void deleteUserById(ObjectId userId);
     void deleteUserByUsername(String username);
+    SysUser addGroup(ObjectId id, String group);
+    SysUser removeGroup(ObjectId id, String group);
 
 }

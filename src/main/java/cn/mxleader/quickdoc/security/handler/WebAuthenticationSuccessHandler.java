@@ -68,11 +68,11 @@ public class WebAuthenticationSuccessHandler implements
         Collection<? extends GrantedAuthority> authorities = authentication
                 .getAuthorities();
         for (GrantedAuthority grantedAuthority : authorities) {
-            if (grantedAuthority.getAuthority().equals(SysUser.Authorities.ADMIN.name())) {
+            if (grantedAuthority.getAuthority().equals(SysUser.Authority.ADMIN.name())) {
                 isAdmin = true;
                 break;
             }
-            if (grantedAuthority.getAuthority().equals(SysUser.Authorities.USER.name())) {
+            if (grantedAuthority.getAuthority().equals(SysUser.Authority.USER.name())) {
                 isUser = true;
                 break;
             }

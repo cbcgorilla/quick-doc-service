@@ -73,7 +73,7 @@ public class FolderController {
         SysFolder folder = folderService.get(folderId).get();
         // 鉴权检查
        /* if (checkAuthentication(folder.getAuthorizations(),
-                activeUser, AccessAuthorization.Action.WRITE)) {
+                activeUser, Authorization.Action.WRITE)) {
 
             if (folderIdRef != null && folderIdRef.trim().length() > 0) {
                 // folderIdRef字段有数据则修改现有目录的数据

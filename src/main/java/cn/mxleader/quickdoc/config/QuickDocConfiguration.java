@@ -19,6 +19,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 
 @SpringBootConfiguration
 @ConditionalOnClass(StreamService.class)
@@ -88,52 +89,56 @@ public class QuickDocConfiguration {
                 userService.saveUser(new SysUser(ObjectId.get(), "admin",
                         "系统管理员", "chenbichao",
                         sysProfile.getIconMap().get("AWARD"),
-                        Arrays.asList(SysUser.Authorities.ADMIN),
-                        Arrays.asList("administrators", "users"),
-                        "chenbichao@mxleader.cn"));
+                        new HashSet<SysUser.Authority>() {{
+                            add(SysUser.Authority.ADMIN);
+                        }},
+                        new HashSet<String>() {{
+                            add("administrators");
+                            add("users");
+                        }},
+                        "admin@mxleader.cn"));
 
                 // 初始化系统目录
                 ObjectId gId = diskService.save("共享磁盘1",
-                        new AccessAuthorization("administrators",
-                                AuthType.GROUP, AuthAction.READ)).getId();
+                        new Authorization("administrators", AuthType.GROUP)).getId();
                 ObjectId id = diskService.save("我的磁盘1",
-                        new AccessAuthorization("admin",
-                                AuthType.PRIVATE, AuthAction.READ)).getId();
+                        new Authorization("admin", AuthType.PRIVATE)).getId();
 
                 // ============================以下为测试数据 @TODO 待删除
-                ObjectId gId1 = folderService.save("一级目录", new ParentLink(gId, AuthTarget.DISK,gId),
-                        new AccessAuthorization("administrators",
-                                AuthType.GROUP, AuthAction.READ)).getId();
-                folderService.save("一级目录2WRITE", new ParentLink(gId, AuthTarget.DISK,gId),
-                        new AccessAuthorization("administrators",
-                                AuthType.GROUP, AuthAction.WRITE)).getId();
+                ObjectId gId1 = folderService.save("一级目录", new ParentLink(gId, AuthTarget.DISK, gId),
+                        new Authorization("administrators", AuthType.GROUP)).getId();
+                folderService.save("一级目录2WRITE", new ParentLink(gId, AuthTarget.DISK, gId),
+                        new Authorization("administrators", AuthType.GROUP, AuthAction.WRITE)).getId();
 
-                ObjectId id1 = folderService.save("一级目录", new ParentLink(id, AuthTarget.DISK,id),
-                        new AccessAuthorization("admin",
-                                AuthType.PRIVATE, AuthAction.READ)).getId();
-                folderService.addParent(id1,new ParentLink(gId, AuthTarget.DISK,gId));
-                ObjectId id2 = folderService.save("二级目录", new ParentLink(id1, AuthTarget.FOLDER,id),
-                        new AccessAuthorization("admin",
-                                AuthType.PRIVATE, AuthAction.READ)).getId();
-                ObjectId id3 = folderService.save("三级目录", new ParentLink(id2, AuthTarget.FOLDER,id),
-                        new AccessAuthorization("admin",
-                                AuthType.PRIVATE, AuthAction.READ)).getId();
-
+                ObjectId id1 = folderService.save("一级目录", new ParentLink(id, AuthTarget.DISK, id),
+                        new Authorization("admin", AuthType.PRIVATE)).getId();
+                folderService.addParent(id1, new ParentLink(gId, AuthTarget.DISK, gId));
+                ObjectId id2 = folderService.save("二级目录", new ParentLink(id1, AuthTarget.FOLDER, id),
+                        new Authorization("admin", AuthType.PRIVATE)).getId();
+                ObjectId id3 = folderService.save("三级目录", new ParentLink(id2, AuthTarget.FOLDER, id),
+                        new Authorization("admin", AuthType.PRIVATE)).getId();
+/*
                 fileService.saveMetadata(sysProfile.getIconMap().get("AWARD"),
                         new Metadata("application/octet-stream",
-                                Arrays.asList(new ParentLink(id3, AuthTarget.FOLDER,id)),
-                                Arrays.asList(new AccessAuthorization("admin",
-                                        AuthType.PRIVATE, AuthAction.READ)),
+                                new HashSet<ParentLink>() {{
+                                    add(new ParentLink(id3, AuthTarget.FOLDER, id));
+                                }},
+                                new HashSet<Authorization>() {{
+                                    add(new Authorization("admin", AuthType.PRIVATE));
+                                }},
                                 null));
 
                 fileService.saveMetadata(sysProfile.getIconMap().get("SYS_LOGO"),
                         new Metadata("application/octet-stream",
-                                Arrays.asList(new ParentLink(gId1, AuthTarget.FOLDER,gId)),
-                                Arrays.asList(new AccessAuthorization("administrators",
-                                        AuthType.GROUP, AuthAction.READ)),
+                                new HashSet<ParentLink>() {{
+                                    add(new ParentLink(gId1, AuthTarget.FOLDER, gId));
+                                }},
+                                new HashSet<Authorization>() {{
+                                    add(new Authorization("administrators", AuthType.GROUP));
+                                }},
                                 null));
                 fileService.addParent(sysProfile.getIconMap().get("SYS_LOGO"),
-                        new ParentLink(gId, AuthTarget.DISK,gId));
+                        new ParentLink(gId, AuthTarget.DISK, gId));*/
                 // ==================测试数据结束
 
                 // 初始化成功标记

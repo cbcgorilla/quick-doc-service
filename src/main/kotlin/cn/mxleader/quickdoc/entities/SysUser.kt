@@ -13,17 +13,17 @@ class SysUser(@Id var id: ObjectId,
               var title: String,
               var password: String,
               var avatarId: ObjectId,
-              var authorities: List<Authorities>,
-              var groups: List<String>,
+              var authorities: Set<Authority>,
+              var groups: Set<String>,
               var email: String? = null) : HttpSessionBindingListener {
 
-    enum class Authorities {
+    enum class Authority {
         ADMIN, USER
     }
 
-    fun isAdmin():Boolean{
+    fun isAdmin(): Boolean {
         for (it in authorities) {
-            if (it == SysUser.Authorities.ADMIN) {
+            if (it == SysUser.Authority.ADMIN) {
                 return true
             }
         }
@@ -46,6 +46,22 @@ class SysUser(@Id var id: ObjectId,
         // 从在线列表中删除用户名
         val activeUserStore = application.getAttribute("ActiveUserStore") as ActiveUserStore
         activeUserStore.removeUser(this.username)
+    }
+
+    fun addAuthority(authority: Authority) {
+        this.authorities += authority
+    }
+
+    fun removeAuthority(authority: Authority) {
+        this.authorities -= authority
+    }
+
+    fun addGroup(group: String) {
+        this.groups += group
+    }
+
+    fun removeGroup(group: String) {
+        this.groups -= group
     }
 
 }

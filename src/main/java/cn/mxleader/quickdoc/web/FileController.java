@@ -2,7 +2,6 @@ package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
 import cn.mxleader.quickdoc.entities.AuthTarget;
-import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.service.FolderService;
@@ -231,7 +230,7 @@ public class FileController {
                          HttpSession session) throws IOException {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         String filename = FileUtils.getFilename(file.getOriginalFilename());
-        String fileType = FileUtils.guessMimeType(filename);
+        String fileType = FileUtils.getContentType(filename);
 /*
         MimetypesFileTypeMap m = new MimetypesFileTypeMap();
         String fileType = m.getContentType(filename);*/

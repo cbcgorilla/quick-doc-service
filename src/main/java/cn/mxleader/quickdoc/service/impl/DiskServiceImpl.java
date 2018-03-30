@@ -1,7 +1,8 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.dao.SysDiskRepository;
-import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.entities.AuthAction;
+import cn.mxleader.quickdoc.entities.Authorization;
 import cn.mxleader.quickdoc.entities.SysDisk;
 import cn.mxleader.quickdoc.service.DiskService;
 import org.bson.types.ObjectId;
@@ -25,8 +26,8 @@ public class DiskServiceImpl implements DiskService {
     }
 
     @Override
-    public List<SysDisk> list(AccessAuthorization authorization) {
-        return sysDiskRepository.findAllByAuthorizationsContains(authorization);
+    public List<SysDisk> list(Authorization authorization) {
+        return sysDiskRepository.findAllByAuthorization(authorization);
     }
 
     @Override
@@ -35,13 +36,8 @@ public class DiskServiceImpl implements DiskService {
     }
 
     @Override
-    public SysDisk save(String name, AccessAuthorization authorization) {
-        return save(name, Arrays.asList(authorization));
-    }
-
-    @Override
-    public SysDisk save(String name, List<AccessAuthorization> authorizations) {
-        return sysDiskRepository.save(new SysDisk(ObjectId.get(), name, authorizations));
+    public SysDisk save(String name, Authorization authorization) {
+        return sysDiskRepository.save(new SysDisk(ObjectId.get(), name, authorization));
     }
 
     @Override
@@ -56,22 +52,22 @@ public class DiskServiceImpl implements DiskService {
     }
 
     @Override
-    public SysDisk addAuthorization(ObjectId id, AccessAuthorization authorization) {
+    public SysDisk addAuthorization(ObjectId id, AuthAction action) {
         Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(id);
         if (optionalSysDisk.isPresent()) {
             SysDisk disk = optionalSysDisk.get();
-            disk.getAuthorizations().add(authorization);
+            disk.getAuthorization().add(action);
             return sysDiskRepository.save(disk);
         }
         return null;
     }
 
     @Override
-    public SysDisk removeAuthorization(ObjectId id, AccessAuthorization authorization) {
+    public SysDisk removeAuthorization(ObjectId id, AuthAction action) {
         Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(id);
         if (optionalSysDisk.isPresent()) {
             SysDisk disk = optionalSysDisk.get();
-            disk.getAuthorizations().remove(authorization);
+            disk.getAuthorization().remove(action);
             return sysDiskRepository.save(disk);
         }
         return null;

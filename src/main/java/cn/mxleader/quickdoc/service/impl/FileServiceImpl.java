@@ -6,11 +6,15 @@ import cn.mxleader.quickdoc.dao.SysFolderRepository;
 import cn.mxleader.quickdoc.dao.ext.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.FileService;
+import cn.mxleader.quickdoc.web.domain.LayuiData;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -21,9 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import java.io.*;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -86,11 +91,23 @@ public class FileServiceImpl implements FileService {
         return gridFsAssistant.find(query);
     }
 
+    @Override
     public List<WebFile> list(ParentLink parent) {
         Query query = Query.query(GridFsCriteria.whereMetaData("parents").in(parent));
         GridFSFindIterable fsFiles = gridFsAssistant.find(query);
         return StreamSupport.stream(switchWebFiles(fsFiles).spliterator(), false)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public LayuiData<List<WebFile>> list(ParentLink parent, Pageable pageable) {
+        Query query = Query.query(GridFsCriteria.whereMetaData("parents").in(parent));
+        GridFSFindIterable fsFiles = gridFsAssistant.find(query)
+                .skip((int) pageable.getOffset())
+                .limit(pageable.getPageSize());
+        List<WebFile> files = StreamSupport.stream(switchWebFiles(fsFiles).spliterator(), false)
+                .collect(Collectors.toList());
+        return new LayuiData<>(0, "", (int) gridFsAssistant.count(query), files);
     }
 
     /**
@@ -99,6 +116,7 @@ public class FileServiceImpl implements FileService {
      * @param filename
      * @return
      */
+    @Override
     public Stream<WebFile> searchFilesContaining(String filename) {
         Pattern pattern = Pattern.compile("^.*" + filename + ".*$", Pattern.CASE_INSENSITIVE);
         Query query = Query.query(GridFsCriteria.whereFilename().is(pattern));
@@ -116,13 +134,16 @@ public class FileServiceImpl implements FileService {
     @Override
     //@Async
     public ObjectId store(InputStream file, String filename, ParentLink parent) {
-        String fileType = FileUtils.guessMimeType(filename);
-        Metadata metadata = new Metadata(fileType, Arrays.asList(parent),
+        String fileType = FileUtils.getContentType(filename);
+        Metadata metadata = new Metadata(fileType,
+                new HashSet<ParentLink>() {{
+                    add(parent);
+                }},
                 getParentAuthorization(parent), null);
         return gridFsAssistant.store(file, filename, metadata);
     }
 
-    private List<AccessAuthorization> getParentAuthorization(ParentLink parent) {
+    private Set<Authorization> getParentAuthorization(ParentLink parent) {
         if (parent.getTarget().equals(AuthTarget.FOLDER)) {
             Optional<SysFolder> optionalSysFolder = sysFolderRepository.findById(parent.getId());
             if (optionalSysFolder.isPresent()) {
@@ -131,7 +152,9 @@ public class FileServiceImpl implements FileService {
         } else if (parent.getTarget().equals(AuthTarget.DISK)) {
             Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(parent.getId());
             if (optionalSysDisk.isPresent()) {
-                return optionalSysDisk.get().getAuthorizations();
+                return new HashSet<Authorization>() {{
+                    add(optionalSysDisk.get().getAuthorization());
+                }};
             }
         }
         return null;
@@ -141,9 +164,11 @@ public class FileServiceImpl implements FileService {
     //@Async
     public ObjectId storeServerFile(String resourceLocation) throws FileNotFoundException {
         File file = ResourceUtils.getFile(resourceLocation);
-        String fileType = FileUtils.guessMimeType(file.getName());
+        String fileType = FileUtils.getContentType(file.getName());
         Metadata metadata = new Metadata(fileType, null,
-                Arrays.asList(new AccessAuthorization("users", AuthType.GROUP, AuthAction.READ)),
+                new HashSet<Authorization>() {{
+                    add(new Authorization("users", AuthType.GROUP));
+                }},
                 null);
         return gridFsAssistant.store(new FileInputStream(file), file.getName(), metadata);
     }
@@ -153,6 +178,7 @@ public class FileServiceImpl implements FileService {
         gridFsAssistant.rename(fileId, newFilename);
     }
 
+    @Override
     public GridFSFile saveMetadata(ObjectId fileId, Metadata metadata) {
         return gridFsAssistant.updateMetadata(fileId, metadata);
     }

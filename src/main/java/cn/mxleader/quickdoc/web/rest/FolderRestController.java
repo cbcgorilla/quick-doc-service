@@ -43,7 +43,7 @@ public class FolderRestController {
         return folderService.listFoldersInDisk(new ObjectId(diskId))
                 .stream()
                 .map(sysFolder -> new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),
-                        sysFolder.getParents().get(0).getId().toString(), Collections.emptyList())
+                        sysFolder.firstParent().getId().toString(), Collections.emptyList())
                 )
                 .collect(Collectors.toList());
     }

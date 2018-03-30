@@ -7,6 +7,9 @@ import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -77,18 +80,14 @@ public class FileUtils {
         }
     }
 
-    public static String guessMimeType(String path) {
-        FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        String contentTypeFor = null;
+    public static String getContentType(String filename) {
         try {
-            contentTypeFor = fileNameMap.getContentTypeFor(URLEncoder.encode(path, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            Path path = Paths.get(filename);
+            String type = Files.probeContentType(path);
+            return type == null ? "application/octet-stream" : type;
+        } catch (IOException exp) {
+            return "application/octet-stream";
         }
-        if (contentTypeFor == null) {
-            contentTypeFor = "application/octet-stream";
-        }
-        return contentTypeFor;
     }
 
     public static String read(InputStream input) throws IOException {

@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -57,14 +57,12 @@ public class DiskController {
 
     @PostMapping("/save")
     public String save(@RequestParam("diskName") String diskName,
-                       @RequestParam(value = "shareGroups", required = false) String[] shareGroups,
+                       @RequestParam("owner") String owner,
+                       @RequestParam("authType") AuthType authType,
                        RedirectAttributes redirectAttributes,
                        Model model,
                        HttpSession session) {
-        List<AccessAuthorization> authorizations = Arrays.asList(shareGroups).stream()
-                .map(group -> new AccessAuthorization(group, AuthType.GROUP, AuthAction.READ))
-                .collect(Collectors.toList());
-        diskService.save(diskName, authorizations);
+        diskService.save(diskName, new Authorization(owner, authType));
         return "redirect:/#disk/space";
     }
 

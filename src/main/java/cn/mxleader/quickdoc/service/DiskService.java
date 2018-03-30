@@ -1,10 +1,10 @@
 package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.common.annotation.PreAuth;
-import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.entities.AuthAction;
 import cn.mxleader.quickdoc.entities.AuthTarget;
+import cn.mxleader.quickdoc.entities.Authorization;
 import cn.mxleader.quickdoc.entities.SysDisk;
-import cn.mxleader.quickdoc.entities.SysFolder;
 import org.bson.types.ObjectId;
 
 import java.util.List;
@@ -14,31 +14,32 @@ public interface DiskService {
 
     List<SysDisk> list();
 
-    List<SysDisk> list(AccessAuthorization authorization);
+    List<SysDisk> list(Authorization authorization);
 
     @PreAuth(target = AuthTarget.DISK)
     Optional<SysDisk> get(ObjectId id);
-    SysDisk save(String name, AccessAuthorization authorization);
-    SysDisk save(String name, List<AccessAuthorization> authorizations);
+
+    SysDisk save(String name, Authorization authorization);
+
     SysDisk rename(ObjectId id, String newName);
 
     /**
      * 增加磁盘授权信息
      *
-     * @param id            文件夹ID
-     * @param authorization 新增授权
+     * @param id     文件夹ID
+     * @param action 新增授权
      * @return
      */
-    SysDisk addAuthorization(ObjectId id, AccessAuthorization authorization);
+    SysDisk addAuthorization(ObjectId id, AuthAction action);
 
     /**
      * 删除磁盘授权信息
      *
-     * @param id            文件夹ID
-     * @param authorization 待删除授权
+     * @param id     文件夹ID
+     * @param action 待删除授权
      * @return
      */
-    SysDisk removeAuthorization(ObjectId id, AccessAuthorization authorization);
+    SysDisk removeAuthorization(ObjectId id, AuthAction action);
 
     void delete(ObjectId id);
 }

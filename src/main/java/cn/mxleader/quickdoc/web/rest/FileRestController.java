@@ -10,6 +10,7 @@ import cn.mxleader.quickdoc.web.domain.WebFile;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,11 +46,10 @@ public class FileRestController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value = "根据上级目录ID获取文件列表")
     public LayuiData<List<WebFile>> list(@RequestParam ObjectId parentId,
-                                    @RequestParam AuthTarget parentType,
-                                    @RequestParam Integer page,
-                                    @RequestParam Integer limit) {
-        List<WebFile> webFileList = fileService.list(new ParentLink(parentId, parentType));
-        return new LayuiData<>(0, "", webFileList.size(), webFileList);
+                                         @RequestParam AuthTarget parentType,
+                                         @RequestParam Integer page,
+                                         @RequestParam Integer limit) {
+        return fileService.list(new ParentLink(parentId, parentType), PageRequest.of(page-1, limit));
     }
 
     @PostMapping(value = "/upload")
@@ -61,11 +61,11 @@ public class FileRestController {
 
         ParentLink parent = new ParentLink(containerId, containerType);
         if (fileService.getStoredFile(filename, parent) != null) {
-            return new LayuiData<>(1, "文件名冲突", 0,false);
+            return new LayuiData<>(1, "文件名冲突", 0, false);
         }
 
         ObjectId fileId = fileService.store(file.getInputStream(), filename, parent);
-        return new LayuiData<>(0, "", 0,true);
+        return new LayuiData<>(0, "", 0, true);
     }
 
     @PostMapping(value = "/delete")

@@ -60,7 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // @TODO 删除.csrf().disable() 可屏蔽 /management 路径下的POST提交，仅支持GET方法交互
             http.csrf().disable().requestMatcher(
                     EndpointRequest.to("mongo-status", "quick-doc-health")).authorizeRequests()
-                    .anyRequest().hasAuthority(SysUser.Authorities.ADMIN.name())
+                    .anyRequest().hasAuthority(SysUser.Authority.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -147,8 +147,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     //.antMatchers("/invalidSession*").anonymous()
                     .antMatchers(SWAGGER_AUTH_WHITELIST).permitAll()
                     .antMatchers("/admin*", "/admin/**", "/swagger-ui.html")
-                    .hasAuthority(SysUser.Authorities.ADMIN.name())
-                    .anyRequest().hasAnyAuthority(SysUser.Authorities.ADMIN.name(), SysUser.Authorities.USER.name())
+                    .hasAuthority(SysUser.Authority.ADMIN.name())
+                    .anyRequest().hasAnyAuthority(SysUser.Authority.ADMIN.name(), SysUser.Authority.USER.name())
                     .and()
                     .formLogin()
                     .loginPage("/login")

@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.dao.SysFolderRepository;
-import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.entities.Authorization;
 import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,11 +58,16 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public SysFolder save(String name, ParentLink parent, AccessAuthorization authorization) {
+    public SysFolder save(String name, ParentLink parent, Authorization authorization) {
         Optional<SysFolder> optionalSysFolder = sysFolderRepository.findByParentsContainsAndName(parent, name);
         if (!optionalSysFolder.isPresent()) {
             return sysFolderRepository.save(new SysFolder(ObjectId.get(), name,
-                    Arrays.asList(parent), Arrays.asList(authorization)));
+                    new HashSet<ParentLink>() {{
+                        add(parent);
+                    }},
+                    new HashSet<Authorization>() {{
+                        add(authorization);
+                    }}));
         }
         return null;
     }
@@ -83,7 +89,7 @@ public class FolderServiceImpl implements FolderService {
         Optional<SysFolder> optionalSysFolder = sysFolderRepository.findById(id);
         if (optionalSysFolder.isPresent()) {
             SysFolder folder = optionalSysFolder.get();
-            folder.getParents().add(parent);
+            folder.addParent(parent);
             return sysFolderRepository.save(folder);
         }
         return null;
@@ -94,29 +100,29 @@ public class FolderServiceImpl implements FolderService {
         Optional<SysFolder> optionalSysFolder = sysFolderRepository.findById(id);
         if (optionalSysFolder.isPresent()) {
             SysFolder folder = optionalSysFolder.get();
-            folder.getParents().remove(parent);
+            folder.removeParent(parent);
             return sysFolderRepository.save(folder);
         }
         return null;
     }
 
     @Override
-    public SysFolder addAuthorization(ObjectId id, AccessAuthorization authorization) {
+    public SysFolder addAuthorization(ObjectId id, Authorization authorization) {
         Optional<SysFolder> optionalSysFolder = sysFolderRepository.findById(id);
         if (optionalSysFolder.isPresent()) {
             SysFolder folder = optionalSysFolder.get();
-            folder.getAuthorizations().add(authorization);
+            folder.addAuthorization(authorization);
             return sysFolderRepository.save(folder);
         }
         return null;
     }
 
     @Override
-    public SysFolder removeAuthorization(ObjectId id, AccessAuthorization authorization) {
+    public SysFolder removeAuthorization(ObjectId id, Authorization authorization) {
         Optional<SysFolder> optionalSysFolder = sysFolderRepository.findById(id);
         if (optionalSysFolder.isPresent()) {
             SysFolder folder = optionalSysFolder.get();
-            folder.getAuthorizations().remove(authorization);
+            folder.removeAuthorization(authorization);
             return sysFolderRepository.save(folder);
         }
         return null;

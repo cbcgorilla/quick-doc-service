@@ -1,7 +1,7 @@
 package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.common.annotation.PreAuth;
-import cn.mxleader.quickdoc.entities.AccessAuthorization;
+import cn.mxleader.quickdoc.entities.Authorization;
 import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
@@ -43,7 +43,7 @@ public interface FolderService {
      * @param authorization
      * @return
      */
-    SysFolder save(String name, ParentLink parent, AccessAuthorization authorization);
+    SysFolder save(String name, ParentLink parent, Authorization authorization);
 
     /**
      * 重命名文件目录
@@ -79,7 +79,7 @@ public interface FolderService {
      * @param authorization 新增授权
      * @return
      */
-    SysFolder addAuthorization(ObjectId id, AccessAuthorization authorization);
+    SysFolder addAuthorization(ObjectId id, Authorization authorization);
 
     /**
      * 删除文件目录授权信息
@@ -88,7 +88,7 @@ public interface FolderService {
      * @param authorization 待删除授权
      * @return
      */
-    SysFolder removeAuthorization(ObjectId id, AccessAuthorization authorization);
+    SysFolder removeAuthorization(ObjectId id, Authorization authorization);
 
     /**
      * 删除文件目录

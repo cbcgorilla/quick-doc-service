@@ -29,18 +29,16 @@ public class IndexController {
     public String index(Model model, HttpSession session) {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         // 个人空间菜单
-        AccessAuthorization privateAuthorization = new AccessAuthorization(activeUser.getUsername(),
-                AuthType.PRIVATE, AuthAction.READ);
-        model.addAttribute("private_disk_menu",diskService.list(privateAuthorization));
+        Authorization privateAuthorization = new Authorization(activeUser.getUsername(), AuthType.PRIVATE);
+        model.addAttribute("private_disk_menu", diskService.list(privateAuthorization));
 
         //组共享空间菜单（包含该用户的所有权限组磁盘）
         List<SysDisk> groupSysDiskList = new ArrayList<>();
-        for(String group: activeUser.getGroups()){
-            AccessAuthorization groupAuthorization = new AccessAuthorization(group,
-                    AuthType.GROUP,AuthAction.READ);
+        for (String group : activeUser.getGroups()) {
+            Authorization groupAuthorization = new Authorization(group, AuthType.GROUP);
             groupSysDiskList.addAll(diskService.list(groupAuthorization));
         }
-        model.addAttribute("group_disk_menu",groupSysDiskList);
+        model.addAttribute("group_disk_menu", groupSysDiskList);
 
         return "index";
     }

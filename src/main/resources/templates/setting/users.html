@@ -8,7 +8,9 @@
                 <div class="card-body">
 
                     <div class="layui-btn-group userTable">
-                        <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
+                        <button class="layui-btn" data-type="getCheckData">
+                            <i class="fas fa-users"></i>加入组
+                        </button>
                         <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
                         <button class="layui-btn" data-type="isAll">验证是否全选</button>
                         <button class="addMemberDialogModal layui-btn btn-success"
@@ -124,7 +126,18 @@
                                 getCheckData: function () { //获取选中数据
                                     var checkStatus = table.checkStatus('reloadUserData')
                                         , data = checkStatus.data;
-                                    layer.alert(JSON.stringify(data));
+                                    //layer.alert(JSON.stringify(data));
+                                    console.log(data);
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "/api/user/addGroup?group=users",
+                                        contentType: 'application/json; charset=utf-8',
+                                        data: JSON.stringify(data), //可选参数
+                                        dataType: "json",
+                                        success: function (value) {
+                                            console.log(value);
+                                        }
+                                    });
                                 }
                                 , getCheckLength: function () { //获取选中数目
                                     var checkStatus = table.checkStatus('reloadUserData')

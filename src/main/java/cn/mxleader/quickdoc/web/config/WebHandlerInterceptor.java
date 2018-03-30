@@ -1,6 +1,5 @@
 package cn.mxleader.quickdoc.web.config;
 
-import cn.mxleader.quickdoc.entities.AccessAuthorization;
 import cn.mxleader.quickdoc.entities.SysUser;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
@@ -9,8 +8,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 
 import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;

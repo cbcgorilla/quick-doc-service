@@ -42,8 +42,6 @@ import static org.springframework.data.mongodb.gridfs.GridFsCriteria.whereFilena
 @Component
 public class GridFsAssistant implements GridFsOperations, ResourcePatternResolver {
 
-    static final String CONTENT_TYPE_FIELD = "_contentType";
-
     private final MongoDbFactory dbFactory;
 
     private final String bucketName;
@@ -146,7 +144,7 @@ public class GridFsAssistant implements GridFsOperations, ResourcePatternResolve
         Document mData = new Document();
 
         if (StringUtils.hasText(contentType)) {
-            mData.put(CONTENT_TYPE_FIELD, contentType);
+            mData.put("_contentType", contentType);
         }
 
         if (metadata != null) {
@@ -168,8 +166,13 @@ public class GridFsAssistant implements GridFsOperations, ResourcePatternResolve
 
         Document queryObject = getMappedQuery(query.getQueryObject());
         Document sortObject = getMappedQuery(query.getSortObject());
-
         return getGridFs().find(queryObject).sort(sortObject);
+    }
+
+    public long count(Query query){
+
+        Document queryObject = getMappedQuery(query.getQueryObject());
+        return filesCollection.count(queryObject);
     }
 
     /*
