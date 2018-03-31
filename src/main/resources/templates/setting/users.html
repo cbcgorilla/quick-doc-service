@@ -50,13 +50,13 @@
                                 cellMinWidth: 120,
                                 page: true, //开启分页,
                                 limit: 10,
-                                limits: [10, 20, 50, 100],
+                                limits: [10, 50, 100, 200],
                                 cols: [
                                     [
                                         {type: 'checkbox'},
                                         {field: 'id', title: 'ID'},
-                                        {field: 'username', title: '用户名', width: 160},
-                                        {field: 'title', title: '显示名', width: 160},
+                                        {field: 'username', title: '用户名', edit: 'text', width: 160},
+                                        {field: 'title', title: '显示名', edit: 'text', width: 160},
                                         {
                                             field: 'avatarId',
                                             title: '头像',
@@ -64,7 +64,7 @@
                                             width: 80,
                                             templet: '#avatarTpl'
                                         },
-                                        {field: 'email', title: '邮箱'},
+                                        {field: 'email', title: '邮箱', edit: 'text'},
                                         {field: 'groups', title: '用户组'},
                                         {
                                             title: '操作',
@@ -85,6 +85,25 @@
                             table.on('checkbox(userTable)', function (obj) {
                                 console.log(obj)
                             });
+
+                            table.on('edit(userTable)', function (obj) {
+                                var value = obj.value, //得到修改后的值
+                                    data = obj.data, //得到所在行所有键值
+                                    field = obj.field; //得到字段
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/api/user/update",
+                                    contentType: 'application/json; charset=utf-8',
+                                    data: JSON.stringify(data), //可选参数
+                                    dataType: "json",
+                                    success: function (resp) {
+                                        console.log(resp);
+                                        layer.msg('用户信息更新成功！');
+                                        //reloadUserTable('/api/user/list');
+                                    }
+                                });
+                            });
+
                             //监听工具条
                             table.on('tool(userTable)', function (obj) {
                                 var data = obj.data;
@@ -158,18 +177,19 @@
                                 layer.prompt(
                                     {
                                         title: '请输入组名',
-                                        success: function(layerInput) {
-                                            layerInput.find('input').on('keydown', function() {
+                                        success: function (layerInput) {
+                                            layerInput.find('input').on('keydown', function () {
                                                 if (event.keyCode === 13) {
                                                     prompt_service(event.target.value);
                                                 }
                                             })
                                         },
                                     },
-                                    function(value) {
+                                    function (value) {
                                         prompt_service(value);
                                     }
                                 );
+
                                 function prompt_service(value) {
                                     $.ajax({
                                         type: "POST",

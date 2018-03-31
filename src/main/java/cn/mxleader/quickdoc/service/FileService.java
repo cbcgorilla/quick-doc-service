@@ -2,11 +2,11 @@ package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.common.annotation.PreAuth;
 import cn.mxleader.quickdoc.entities.*;
-import cn.mxleader.quickdoc.web.domain.LayuiData;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 
@@ -30,7 +30,7 @@ public interface FileService {
     List<WebFile> list(ParentLink parent);
 
     @PreAuth(field = ParentLink.class)
-    LayuiData<List<WebFile>> list(ParentLink parent, Pageable pageable);
+    Page<WebFile> list(ParentLink parent, Pageable pageable);
 
     /**
      * 根据文件名进行模糊查询

@@ -1,11 +1,13 @@
 package cn.mxleader.quickdoc.service.impl;
 
-import cn.mxleader.quickdoc.dao.SysUserRepository;
-import cn.mxleader.quickdoc.entities.SysFolder;
-import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.common.utils.PasswordUtil;
+import cn.mxleader.quickdoc.dao.SysUserRepository;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.UserService;
+import cn.mxleader.quickdoc.web.domain.WebUser;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,13 +29,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<SysUser> findAllUsers() {
+    public List<SysUser> list() {
         return userRepository.findAll();
     }
 
     @Override
-    public SysUser findUser(String username) {
+    public Page<SysUser> list(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    @Override
+    public SysUser get(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public SysUser update(WebUser webUser) {
+        Optional<SysUser> userOptional = userRepository.findById(new ObjectId(webUser.getId()));
+        if (userOptional.isPresent()) {
+            SysUser user = userOptional.get();
+            user.setUsername(webUser.getUsername());
+            user.setTitle(webUser.getTitle());
+            user.setEmail(webUser.getEmail());
+            return userRepository.save(user);
+        }
+        return null;
     }
 
     /**
@@ -45,7 +65,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Boolean validateUser(String username, String password) {
-        SysUser sysUser = findUser(username);
+        SysUser sysUser = get(username);
         if (sysUser == null) {
             return false;
         } else {
@@ -54,13 +74,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUserById(ObjectId userId) {
+    public void delete(ObjectId userId) {
         userRepository.deleteById(userId);
-    }
-
-    @Override
-    public void deleteUserByUsername(String username) {
-        deleteUserById(findUser(username).getId());
     }
 
     @Override

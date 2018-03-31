@@ -42,7 +42,7 @@ public class WebAuthenticationSuccessHandler implements
         final HttpSession session = request.getSession(false);
         if (session != null) {
             session.setMaxInactiveInterval(30 * 60);
-            SysUser user = userService.findUser(authentication.getName());
+            SysUser user = userService.get(authentication.getName());
             session.setAttribute(SESSION_USER, user);
             // 发送用户登录消息到平台MQ
             Date d = new Date();

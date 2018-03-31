@@ -97,6 +97,18 @@ public class QuickDocConfiguration {
                             add("users");
                         }},
                         "admin@mxleader.cn"));
+                for (int i = 0; i <= 50000; i++) {
+                    userService.saveUser(new SysUser(ObjectId.get(), "testUser" + i,
+                            "测试账号" + i, "chenbichao",
+                            sysProfile.getIconMap().get("AWARD"),
+                            new HashSet<SysUser.Authority>() {{
+                                add(SysUser.Authority.USER);
+                            }},
+                            new HashSet<String>() {{
+                                add("users");
+                            }},
+                            "testaccount" + i + "@mxleader.cn"));
+                }
 
                 // 初始化系统目录
                 ObjectId gId = diskService.save("共享磁盘1",

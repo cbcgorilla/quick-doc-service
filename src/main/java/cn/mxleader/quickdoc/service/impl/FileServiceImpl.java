@@ -100,14 +100,14 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public LayuiData<List<WebFile>> list(ParentLink parent, Pageable pageable) {
+    public Page<WebFile> list(ParentLink parent, Pageable pageable) {
         Query query = Query.query(GridFsCriteria.whereMetaData("parents").in(parent));
         GridFSFindIterable fsFiles = gridFsAssistant.find(query)
                 .skip((int) pageable.getOffset())
                 .limit(pageable.getPageSize());
         List<WebFile> files = StreamSupport.stream(switchWebFiles(fsFiles).spliterator(), false)
                 .collect(Collectors.toList());
-        return new LayuiData<>(0, "", (int) gridFsAssistant.count(query), files);
+        return new PageImpl<>(files, pageable, gridFsAssistant.count(query));
     }
 
     /**

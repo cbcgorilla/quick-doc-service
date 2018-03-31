@@ -7,6 +7,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,28 +27,40 @@ public class UserRestController {
     }
     // -------------------Retrieve All Users-------------------
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @GetMapping(value = "/list")
     @ApiOperation("返回所有用户信息清单")
-    public LayuiData<List<WebUser>> listAllUsers() {
-        List<WebUser> users = userService.findAllUsers()
+    public LayuiData<List<WebUser>> list(@RequestParam Integer page,
+                                         @RequestParam Integer limit) {
+        Page<SysUser> userPage = userService.list(PageRequest.of(page - 1, limit));
+        List<WebUser> users = userPage.getContent()
                 .stream()
                 .map(WebUser::new)
                 .collect(Collectors.toList());
-        return new LayuiData<>(0, "", users.size(), users);
+        return new LayuiData<>(0, "", userPage.getTotalElements(), users);
     }
 
     // -------------------Retrieve Single User------------------------------------------
 
-    @RequestMapping(value = "/get/{username}", method = RequestMethod.GET)
+    @GetMapping("/get/{username}")
     @ApiOperation("根据用户名返回用户信息详情")
     public SysUser getUser(@PathVariable("username") String username) {
-        return userService.findUser(username);
+        return userService.get(username);
+    }
+
+    @PostMapping("/update")
+    @ApiOperation("更新系统用户信息")
+    public Boolean update(@RequestBody WebUser webUser) {
+        if(userService.get(webUser.getUsername())==null){
+            userService.update(webUser);
+            return true;
+        }
+        return false;
     }
 
     @PostMapping("/delete")
     @ApiOperation("删除系统用户")
-    public Boolean deleteUser(@RequestBody String userId) {
-        userService.deleteUserById(new ObjectId(userId));
+    public Boolean delete(@RequestBody String userId) {
+        userService.delete(new ObjectId(userId));
         return true;
     }
 
@@ -63,7 +77,7 @@ public class UserRestController {
     @PostMapping("/removeGroup")
     @ApiOperation("批量删除用户组")
     public Boolean removeGroup(@RequestParam String group,
-                            @RequestBody List<WebUser> webUserList) {
+                               @RequestBody List<WebUser> webUserList) {
         for (WebUser user : webUserList) {
             userService.removeGroup(new ObjectId(user.getId()), group);
         }

@@ -24,10 +24,10 @@ public class WebAuthenticationProvider
     public Authentication authenticate(Authentication authentication)
             throws AuthenticationException {
 
-        String name = authentication.getName();
+        String username = authentication.getName();
         String password = authentication.getCredentials().toString();
-        if (userService.validateUser(name, password)) {
-            SysUser sysUser = userService.findUser(name);
+        if (userService.validateUser(username, password)) {
+            SysUser sysUser = userService.get(username);
             return new UsernamePasswordAuthenticationToken(sysUser.getUsername(),
                     sysUser.getPassword(),
                     sysUser.getAuthorities().stream()

@@ -10,6 +10,7 @@ import cn.mxleader.quickdoc.web.domain.WebFile;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,7 +50,9 @@ public class FileRestController {
                                          @RequestParam AuthTarget parentType,
                                          @RequestParam Integer page,
                                          @RequestParam Integer limit) {
-        return fileService.list(new ParentLink(parentId, parentType), PageRequest.of(page-1, limit));
+        Page<WebFile> filePage = fileService.list(new ParentLink(parentId, parentType),
+                PageRequest.of(page - 1, limit));
+        return new LayuiData<>(0, "", filePage.getTotalElements(), filePage.getContent());
     }
 
     @PostMapping(value = "/upload")

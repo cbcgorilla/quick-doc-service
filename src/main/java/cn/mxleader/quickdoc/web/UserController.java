@@ -57,7 +57,7 @@ public class UserController {
      */
     @GetMapping()
     public String index(Model model) {
-        //model.addAttribute("users", userService.findAllUsers());
+        //model.addAttribute("users", userService.list());
         return "setting/users";
     }
 
@@ -80,7 +80,7 @@ public class UserController {
                     add(userGroup);
                 }},
                 email);
-        if (userService.findUser(username) == null) {
+        if (userService.get(username) == null) {
             userService.saveUser(sysUser);
             ObjectId diskId = diskService.save("我的磁盘1",
                     new Authorization(username, AuthType.PRIVATE)).getId();
@@ -105,7 +105,7 @@ public class UserController {
                          RedirectAttributes redirectAttributes) {
         SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         if (activeUser.isAdmin()) {
-            userService.deleteUserById(userId);
+            userService.delete(userId);
             redirectAttributes.addFlashAttribute("message",
                     "成功删除用户： " + userId);
         } else {
