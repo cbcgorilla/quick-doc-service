@@ -92,7 +92,7 @@
                                     field = obj.field; //得到字段
                                 $.ajax({
                                     type: "POST",
-                                    url: "/api/user/update",
+                                    url: "/api/user/update/" + field,
                                     contentType: 'application/json; charset=utf-8',
                                     data: JSON.stringify(data), //可选参数
                                     dataType: "json",

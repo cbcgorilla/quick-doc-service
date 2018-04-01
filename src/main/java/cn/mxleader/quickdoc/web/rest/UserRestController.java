@@ -47,10 +47,15 @@ public class UserRestController {
         return userService.get(username);
     }
 
-    @PostMapping("/update")
+    @PostMapping("/update/{field}")
     @ApiOperation("更新系统用户信息")
-    public Boolean update(@RequestBody WebUser webUser) {
-        if(userService.get(webUser.getUsername())==null){
+    public Boolean update(@PathVariable String field, @RequestBody WebUser webUser) {
+        if (field.equalsIgnoreCase("username")) {
+            if (userService.get(webUser.getUsername()) == null) {
+                userService.update(webUser);
+                return true;
+            }
+        } else {
             userService.update(webUser);
             return true;
         }
