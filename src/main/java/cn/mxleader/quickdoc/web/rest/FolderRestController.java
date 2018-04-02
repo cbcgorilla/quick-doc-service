@@ -54,6 +54,7 @@ public class FolderRestController {
                                @RequestParam ObjectId parentId,
                                @RequestParam AuthTarget parentType,
                                @RequestParam ObjectId diskId) {
+        //@TODO 增加对一个目录下增加同名文件夹的异常处理
         SysFolder sysFolder = folderService.save(name, new ParentLink(parentId, parentType,diskId));
         return new ArrayList<TreeNode>() {{
             add(new TreeNode(sysFolder.getId().toString(),
