@@ -170,30 +170,7 @@
             var data = obj.data;
             if (obj.event === 'diskName') {
                 diskId = data.id;
-                $.ajax({
-                    type: "GET",
-                    url: "/api/folder/list?diskId=" + diskId,
-                    contentType: 'application/json; charset=utf-8',
-                    //data: data.id, //可选参数
-                    dataType: "json",
-                    success: function (value) {
-                        console.log(value);
-                        if (value.length > 0) {
-                            folderTreeGrid = treegrid.createNew({
-                                elem: 'LAY_table_folders',
-                                view: 'folderView',
-                                data: {rows: value},
-                                id: 'id',
-                                root: diskId,
-                                parentid: 'parentId',
-                                singleSelect: true
-                            });
-                            folderTreeGrid.build();
-                        } else {
-                            layer.msg('该磁盘内无子目录！');
-                        }
-                    }
-                });
+                loadDiskFolders(diskId);
             } else if (obj.event === 'download') {
                 layer.msg('磁盘ID号：' + data.id + '名称：' + data.name);
                 //window.open('file/download/' + data.id);
@@ -266,6 +243,7 @@
                 }
                     break;
                 case 'update': {
+                    var row = folderTreeGrid.getRow();
                     row.text += 'update';
                     folderTreeGrid.updateNode(row, row.id);
                 }
@@ -288,7 +266,7 @@
                                 saveFolderService(event.target.value, selectedRow, addType);
                             }
                         })
-                    },
+                    }
                 },
                 function (value) {
                     saveFolderService(value, selectedRow, addType);
@@ -327,19 +305,51 @@
                 dataType: "json",
                 success: function (value) {
                     console.log(value);
-                    switch (addType) {
-                        case 'sibling': {
-                            folderTreeGrid.insertNode(value, parentId);
+                    if (folderTreeGrid === null) {
+                        loadDiskFolders(diskId);
+                    } else {
+                        switch (addType) {
+                            case 'sibling': {
+                                folderTreeGrid.insertNode(value, parentId);
+                            }
+                                break;
+                            case 'child': {
+                                folderTreeGrid.insertChild(value, parentId);
+                            }
+                                break;
                         }
-                            break;
-                        case 'child': {
-                            folderTreeGrid.insertChild(value, parentId);
-                        }
-                            break;
                     }
                 }
             });
             layer.closeAll();
+        }
+
+        function loadDiskFolders(_diskId) {
+            $.ajax({
+                type: "GET",
+                url: "/api/folder/list?diskId=" + _diskId,
+                contentType: 'application/json; charset=utf-8',
+                //data: data.id, //可选参数
+                dataType: "json",
+                success: function (value) {
+                    console.log(value);
+                    if (value.length > 0) {
+                        folderTreeGrid = treegrid.createNew({
+                            elem: 'LAY_table_folders',
+                            view: 'folderView',
+                            data: {rows: value},
+                            id: 'id',
+                            root: _diskId,
+                            parentid: 'parentId',
+                            singleSelect: true
+                        });
+                        folderTreeGrid.build();
+                    } else {
+                        layer.msg('该磁盘内无子目录！');
+                        folderTreeGrid = null;
+                    }
+                }
+            });
         }
 
         /*]]>*/
