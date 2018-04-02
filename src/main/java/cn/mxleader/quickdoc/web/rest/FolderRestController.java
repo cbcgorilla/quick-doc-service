@@ -6,13 +6,13 @@ import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.TreeNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,14 +30,14 @@ public class FolderRestController {
         this.folderService = folderService;
     }
 
-    @RequestMapping(value = "/tree", method = RequestMethod.GET)
+    @GetMapping("/tree")
     @ApiOperation(value = "根据磁盘ID号获取目录树信息")
     public List<TreeNode> getFolderTree(@RequestParam String parentId) {
         return folderService.getFolderTree(new ParentLink(new ObjectId(parentId),
                 AuthTarget.DISK, new ObjectId(parentId)));
     }
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @GetMapping("/list")
     @ApiOperation(value = "根据磁盘ID号获取目录列表")
     public List<TreeNode> getFoldersOfDisk(@RequestParam String diskId) throws JsonProcessingException {
         return folderService.listFoldersInDisk(new ObjectId(diskId))
@@ -46,6 +46,21 @@ public class FolderRestController {
                         sysFolder.firstParent().getId().toString(), Collections.emptyList())
                 )
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping("/save")
+    @ApiOperation("根据上级目录ID增加子目录")
+    public List<TreeNode> save(@RequestParam String name,
+                               @RequestParam ObjectId parentId,
+                               @RequestParam AuthTarget parentType,
+                               @RequestParam ObjectId diskId) {
+        SysFolder sysFolder = folderService.save(name, new ParentLink(parentId, parentType,diskId));
+        return new ArrayList<TreeNode>() {{
+            add(new TreeNode(sysFolder.getId().toString(),
+                    sysFolder.getName(),
+                    parentId.toString(),
+                    Collections.emptyList()));
+        }};
     }
 /*
 

@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -51,7 +48,12 @@ public class DiskController {
     }
 
     @RequestMapping("/space")
-    public String spaceManagement() {
+    public String spaceManagement(Model model) {
+        Map<AuthType, String> authTypeMap = new HashMap<AuthType, String>() {{
+            put(AuthType.GROUP, "共享组");
+            put(AuthType.PRIVATE, "个人用户");
+        }};
+        model.addAttribute("authTypeMap", authTypeMap);
         return "setting/space";
     }
 

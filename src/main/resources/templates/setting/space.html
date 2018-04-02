@@ -18,7 +18,7 @@
                                     </button>
                                 </div>
 
-                                <table class="layui-table" id="LAY_table_disks" lay-filter="disk">
+                                <table class="layui-disk" id="LAY_table_disks" lay-filter="disk">
                                 </table>
 
                                 <script type="text/html" id="diskOpsBar">
@@ -37,10 +37,7 @@
 
                             <div class="container">
                                 <div class="layui-btn-group">
-                                    <button type="button" class="layui-btn" data-toggle="modal"
-                                            data-target="#addDisk">
-                                        <i class="fas fa-cloud-upload-alt"></i>新建
-                                    </button>
+                                    <a class="layui-btn" lay-filter="add">添加同级目录</a>
                                     <a class="layui-btn" lay-filter="addChild">添加子目录</a>
                                     <a class="layui-btn" lay-filter="update">修改目录名</a>
                                     <a class="layui-btn" lay-filter="delete">删除目录及其子目录</a>
@@ -86,14 +83,24 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td align="right">共享组:</td>
+                                <td align="right">所有者名称:</td>
                                 <td>
-                                    <select id="shareGroups" name="shareGroups"
-                                            class="select custom-select"
-                                            multiple="multiple">
-                                        <option th:each="group : ${session.ActiveUser.groups}"
-                                                th:value="${group}"
-                                                th:text="${group}">共享组
+                                    <div class="template-input-icon-container">
+                                        <input type="text" class="form-control"
+                                               placeholder="所有者名称"
+                                               required="required"
+                                               id="owner" name="owner"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">所有者类别:</td>
+                                <td>
+                                    <select id="authType" name="authType"
+                                            class="select custom-select">
+                                        <option th:each="entry : ${authTypeMap}"
+                                                th:value="${entry.key}"
+                                                th:text="${entry.value}">所有者类别
                                         </option>
                                     </select>
                                 </td>
@@ -127,6 +134,8 @@
             return laytpl(view).render(data) || '';
         };
 
+        var diskId = null;
+
         var optDisk = {
             elem: '#LAY_table_disks',
             id: 'disk-data',
@@ -155,25 +164,27 @@
         //方法级渲染
         table.render(optDisk);
 
+        var folderTreeGrid = null;
+
         table.on('tool(disk)', function (obj) {
             var data = obj.data;
-            var event = obj.event;
-            if (event == "diskName") {
+            if (obj.event === 'diskName') {
+                diskId = data.id;
                 $.ajax({
                     type: "GET",
-                    url: "/api/folder/list?diskId=" + data.id,
+                    url: "/api/folder/list?diskId=" + diskId,
                     contentType: 'application/json; charset=utf-8',
                     //data: data.id, //可选参数
                     dataType: "json",
                     success: function (value) {
                         console.log(value);
-                        if (value.length != 0) {
-                            var folderTreeGrid = treegrid.createNew({
+                        if (value.length > 0) {
+                            folderTreeGrid = treegrid.createNew({
                                 elem: 'LAY_table_folders',
                                 view: 'folderView',
                                 data: {rows: value},
                                 id: 'id',
-                                root: data.id,
+                                root: diskId,
                                 parentid: 'parentId',
                                 singleSelect: true
                             });
@@ -183,18 +194,8 @@
                         }
                     }
                 });
-            }
-        });
-
-        //监听表格复选框选择
-        /*table.on('checkbox(disk-table)', function (obj) {
-            console.log(obj)
-        });*/
-        //监听工具条
-        table.on('tool(disk-table)', function (obj) {
-            var data = obj.data;
-            if (obj.event === 'download') {
-                layer.msg('文件ID号：' + data.id + '名称：' + data.name);
+            } else if (obj.event === 'download') {
+                layer.msg('磁盘ID号：' + data.id + '名称：' + data.name);
                 //window.open('file/download/' + data.id);
             } else if (obj.event === 'delete') {
                 layer.confirm('真的删除磁盘: ' + data.name + ' 吗？', {title: "删除确认"}, function (index) {
@@ -212,12 +213,12 @@
                                     icon: 6, btn: ['确认'], yes: function (index) {
                                         obj.del();
                                         layer.close(index);
-                                        var tableIns = table.render(opt);
-                                        tableIns.reload();
+                                        var tableDisk = table.render(optDisk);
+                                        tableDisk.reload();
                                     }
                                 });
                             } else {
-                                layer.alert("文件删除失败!", {icon: 2});
+                                layer.alert("磁盘删除失败!", {icon: 2});
                             }
                             layer.close(index);
                         }
@@ -225,6 +226,11 @@
                 });
             }
         });
+
+        //监听表格复选框选择
+        /*table.on('checkbox(disk)', function (obj) {
+            console.log(obj)
+        });*/
 
         var $ = layui.$, active = {
             downloadSelectedFiles: function () { //下载选中的文件
@@ -234,10 +240,107 @@
             }
         };
 
-        $('.disk-table .layui-btn').on('click', function () {
-            var type = $(this).data('type');
-            active[type] ? active[type].call(this) : '';
+        $('.layui-btn').on('click', function () {
+            switch ($(this).attr('lay-filter')) {
+                case 'add': {
+                    if (folderTreeGrid === null) {
+                        promptAddFolder(null, 'sibling');
+                    } else {
+                        var row = folderTreeGrid.getRow();
+                        if (row === null) {
+                            layer.msg('请选择一个目录！');
+                        } else {
+                            promptAddFolder(row, 'sibling');
+                        }
+                    }
+                }
+                    break;
+                case 'addChild': {
+                    var row = folderTreeGrid.getRow();
+                    if (row === null) {
+                        layer.msg('请选择一个目录！');
+                    } else {
+                        promptAddFolder(row, 'child');
+                    }
+
+                }
+                    break;
+                case 'update': {
+                    row.text += 'update';
+                    folderTreeGrid.updateNode(row, row.id);
+                }
+                    break;
+                case 'delete': {
+                    var row = folderTreeGrid.getRow();
+                    folderTreeGrid.deleteNode(row.id);
+                }
+                    break;
+            }
         });
+
+        function promptAddFolder(selectedRow, addType) {
+            layer.prompt(
+                {
+                    title: '请输入目录名',
+                    success: function (layerInput) {
+                        layerInput.find('input').on('keydown', function () {
+                            if (event.keyCode === 13) {
+                                saveFolderService(event.target.value, selectedRow, addType);
+                            }
+                        })
+                    },
+                },
+                function (value) {
+                    saveFolderService(value, selectedRow, addType);
+                }
+            );
+        }
+
+        function saveFolderService(folderName, selectedRow, addType) {
+            var parentId = null;
+            var parentType = null;
+            switch (addType) {
+                case 'sibling': {
+                    if (selectedRow === null) {
+                        parentId = diskId;
+                    } else {
+                        parentId = selectedRow.parentId;
+                    }
+                    if (parentId === diskId) {
+                        parentType = 'DISK';
+                    } else {
+                        parentType = 'FOLDER';
+                    }
+                }
+                    break;
+                case 'child': {
+                    parentId = selectedRow.id;
+                    parentType = 'FOLDER';
+                }
+                    break;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/api/folder/save?name=" + folderName + "&parentId=" + parentId + "&parentType=" + parentType + "&diskId=" + diskId,
+                contentType: 'application/json; charset=utf-8',
+                //data: JSON.stringify(postData), //可选参数
+                dataType: "json",
+                success: function (value) {
+                    console.log(value);
+                    switch (addType) {
+                        case 'sibling': {
+                            folderTreeGrid.insertNode(value, parentId);
+                        }
+                            break;
+                        case 'child': {
+                            folderTreeGrid.insertChild(value, parentId);
+                        }
+                            break;
+                    }
+                }
+            });
+            layer.closeAll();
+        }
 
         /*]]>*/
     });

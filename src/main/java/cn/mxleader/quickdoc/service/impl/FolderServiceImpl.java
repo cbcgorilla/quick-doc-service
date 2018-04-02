@@ -1,27 +1,25 @@
 package cn.mxleader.quickdoc.service.impl;
 
+import cn.mxleader.quickdoc.dao.SysDiskRepository;
 import cn.mxleader.quickdoc.dao.SysFolderRepository;
-import cn.mxleader.quickdoc.entities.Authorization;
-import cn.mxleader.quickdoc.entities.AuthTarget;
-import cn.mxleader.quickdoc.entities.ParentLink;
-import cn.mxleader.quickdoc.entities.SysFolder;
+import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.TreeNode;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class FolderServiceImpl implements FolderService {
 
+    private final SysDiskRepository sysDiskRepository;
     private final SysFolderRepository sysFolderRepository;
 
-    FolderServiceImpl(SysFolderRepository sysFolderRepository) {
+    FolderServiceImpl(SysDiskRepository sysDiskRepository,
+                      SysFolderRepository sysFolderRepository) {
+        this.sysDiskRepository = sysDiskRepository;
         this.sysFolderRepository = sysFolderRepository;
     }
 
@@ -55,6 +53,35 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public Optional<SysFolder> get(ObjectId id) {
         return sysFolderRepository.findById(id);
+    }
+
+    @Override
+    public SysFolder save(String name, ParentLink parent) {
+        Optional<SysFolder> optionalSysFolder = sysFolderRepository.findByParentsContainsAndName(parent, name);
+        if (!optionalSysFolder.isPresent()) {
+            if (parent.getTarget().equals(AuthTarget.DISK)) {
+                Optional<SysDisk> sysDisk = sysDiskRepository.findById(parent.getId());
+                if (sysDisk.isPresent()) {
+                    return sysFolderRepository.save(new SysFolder(ObjectId.get(), name,
+                            new HashSet<ParentLink>() {{
+                                add(parent);
+                            }},
+                            new HashSet<Authorization>() {{
+                                add(sysDisk.get().getAuthorization());
+                            }}));
+                }
+            } else {
+                Optional<SysFolder> sysFolder = sysFolderRepository.findById(parent.getId());
+                if (sysFolder.isPresent()) {
+                    return sysFolderRepository.save(new SysFolder(ObjectId.get(), name,
+                            new HashSet<ParentLink>() {{
+                                add(parent);
+                            }},
+                            sysFolder.get().getAuthorizations()));
+                }
+            }
+        }
+        return null;
     }
 
     @Override

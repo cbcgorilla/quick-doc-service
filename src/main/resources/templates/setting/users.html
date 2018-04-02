@@ -190,10 +190,10 @@
                                     }
                                 );
 
-                                function prompt_service(value) {
+                                function prompt_service(inputParam) {
                                     $.ajax({
                                         type: "POST",
-                                        url: url + "?group=" + value,
+                                        url: url + "?group=" + inputParam,
                                         contentType: 'application/json; charset=utf-8',
                                         data: JSON.stringify(postData), //可选参数
                                         dataType: "json",

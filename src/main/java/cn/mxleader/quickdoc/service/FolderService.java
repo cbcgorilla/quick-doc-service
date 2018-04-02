@@ -40,6 +40,15 @@ public interface FolderService {
      *
      * @param name
      * @param parent
+     * @return
+     */
+    SysFolder save(String name, ParentLink parent);
+
+    /**
+     * 新增文件目录；
+     *
+     * @param name
+     * @param parent
      * @param authorization
      * @return
      */
