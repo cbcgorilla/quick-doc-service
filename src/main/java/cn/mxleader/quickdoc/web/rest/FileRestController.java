@@ -1,8 +1,8 @@
 package cn.mxleader.quickdoc.web.rest;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
-import cn.mxleader.quickdoc.entities.*;
-import cn.mxleader.quickdoc.service.DiskService;
+import cn.mxleader.quickdoc.entities.AuthTarget;
+import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.LayuiData;
@@ -25,14 +25,11 @@ public class FileRestController {
 
     private final FileService fileService;
     private final FolderService folderService;
-    private final DiskService diskService;
 
     FileRestController(FileService fileService,
-                       FolderService folderService,
-                       DiskService diskService) {
+                       FolderService folderService) {
         this.fileService = fileService;
         this.folderService = folderService;
-        this.diskService = diskService;
     }
 
     /**
@@ -50,19 +47,18 @@ public class FileRestController {
                                          @RequestParam AuthTarget parentType,
                                          @RequestParam Integer page,
                                          @RequestParam Integer limit) {
-        Page<WebFile> filePage = fileService.list(new ParentLink(parentId, parentType),
+        Page<WebFile> filePage = fileService.list(getParentLink(parentId, parentType),
                 PageRequest.of(page - 1, limit));
         return new LayuiData<>(0, "", filePage.getTotalElements(), filePage.getContent());
     }
 
     @PostMapping(value = "/upload")
     public LayuiData<Boolean> upload(@RequestParam("file") MultipartFile file,
-                                     @RequestParam("containerId") ObjectId containerId,
-                                     @RequestParam("containerType") AuthTarget containerType) throws IOException {
+                                     @RequestParam ObjectId parentId,
+                                     @RequestParam AuthTarget parentType) throws IOException {
         //SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
         String filename = FileUtils.getFilename(file.getOriginalFilename());
-
-        ParentLink parent = new ParentLink(containerId, containerType);
+        ParentLink parent = getParentLink(parentId, parentType);
         if (fileService.getStoredFile(filename, parent) != null) {
             return new LayuiData<>(1, "文件名冲突", 0, false);
         }
@@ -81,6 +77,20 @@ public class FileRestController {
             return false;
         }
         return true;
+    }
+
+    private ParentLink getParentLink(ObjectId parentId, AuthTarget parentType) {
+        ParentLink parent = null;
+        switch (parentType) {
+            case DISK:
+                parent = new ParentLink(parentId, parentType, parentId);
+                break;
+            case FOLDER:
+                ObjectId diskId = folderService.get(parentId).get().getParent().getDiskId();
+                parent = new ParentLink(parentId, parentType, diskId);
+                break;
+        }
+        return parent;
     }
 
 }

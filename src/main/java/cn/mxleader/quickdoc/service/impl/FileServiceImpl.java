@@ -139,22 +139,22 @@ public class FileServiceImpl implements FileService {
                 new HashSet<ParentLink>() {{
                     add(parent);
                 }},
-                getParentAuthorization(parent), null);
+                new HashSet<Authorization>() {{
+                    add(getParentAuthorization(parent));
+                }}, null);
         return gridFsAssistant.store(file, filename, metadata);
     }
 
-    private Set<Authorization> getParentAuthorization(ParentLink parent) {
+    private Authorization getParentAuthorization(ParentLink parent) {
         if (parent.getTarget().equals(AuthTarget.FOLDER)) {
             Optional<SysFolder> optionalSysFolder = sysFolderRepository.findById(parent.getId());
             if (optionalSysFolder.isPresent()) {
-                return optionalSysFolder.get().getAuthorizations();
+                return optionalSysFolder.get().getAuthorization();
             }
         } else if (parent.getTarget().equals(AuthTarget.DISK)) {
             Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(parent.getId());
             if (optionalSysDisk.isPresent()) {
-                return new HashSet<Authorization>() {{
-                    add(optionalSysDisk.get().getAuthorization());
-                }};
+                return optionalSysDisk.get().getAuthorization();
             }
         }
         return null;

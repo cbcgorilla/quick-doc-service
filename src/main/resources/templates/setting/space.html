@@ -38,9 +38,9 @@
                             <div class="container">
                                 <div class="layui-btn-group">
                                     <a class="layui-btn" lay-filter="add">添加同级目录</a>
-                                    <a class="layui-btn" lay-filter="addChild">添加子目录</a>
-                                    <a class="layui-btn" lay-filter="update">修改目录名</a>
-                                    <a class="layui-btn" lay-filter="delete">删除目录及其子目录</a>
+                                    <a id="addSubBtn" class="layui-btn" lay-filter="addChild">添加子目录</a>
+                                    <a id="renameFolderBtn" class="layui-btn" lay-filter="update">修改目录名</a>
+                                    <a id="deleteFolderBtn" class="layui-btn" lay-filter="delete">删除目录及其子目录</a>
                                 </div>
                                 <table class="layui-table" id="LAY_table_folders" lay-filter="folder">
                                 </table>
@@ -140,17 +140,19 @@
             elem: '#LAY_table_disks',
             id: 'disk-data',
             url: '/api/disk/list',
-            cellMinWidth: 120,
-            page: false,
+            height: '510',
+            page: true,
             limit: 10,
-            limits: [10, 20, 50, 100],
+            limits: [10, 50, 100, 200],
             cols: [
                 [
                     {field: 'id', title: 'ID'},
                     {field: 'name', title: '磁盘名称', event: 'diskName'},
+                    {field: 'owner', title: '所有者', event: 'diskName'},
+                    {field: 'ownerType', title: '类别'},
+                    {field: 'authActions', title: '授权'},
                     {
                         title: '操作',
-                        width: 160,
                         align: 'center',
                         toolbar: '#diskOpsBar'
                     }
@@ -344,9 +346,15 @@
                             singleSelect: true
                         });
                         folderTreeGrid.build();
+                        $('#addSubBtn').removeClass('layui-btn-disabled');
+                        $('#renameFolderBtn').removeClass('layui-btn-disabled');
+                        $('#deleteFolderBtn').removeClass('layui-btn-disabled');
                     } else {
                         layer.msg('该磁盘内无子目录！');
                         folderTreeGrid = null;
+                        $('#addSubBtn').addClass('layui-btn-disabled');
+                        $('#renameFolderBtn').addClass('layui-btn-disabled');
+                        $('#deleteFolderBtn').addClass('layui-btn-disabled');
                     }
                 }
             });

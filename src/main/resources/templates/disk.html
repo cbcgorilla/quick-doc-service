@@ -63,8 +63,8 @@
         var table = layui.table,
             upload = layui.upload;
 
-        var containerId = [[${disk.id.toString()}]],
-            containerType = 'DISK';
+        var parentId = [[${disk.id.toString()}]],
+            parentType = 'DISK';
 
         var uploadInst = upload.render({
             elem: '#upload-file',
@@ -73,14 +73,14 @@
             multiple: true,
             before: function (obj) {
                 this.data = {
-                    containerId: containerId,
-                    containerType: containerType
+                    parentId: parentId,
+                    parentType: parentType
                 };
                 //this.data.params = JSON.stringify(this.data.params);
             },
             done: function (res) {
                 //上传完毕回调
-                reloadFileTable('/api/file/list', containerId, containerType);
+                reloadFileTable('/api/file/list', parentId, parentType);
             },
             error: function () {
                 //请求异常回调
@@ -145,8 +145,8 @@
                                     icon: 6, btn: ['确认'], yes: function (index) {
                                         obj.del();
                                         layer.close(index);
-                                        var tableIns = table.render(opt);
-                                        tableIns.reload();
+                                        var tableFiles = table.render(opt);
+                                        tableFiles.reload();
                                     }
                                 });
                             } else {
@@ -168,11 +168,13 @@
                 }
             }
         };
+/*
 
         $('.file-table .layui-btn').on('click', function () {
             var type = $(this).data('type');
             active[type] ? active[type].call(this) : '';
         });
+*/
 
         $('#diskTree').treeview({
             data: [[${folderTree}]],
@@ -181,31 +183,26 @@
             collapseIcon: 'fas fa-folder-open',
             nodeIcon: "fas fa-film",
             onNodeSelected: function (event, data) {
-                containerId = data.id;
-                containerType = 'FOLDER';
-                reloadFileTable('/api/file/list', containerId, containerType);
+                parentId = data.id;
+                parentType = 'FOLDER';
+                reloadFileTable('/api/file/list', parentId, parentType);
             },
             onNodeUnselected: function (event, data) {
-                containerId = [[${disk.id.toString()}]];
-                containerType = 'DISK';
-                reloadFileTable('/api/file/list', containerId, containerType);
+                parentId = [[${disk.id.toString()}]];
+                parentType = 'DISK';
+                reloadFileTable('/api/file/list', parentId, parentType);
             }
         });
 
-        $(document).on("click", ".uploadDialog", function () {
-            $("#containerId").val(containerId);
-            $("#containerType").val(containerType);
-        });
-
-        function reloadFileTable(restUrl, parentId, parentType) {
+        function reloadFileTable(restUrl, _parentId, _parentType) {
             table.reload('file-data', {
                 url: restUrl,
                 page: {
                     curr: 1 //重新从第 1 页开始
                 },
                 where: {
-                    parentId: parentId,
-                    parentType: parentType
+                    parentId: _parentId,
+                    parentType: _parentType
                 }
             });
         }

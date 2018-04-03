@@ -5,7 +5,6 @@ import cn.mxleader.quickdoc.entities.ParentLink;
 import cn.mxleader.quickdoc.entities.SysFolder;
 import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.TreeNode;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
@@ -39,11 +38,11 @@ public class FolderRestController {
 
     @GetMapping("/list")
     @ApiOperation(value = "根据磁盘ID号获取目录列表")
-    public List<TreeNode> getFoldersOfDisk(@RequestParam String diskId) throws JsonProcessingException {
+    public List<TreeNode> getFoldersOfDisk(@RequestParam String diskId) {
         return folderService.listFoldersInDisk(new ObjectId(diskId))
                 .stream()
                 .map(sysFolder -> new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),
-                        sysFolder.firstParent().getId().toString(), Collections.emptyList())
+                        sysFolder.getParent().getId().toString(), Collections.emptyList())
                 )
                 .collect(Collectors.toList());
     }
@@ -55,7 +54,7 @@ public class FolderRestController {
                                @RequestParam AuthTarget parentType,
                                @RequestParam ObjectId diskId) {
         //@TODO 增加对一个目录下增加同名文件夹的异常处理
-        SysFolder sysFolder = folderService.save(name, new ParentLink(parentId, parentType,diskId));
+        SysFolder sysFolder = folderService.save(name, new ParentLink(parentId, parentType, diskId));
         return new ArrayList<TreeNode>() {{
             add(new TreeNode(sysFolder.getId().toString(),
                     sysFolder.getName(),

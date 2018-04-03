@@ -47,18 +47,6 @@ public class FileController {
         this.streamService = streamService;
     }
 
-    /**
-     * 登录后的首页
-     *
-     * @param model
-     * @return
-     */
-    @GetMapping()
-    public String index(Model model, HttpSession session) {
-        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        return "files";
-    }
-
     @RequestMapping("/search")
     public String searchFiles(@RequestParam("filename") String filename,
                               Model model, HttpSession session) {

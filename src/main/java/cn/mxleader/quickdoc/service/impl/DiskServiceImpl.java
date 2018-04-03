@@ -6,9 +6,10 @@ import cn.mxleader.quickdoc.entities.Authorization;
 import cn.mxleader.quickdoc.entities.SysDisk;
 import cn.mxleader.quickdoc.service.DiskService;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,11 @@ public class DiskServiceImpl implements DiskService {
     @Override
     public List<SysDisk> list() {
         return sysDiskRepository.findAll();
+    }
+
+    @Override
+    public Page<SysDisk> list(Pageable pageable) {
+        return sysDiskRepository.findAll(pageable);
     }
 
     @Override

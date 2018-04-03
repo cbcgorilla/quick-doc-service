@@ -1,11 +1,14 @@
 package cn.mxleader.quickdoc.web.rest;
 
+import cn.mxleader.quickdoc.entities.SysDisk;
 import cn.mxleader.quickdoc.service.DiskService;
 import cn.mxleader.quickdoc.web.domain.LayuiData;
 import cn.mxleader.quickdoc.web.domain.WebDisk;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,11 +35,12 @@ public class DiskRestController {
     @ApiOperation(value = "根据上级目录ID获取文件列表")
     public LayuiData<List<WebDisk>> list(@RequestParam Integer page,
                                          @RequestParam Integer limit) {
-        List<WebDisk> disks = diskService.list()
+        Page<SysDisk> diskPage = diskService.list(PageRequest.of(page - 1, limit));
+        List<WebDisk> disks = diskPage.getContent()
                 .stream()
                 .map(WebDisk::new)
                 .collect(Collectors.toList());
-        return new LayuiData<>(0, "", disks.size(), disks);
+        return new LayuiData<>(0, "", diskPage.getTotalElements(), disks);
     }
 
     @PostMapping(value = "/delete")

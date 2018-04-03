@@ -64,42 +64,6 @@ public interface FolderService {
     SysFolder rename(ObjectId id, String newName);
 
     /**
-     * 增加文件目录上级关系
-     *
-     * @param id     文件夹ID
-     * @param parent 新增上级目录信息
-     * @return
-     */
-    SysFolder addParent(ObjectId id, ParentLink parent);
-
-    /**
-     * 删除文件目录上级关系
-     *
-     * @param id     文件夹ID
-     * @param parent 待删除上级目录信息
-     * @return
-     */
-    SysFolder removeParent(ObjectId id, ParentLink parent);
-
-    /**
-     * 增加文件目录授权信息
-     *
-     * @param id            文件夹ID
-     * @param authorization 新增授权
-     * @return
-     */
-    SysFolder addAuthorization(ObjectId id, Authorization authorization);
-
-    /**
-     * 删除文件目录授权信息
-     *
-     * @param id            文件夹ID
-     * @param authorization 待删除授权
-     * @return
-     */
-    SysFolder removeAuthorization(ObjectId id, Authorization authorization);
-
-    /**
      * 删除文件目录
      *
      * @param folderId

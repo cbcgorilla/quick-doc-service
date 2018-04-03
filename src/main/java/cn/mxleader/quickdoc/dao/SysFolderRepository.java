@@ -11,11 +11,11 @@ import java.util.Optional;
 
 public interface SysFolderRepository extends MongoRepository<SysFolder, ObjectId> {
 
-    List<SysFolder> findAllByParentsContaining(ParentLink parent);
+    List<SysFolder> findAllByParent(ParentLink parent);
 
-    Optional<SysFolder> findByParentsContainsAndName(ParentLink parent, String name);
-
-    @Query(value = "{ 'parents.diskId' : ?0 }",
-            fields = "{ 'name' : 1, 'parents' : {$elemMatch: {'diskId': ?0}  }, 'authorizations': 1 }")
-    List<SysFolder> findAllByParentsDiskId(ObjectId diskId);
+    Optional<SysFolder> findByParentAndName(ParentLink parent, String name);
+/*
+    @Query(value = "{ 'parent.diskId' : ?0 }",
+            fields = "{ 'name' : 1, 'parent' : {$elemMatch: {'diskId': ?0}  }, 'authorization': 1 }")*/
+    List<SysFolder> findAllByParentDiskId(ObjectId diskId);
 }

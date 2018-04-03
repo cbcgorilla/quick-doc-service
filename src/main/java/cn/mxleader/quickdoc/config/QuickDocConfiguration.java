@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.config;
 
-import cn.mxleader.quickdoc.entities.*;
+import cn.mxleader.quickdoc.entities.SysProfile;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.*;
 import cn.mxleader.quickdoc.service.impl.StreamServiceDefaultImpl;
 import cn.mxleader.quickdoc.service.impl.StreamServiceKafkaImpl;
@@ -16,7 +17,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,6 +111,7 @@ public class QuickDocConfiguration {
                 }
 
                 // 初始化系统目录
+/*
                 ObjectId gId = diskService.save("共享磁盘1",
                         new Authorization("administrators", AuthType.GROUP)).getId();
                 ObjectId id = diskService.save("我的磁盘1",
@@ -124,33 +125,12 @@ public class QuickDocConfiguration {
 
                 ObjectId id1 = folderService.save("一级目录", new ParentLink(id, AuthTarget.DISK, id),
                         new Authorization("admin", AuthType.PRIVATE)).getId();
-                folderService.addParent(id1, new ParentLink(gId, AuthTarget.DISK, gId));
                 ObjectId id2 = folderService.save("二级目录", new ParentLink(id1, AuthTarget.FOLDER, id),
                         new Authorization("admin", AuthType.PRIVATE)).getId();
                 ObjectId id3 = folderService.save("三级目录", new ParentLink(id2, AuthTarget.FOLDER, id),
                         new Authorization("admin", AuthType.PRIVATE)).getId();
-/*
-                fileService.saveMetadata(sysProfile.getIconMap().get("AWARD"),
-                        new Metadata("application/octet-stream",
-                                new HashSet<ParentLink>() {{
-                                    add(new ParentLink(id3, AuthTarget.FOLDER, id));
-                                }},
-                                new HashSet<Authorization>() {{
-                                    add(new Authorization("admin", AuthType.PRIVATE));
-                                }},
-                                null));
+*/
 
-                fileService.saveMetadata(sysProfile.getIconMap().get("SYS_LOGO"),
-                        new Metadata("application/octet-stream",
-                                new HashSet<ParentLink>() {{
-                                    add(new ParentLink(gId1, AuthTarget.FOLDER, gId));
-                                }},
-                                new HashSet<Authorization>() {{
-                                    add(new Authorization("administrators", AuthType.GROUP));
-                                }},
-                                null));
-                fileService.addParent(sysProfile.getIconMap().get("SYS_LOGO"),
-                        new ParentLink(gId, AuthTarget.DISK, gId));*/
                 // ==================测试数据结束
 
                 // 初始化成功标记

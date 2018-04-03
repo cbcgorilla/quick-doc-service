@@ -80,17 +80,17 @@ public class ServiceIntercept {
                     Boolean auth = false;
                     switch (authTarget) {
                         case DISK:
-                            auth = checkAuthentication(sysDiskRepository.findById(id)
+                            auth = checkAuthorization(sysDiskRepository.findById(id)
                                     .get().getAuthorization(), sysUser, preAuth.action());
                             break;
                         case FOLDER:
-                            auth = checkAuthentication(sysFolderRepository.findById(id)
-                                    .get().getAuthorizations(), sysUser, preAuth.action());
+                            auth = checkAuthorization(sysFolderRepository.findById(id)
+                                    .get().getAuthorization(), sysUser, preAuth.action());
                             break;
                         case FILE:
                             GridFSFile file = gridFsAssistant.findOne(Query.query(Criteria.where("_id").is(id)));
                             Metadata metadata = converter.read(Metadata.class, file.getMetadata());
-                            auth = checkAuthentication(metadata.getAuthorizations(), sysUser, preAuth.action());
+                            auth = checkAuthorization(metadata.getAuthorizations(), sysUser, preAuth.action());
                             break;
                     }
                     if (auth) {
@@ -125,15 +125,15 @@ public class ServiceIntercept {
      * @param action         待校验权限级别（READ，WRITE，DELETE）
      * @return 鉴权通过返回True，否则返回False
      */
-    private Boolean checkAuthentication(Set<Authorization> authorizations,
-                                        SysUser sysUser, AuthAction action) {
+    private Boolean checkAuthorization(Set<Authorization> authorizations,
+                                       SysUser sysUser, AuthAction action) {
         // 管理员默认可访问所有目录和文件
         if (sysUser.isAdmin()) {
             return true;
         }
         if (authorizations != null && authorizations.size() > 0) {
             for (Authorization authorization : authorizations) {
-                if (checkAuthentication(authorization, sysUser, action)) {
+                if (checkAuthorization(authorization, sysUser, action)) {
                     return true;
                 }
             }
@@ -149,8 +149,8 @@ public class ServiceIntercept {
      * @param action        待校验权限级别（READ，WRITE，DELETE）
      * @return 鉴权通过返回True，否则返回False
      */
-    private Boolean checkAuthentication(Authorization authorization,
-                                        SysUser sysUser, AuthAction action) {
+    private Boolean checkAuthorization(Authorization authorization,
+                                       SysUser sysUser, AuthAction action) {
         // 管理员默认可访问所有目录和文件
         if (sysUser.isAdmin()) {
             return true;

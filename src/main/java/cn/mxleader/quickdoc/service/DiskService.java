@@ -6,13 +6,15 @@ import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.Authorization;
 import cn.mxleader.quickdoc.entities.SysDisk;
 import org.bson.types.ObjectId;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
 public interface DiskService {
 
     List<SysDisk> list();
+    Page<SysDisk> list(Pageable pageable);
 
     List<SysDisk> list(Authorization authorization);
 
