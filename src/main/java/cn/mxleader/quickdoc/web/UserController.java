@@ -82,9 +82,13 @@ public class UserController {
                 email);
         if (userService.get(username) == null) {
             userService.saveUser(sysUser);
-            ObjectId diskId = diskService.save("我的磁盘1",
-                    new Authorization(username, AuthType.PRIVATE)).getId();
-            diskService.addAuthorization(diskId, AuthAction.WRITE);
+            diskService.save("我的磁盘1",
+                    new Authorization(username, AuthType.PRIVATE,
+                            new HashSet<AuthAction>() {{
+                                add(AuthAction.READ);
+                                add(AuthAction.WRITE);
+                                add(AuthAction.DELETE);
+                            }}));
             redirectAttributes.addFlashAttribute("message",
                     "保存用户信息成功： " + username);
         }

@@ -62,14 +62,14 @@ public class FolderServiceImpl implements FolderService {
             if (parent.getTarget().equals(AuthTarget.DISK)) {
                 Optional<SysDisk> sysDisk = sysDiskRepository.findById(parent.getId());
                 if (sysDisk.isPresent()) {
-                    return sysFolderRepository.save(new SysFolder(ObjectId.get(), name,parent,
-                            sysDisk.get().getAuthorization()));
+                    return sysFolderRepository.save(new SysFolder(ObjectId.get(), name, parent,
+                            sysDisk.get().getAuthorizations()));
                 }
             } else {
                 Optional<SysFolder> sysFolder = sysFolderRepository.findById(parent.getId());
                 if (sysFolder.isPresent()) {
-                    return sysFolderRepository.save(new SysFolder(ObjectId.get(), name,parent,
-                            sysFolder.get().getAuthorization()));
+                    return sysFolderRepository.save(new SysFolder(ObjectId.get(), name, parent,
+                            sysFolder.get().getAuthorizations()));
                 }
             }
         }
@@ -80,7 +80,10 @@ public class FolderServiceImpl implements FolderService {
     public SysFolder save(String name, ParentLink parent, Authorization authorization) {
         Optional<SysFolder> optionalSysFolder = sysFolderRepository.findByParentAndName(parent, name);
         if (!optionalSysFolder.isPresent()) {
-            return sysFolderRepository.save(new SysFolder(ObjectId.get(), name,parent,authorization));
+            return sysFolderRepository.save(new SysFolder(ObjectId.get(), name, parent,
+                    new HashSet<Authorization>() {{
+                        add(authorization);
+                    }}));
         }
         return null;
     }

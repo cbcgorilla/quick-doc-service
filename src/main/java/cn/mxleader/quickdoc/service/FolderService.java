@@ -1,10 +1,7 @@
 package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.common.annotation.PreAuth;
-import cn.mxleader.quickdoc.entities.Authorization;
-import cn.mxleader.quickdoc.entities.AuthTarget;
-import cn.mxleader.quickdoc.entities.ParentLink;
-import cn.mxleader.quickdoc.entities.SysFolder;
+import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.web.domain.TreeNode;
 import org.bson.types.ObjectId;
 
@@ -61,6 +58,7 @@ public interface FolderService {
      * @param newName
      * @return
      */
+    @PreAuth(action = AuthAction.WRITE)
     SysFolder rename(ObjectId id, String newName);
 
     /**

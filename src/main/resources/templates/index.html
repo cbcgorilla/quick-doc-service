@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="css/fontawesome-all.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/simple-line-icons.css"/>
     <!--layui and necessary plugins-->
-    <link rel="stylesheet" type="text/css" href="/lib/layui/css/layui.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="lib/layui/css/layui.css" media="all"/>
     <!-- Main styles for this application -->
     <link rel="stylesheet" type="text/css" href="css/style.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/mxleader-style.css"/>
@@ -32,7 +32,7 @@
 
     <ul class="nav navbar-nav d-md-down-none">
         <li class="nav-item px-3" th:if="${session.ActiveUser.isAdmin()}">
-            <a class="nav-link" href="folders">目录管理</a>
+            <a class="nav-link" href="disk/space">空间管理</a>
         </li>
         <li class="nav-item px-3" th:if="${session.ActiveUser.isAdmin()}">
             <a class="nav-link" href="users">系统用户</a>
@@ -101,7 +101,7 @@
                     系统设置
                 </li>
                 <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">
-                    <a class="nav-link" href="disk/space"><i class="fas fa-cogs"></i>系统空间</a>
+                    <a class="nav-link" href="disk/space"><i class="fas fa-cogs"></i>空间管理</a>
                 </li>
                 <li class="nav-item" th:if="${session.ActiveUser.isAdmin()}">
                     <a class="nav-link" href="users"><i class="fas fa-users"></i>系统用户</a>

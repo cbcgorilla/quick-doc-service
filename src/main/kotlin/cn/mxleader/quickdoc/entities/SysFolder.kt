@@ -6,4 +6,4 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 data class SysFolder(@Id var id: ObjectId, var name: String,
-                     var parent: ParentLink, var authorization: Authorization)
+                     var parent: ParentLink, var authorizations: Set<Authorization>)

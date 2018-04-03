@@ -58,69 +58,22 @@ public class FolderRestController {
         return new ArrayList<TreeNode>() {{
             add(new TreeNode(sysFolder.getId().toString(),
                     sysFolder.getName(),
-                    parentId.toString(),
+                    sysFolder.getParent().getId().toString(),
                     Collections.emptyList()));
         }};
     }
-/*
 
-    @GetMapping("/list")
-    @ApiOperation(value = "获取根目录列表")
-    public Flux<WebFolder> list() {
-        return folderService.findAllByParentIdInWebFormat(
-                configService.getSysProfile().getId());
-    }
-
-    @GetMapping("/list/{parentId}")
-    @ApiOperation(value = "根据上级目录ID获取下级目录列表")
-    public Flux<WebFolder> list(@PathVariable("parentId") ObjectId parentId) {
-        return folderService.findAllByParentIdInWebFormat(parentId);
-    }
-
-    @PostMapping(value = "/save",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "保存目录信息")
-    public Mono<RestResponse> save(@RequestBody SysFolder folder) {
-        return folderService.save(folder)
-                .map(SuccessResponse::new);
-    }
-
-    @PostMapping(value = "/rename/{folderId}",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "更改目录名称")
-    public Mono<RestResponse> rename(@PathVariable("folderId") ObjectId folderId,
-                                     @RequestBody String newPath) {
-        Optional<SysFolder> folderOptional = folderService.get(folderId).blockOptional();
-        if (folderOptional.isPresent()) {
-            return folderService.rename(folderOptional.get(), newPath)
-                    .map(folder -> new SuccessResponse<>("目录改名成功！"));
-        } else {
-            return Mono.just(new ErrorResponse(0, "目录重命名失败, 请检查新目录名是否有误！"));
+    @PostMapping("/rename")
+    @ApiOperation("修改目录名称")
+    public TreeNode rename(@RequestParam ObjectId id, @RequestParam String newName) {
+        try {
+            SysFolder sysFolder = folderService.rename(id, newName);
+            return new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),
+                    sysFolder.getParent().getId().toString(), Collections.emptyList());
+        } catch (Exception exp) {
+            //System.out.println(exp.getMessage());
+            return null;
         }
     }
-
-    @PostMapping(value = "/move/{folderId}",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "移动目录位置")
-    public Mono<RestResponse> move
-            (@PathVariable("folderId") ObjectId folderId,
-             @RequestBody String newFolderId) {
-        Optional<SysFolder> folderOptional = folderService.get(folderId).blockOptional();
-        if (folderOptional.isPresent()) {
-            return folderService.move(folderId, new ObjectId(newFolderId))
-                    .map(folder -> new SuccessResponse<>("目录转移成功！"));
-        } else {
-            return Mono.just(new ErrorResponse(0, "目录转移失败, 请检查新目录ID是否有误！"));
-        }
-    }
-
-    @DeleteMapping(value = "/delete/{folderId}",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "删除文件夹")
-    public Mono<RestResponse> delete(@PathVariable ObjectId folderId) {
-        return folderService.delete(folderId)
-                .map(v -> new SuccessResponse<>("删除文件夹成功！"));
-    }
-*/
 
 }

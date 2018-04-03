@@ -67,8 +67,6 @@ public class QuickDocConfiguration {
     @Bean
     CommandLineRunner initConfigurationData(UserService userService,
                                             FileService fileService,
-                                            DiskService diskService,
-                                            FolderService folderService,
                                             ConfigService configService) {
         return args -> {
             SysProfile sysProfile = configService.getSysProfile();
@@ -97,41 +95,6 @@ public class QuickDocConfiguration {
                             add("users");
                         }},
                         "admin@mxleader.cn"));
-                for (int i = 0; i <= 50000; i++) {
-                    userService.saveUser(new SysUser(ObjectId.get(), "testUser" + i,
-                            "测试账号" + i, "chenbichao",
-                            sysProfile.getIconMap().get("AWARD"),
-                            new HashSet<SysUser.Authority>() {{
-                                add(SysUser.Authority.USER);
-                            }},
-                            new HashSet<String>() {{
-                                add("users");
-                            }},
-                            "testaccount" + i + "@mxleader.cn"));
-                }
-
-                // 初始化系统目录
-/*
-                ObjectId gId = diskService.save("共享磁盘1",
-                        new Authorization("administrators", AuthType.GROUP)).getId();
-                ObjectId id = diskService.save("我的磁盘1",
-                        new Authorization("admin", AuthType.PRIVATE)).getId();
-
-                // ============================以下为测试数据 @TODO 待删除
-                ObjectId gId1 = folderService.save("一级目录", new ParentLink(gId, AuthTarget.DISK, gId),
-                        new Authorization("administrators", AuthType.GROUP)).getId();
-                folderService.save("一级目录2WRITE", new ParentLink(gId, AuthTarget.DISK, gId),
-                        new Authorization("administrators", AuthType.GROUP, AuthAction.WRITE)).getId();
-
-                ObjectId id1 = folderService.save("一级目录", new ParentLink(id, AuthTarget.DISK, id),
-                        new Authorization("admin", AuthType.PRIVATE)).getId();
-                ObjectId id2 = folderService.save("二级目录", new ParentLink(id1, AuthTarget.FOLDER, id),
-                        new Authorization("admin", AuthType.PRIVATE)).getId();
-                ObjectId id3 = folderService.save("三级目录", new ParentLink(id2, AuthTarget.FOLDER, id),
-                        new Authorization("admin", AuthType.PRIVATE)).getId();
-*/
-
-                // ==================测试数据结束
 
                 // 初始化成功标记
                 sysProfile.setInitialized(true);

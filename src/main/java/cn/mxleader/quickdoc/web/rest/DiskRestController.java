@@ -43,6 +43,18 @@ public class DiskRestController {
         return new LayuiData<>(0, "", diskPage.getTotalElements(), disks);
     }
 
+    @PostMapping(value = "/rename")
+    @ApiOperation(value = "修改磁盘显示名称")
+    public Boolean rename(@RequestParam ObjectId diskId, @RequestParam String newName) {
+        try {
+            diskService.rename(diskId,newName);
+        } catch (Exception exp) {
+            //System.out.println(exp.getMessage());
+            return false;
+        }
+        return true;
+    }
+
     @PostMapping(value = "/delete")
     @ApiOperation(value = "根据磁盘ID删除库内磁盘信息")
     public Boolean delete(@RequestBody String diskId) {

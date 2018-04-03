@@ -81,11 +81,11 @@ public class ServiceIntercept {
                     switch (authTarget) {
                         case DISK:
                             auth = checkAuthorization(sysDiskRepository.findById(id)
-                                    .get().getAuthorization(), sysUser, preAuth.action());
+                                    .get().getAuthorizations(), sysUser, preAuth.action());
                             break;
                         case FOLDER:
                             auth = checkAuthorization(sysFolderRepository.findById(id)
-                                    .get().getAuthorization(), sysUser, preAuth.action());
+                                    .get().getAuthorizations(), sysUser, preAuth.action());
                             break;
                         case FILE:
                             GridFSFile file = gridFsAssistant.findOne(Query.query(Criteria.where("_id").is(id)));

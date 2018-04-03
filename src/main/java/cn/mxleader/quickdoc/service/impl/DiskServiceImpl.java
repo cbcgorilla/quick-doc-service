@@ -10,8 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class DiskServiceImpl implements DiskService {
@@ -33,7 +35,7 @@ public class DiskServiceImpl implements DiskService {
 
     @Override
     public List<SysDisk> list(Authorization authorization) {
-        return sysDiskRepository.findAllByAuthorization(authorization);
+        return sysDiskRepository.findAllByAuthorizationsContaining(authorization);
     }
 
     @Override
@@ -43,7 +45,10 @@ public class DiskServiceImpl implements DiskService {
 
     @Override
     public SysDisk save(String name, Authorization authorization) {
-        return sysDiskRepository.save(new SysDisk(ObjectId.get(), name, authorization));
+        return sysDiskRepository.save(new SysDisk(ObjectId.get(), name,
+                new HashSet<Authorization>() {{
+                    add(authorization);
+                }}));
     }
 
     @Override
@@ -58,22 +63,42 @@ public class DiskServiceImpl implements DiskService {
     }
 
     @Override
-    public SysDisk addAuthorization(ObjectId id, AuthAction action) {
+    public SysDisk addAuthorization(ObjectId id, Authorization authorization) {
         Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(id);
         if (optionalSysDisk.isPresent()) {
             SysDisk disk = optionalSysDisk.get();
-            disk.getAuthorization().add(action);
+            Set<Authorization> authorizations = disk.getAuthorizations();
+            for (Authorization item : authorizations) {
+                if (item.getName().equalsIgnoreCase(authorization.getName())
+                        && item.getType().equals(authorization.getType())) {
+                    for (AuthAction action : authorization.getActions()) {
+                        item.add(action);
+                    }
+                    return sysDiskRepository.save(disk);
+                }
+            }
+            disk.addAuthorization(authorization);
             return sysDiskRepository.save(disk);
         }
         return null;
     }
 
     @Override
-    public SysDisk removeAuthorization(ObjectId id, AuthAction action) {
+    public SysDisk removeAuthorization(ObjectId id, Authorization authorization) {
         Optional<SysDisk> optionalSysDisk = sysDiskRepository.findById(id);
         if (optionalSysDisk.isPresent()) {
             SysDisk disk = optionalSysDisk.get();
-            disk.getAuthorization().remove(action);
+            Set<Authorization> authorizations = disk.getAuthorizations();
+            for (Authorization item : authorizations) {
+                if (item.getName().equalsIgnoreCase(authorization.getName())
+                        && item.getType().equals(authorization.getType())) {
+                    for (AuthAction action : authorization.getActions()) {
+                        item.remove(action);
+                    }
+                    return sysDiskRepository.save(disk);
+                }
+            }
+            disk.removeAuthorization(authorization);
             return sysDiskRepository.save(disk);
         }
         return null;

@@ -14,7 +14,7 @@
                                 <div class="layui-btn-group">
                                     <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
                                             data-target="#addDisk">
-                                        <i class="fas fa-cloud-upload-alt"></i>新建
+                                        <i class="fas fa-plus-square"></i> 新建磁盘
                                     </button>
                                 </div>
 
@@ -23,8 +23,11 @@
 
                                 <script type="text/html" id="diskOpsBar">
                                     <div class="layui-btn-group">
-                                        <button class="layui-btn layui-btn-sm" lay-event="download">
-                                            <i class="fas fa-cloud-download-alt" title="编辑"></i>
+                                        <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="edit-disk">
+                                            <i class="fas fa-edit" title="编辑"></i>
+                                        </button>
+                                        <button class="layui-btn layui-btn-warm layui-btn-sm" lay-event="auth-disk">
+                                            <i class="fas fa-user-secret" title="授权"></i>
                                         </button>
                                         <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
                                             <i class="fas fa-trash-alt" title="删除"></i>
@@ -37,10 +40,11 @@
 
                             <div class="container">
                                 <div class="layui-btn-group">
-                                    <a class="layui-btn" lay-filter="add">添加同级目录</a>
-                                    <a id="addSubBtn" class="layui-btn" lay-filter="addChild">添加子目录</a>
-                                    <a id="renameFolderBtn" class="layui-btn" lay-filter="update">修改目录名</a>
-                                    <a id="deleteFolderBtn" class="layui-btn" lay-filter="delete">删除目录及其子目录</a>
+                                    <a class="layui-btn" lay-filter="add"><i class="fas fa-plus-square"></i> 新建目录</a>
+                                    <a id="addSubBtn" class="layui-btn-disabled layui-btn" lay-filter="addChild"><i class="far fa-plus-square"></i> 新建子目录</a>
+                                    <a id="renameFolderBtn" class="layui-btn-disabled layui-btn layui-btn-normal" lay-filter="update"><i class="fas fa-edit"></i> 修改</a>
+                                    <a id="authFolderBtn" class="layui-btn-disabled layui-btn layui-btn-warm" lay-filter="auth-folder"><i class="fas fa-user-secret"></i> 授权</a>
+                                    <a id="deleteFolderBtn" class="layui-btn-disabled layui-btn layui-btn-danger" lay-filter="delete"><i class="fas fa-trash-alt"></i> 删除</a>
                                 </div>
                                 <table class="layui-table" id="LAY_table_folders" lay-filter="folder">
                                 </table>
@@ -148,9 +152,6 @@
                 [
                     {field: 'id', title: 'ID'},
                     {field: 'name', title: '磁盘名称', event: 'diskName'},
-                    {field: 'owner', title: '所有者', event: 'diskName'},
-                    {field: 'ownerType', title: '类别'},
-                    {field: 'authActions', title: '授权'},
                     {
                         title: '操作',
                         align: 'center',
@@ -173,7 +174,37 @@
             if (obj.event === 'diskName') {
                 diskId = data.id;
                 loadDiskFolders(diskId);
-            } else if (obj.event === 'download') {
+            } else if (obj.event === 'edit-disk') {
+                layer.prompt(
+                    {
+                        title: '请输入新的磁盘名称',
+                        success: function (layerInput) {
+                            layerInput.find('input').on('keydown', function () {
+                                if (event.keyCode === 13) {
+                                    prompt_service(event.target.value);
+                                }
+                            })
+                        }
+                    },
+                    function (value) {
+                        prompt_service(value);
+                    }
+                );
+
+                function prompt_service(inputParam) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/disk/rename?diskId="+data.id+"&newName="+inputParam,
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: "json",
+                        success: function (value) {
+                            var tableDisk = table.render(optDisk);
+                            tableDisk.reload();
+                        }
+                    });
+                    layer.closeAll();
+                }
+            } else if (obj.event === 'auth-disk') {
                 layer.msg('磁盘ID号：' + data.id + '名称：' + data.name);
                 //window.open('file/download/' + data.id);
             } else if (obj.event === 'delete') {
@@ -185,7 +216,6 @@
                         data: data.id, //可选参数
                         dataType: "json",
                         success: function (value) {
-                            console.log(value);
                             var result = JSON.parse(value);
                             if (result == true) {
                                 layer.alert('磁盘【' + data.name + '】删除成功!', {
@@ -205,19 +235,6 @@
                 });
             }
         });
-
-        //监听表格复选框选择
-        /*table.on('checkbox(disk)', function (obj) {
-            console.log(obj)
-        });*/
-
-        var $ = layui.$, active = {
-            downloadSelectedFiles: function () { //下载选中的文件
-                var checkStatus = table.checkStatus('disk-data')
-                    , data = checkStatus.data;
-                layer.alert(JSON.stringify(data));
-            }
-        };
 
         $('.layui-btn').on('click', function () {
             switch ($(this).attr('lay-filter')) {
@@ -246,7 +263,39 @@
                     break;
                 case 'update': {
                     var row = folderTreeGrid.getRow();
-                    row.text += 'update';
+                    layer.prompt(
+                        {
+                            title: '请输入新的目录名称',
+                            success: function (layerInput) {
+                                layerInput.find('input').on('keydown', function () {
+                                    if (event.keyCode === 13) {
+                                        prompt_service(event.target.value,row);
+                                    }
+                                })
+                            }
+                        },
+                        function (value) {
+                            prompt_service(value,row);
+                        }
+                    );
+
+                    function prompt_service(_newName,_row) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/folder/rename?id="+_row.id+"&newName="+_newName,
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: "json",
+                            success: function (value) {
+                                folderTreeGrid.updateNode(value, _row.id);
+                            }
+                        });
+                        layer.closeAll();
+                    }
+                }
+                    break;
+                case 'auth-folder': {
+                    var row = folderTreeGrid.getRow();
+                    row.text += 'auth-folder';
                     folderTreeGrid.updateNode(row, row.id);
                 }
                     break;
@@ -306,7 +355,6 @@
                 //data: JSON.stringify(postData), //可选参数
                 dataType: "json",
                 success: function (value) {
-                    console.log(value);
                     if (folderTreeGrid === null) {
                         loadDiskFolders(diskId);
                     } else {
@@ -334,7 +382,6 @@
                 //data: data.id, //可选参数
                 dataType: "json",
                 success: function (value) {
-                    console.log(value);
                     if (value.length > 0) {
                         folderTreeGrid = treegrid.createNew({
                             elem: 'LAY_table_folders',
@@ -348,12 +395,14 @@
                         folderTreeGrid.build();
                         $('#addSubBtn').removeClass('layui-btn-disabled');
                         $('#renameFolderBtn').removeClass('layui-btn-disabled');
+                        $('#authFolderBtn').removeClass('layui-btn-disabled');
                         $('#deleteFolderBtn').removeClass('layui-btn-disabled');
                     } else {
                         layer.msg('该磁盘内无子目录！');
                         folderTreeGrid = null;
                         $('#addSubBtn').addClass('layui-btn-disabled');
                         $('#renameFolderBtn').addClass('layui-btn-disabled');
+                        $('#authFolderBtn').addClass('layui-btn-disabled');
                         $('#deleteFolderBtn').addClass('layui-btn-disabled');
                     }
                 }
