@@ -49,13 +49,31 @@ public class DiskController {
     }
 
     @RequestMapping("/space")
-    public String spaceManagement(Model model) {
+    public String space(Model model) {
         Map<AuthType, String> authTypeMap = new HashMap<AuthType, String>() {{
             put(AuthType.GROUP, "共享组");
             put(AuthType.PRIVATE, "个人用户");
         }};
         model.addAttribute("authTypeMap", authTypeMap);
         return "setting/space";
+    }
+
+    @RequestMapping("/auth")
+    public String auth(@RequestParam ObjectId id, Model model) {
+        Optional<SysDisk> disk = diskService.get(id);
+        if (disk.isPresent()) {
+            model.addAttribute("authorizations", disk.get().getAuthorizations());
+        }
+        return "setting/auth";
+    }
+
+    @RequestMapping("/authFolder")
+    public String authFolder(@RequestParam ObjectId id, Model model) {
+        Optional<SysFolder> folder = folderService.get(id);
+        if (folder.isPresent()) {
+            model.addAttribute("authorizations", folder.get().getAuthorizations());
+        }
+        return "setting/auth";
     }
 
     @PostMapping("/save")

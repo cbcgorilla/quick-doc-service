@@ -41,10 +41,14 @@
                             <div class="container">
                                 <div class="layui-btn-group">
                                     <a class="layui-btn" lay-filter="add"><i class="fas fa-plus-square"></i> 新建目录</a>
-                                    <a id="addSubBtn" class="layui-btn-disabled layui-btn" lay-filter="addChild"><i class="far fa-plus-square"></i> 新建子目录</a>
-                                    <a id="renameFolderBtn" class="layui-btn-disabled layui-btn layui-btn-normal" lay-filter="update"><i class="fas fa-edit"></i> 修改</a>
-                                    <a id="authFolderBtn" class="layui-btn-disabled layui-btn layui-btn-warm" lay-filter="auth-folder"><i class="fas fa-user-secret"></i> 授权</a>
-                                    <a id="deleteFolderBtn" class="layui-btn-disabled layui-btn layui-btn-danger" lay-filter="delete"><i class="fas fa-trash-alt"></i> 删除</a>
+                                    <a id="addSubBtn" class="layui-btn-disabled layui-btn" lay-filter="addChild"><i
+                                            class="far fa-plus-square"></i> 新建子目录</a>
+                                    <a id="renameFolderBtn" class="layui-btn-disabled layui-btn layui-btn-normal"
+                                       lay-filter="update"><i class="fas fa-edit"></i> 修改</a>
+                                    <a id="authFolderBtn" class="layui-btn-disabled layui-btn layui-btn-warm"
+                                       lay-filter="auth-folder"><i class="fas fa-user-secret"></i> 授权</a>
+                                    <a id="deleteFolderBtn" class="layui-btn-disabled layui-btn layui-btn-danger"
+                                       lay-filter="delete"><i class="fas fa-trash-alt"></i> 删除</a>
                                 </div>
                                 <table class="layui-table" id="LAY_table_folders" lay-filter="folder">
                                 </table>
@@ -79,6 +83,7 @@
                                 <td align="right">磁盘空间名:</td>
                                 <td>
                                     <div class="template-input-icon-container">
+                                        <i class="fas fa-hdd"></i>
                                         <input type="text" class="form-control"
                                                placeholder="磁盘空间名"
                                                required="required"
@@ -90,6 +95,7 @@
                                 <td align="right">所有者名称:</td>
                                 <td>
                                     <div class="template-input-icon-container">
+                                        <i class="fas fa-user-secret"></i>
                                         <input type="text" class="form-control"
                                                placeholder="所有者名称"
                                                required="required"
@@ -144,7 +150,7 @@
             elem: '#LAY_table_disks',
             id: 'disk-data',
             url: '/api/disk/list',
-            height: '510',
+            height: '520',
             page: true,
             limit: 10,
             limits: [10, 50, 100, 200],
@@ -194,7 +200,7 @@
                 function prompt_service(inputParam) {
                     $.ajax({
                         type: "POST",
-                        url: "/api/disk/rename?diskId="+data.id+"&newName="+inputParam,
+                        url: "/api/disk/rename?diskId=" + data.id + "&newName=" + inputParam,
                         contentType: 'application/json; charset=utf-8',
                         dataType: "json",
                         success: function (value) {
@@ -205,8 +211,17 @@
                     layer.closeAll();
                 }
             } else if (obj.event === 'auth-disk') {
-                layer.msg('磁盘ID号：' + data.id + '名称：' + data.name);
-                //window.open('file/download/' + data.id);
+                layer.open({
+                    type: 2,
+                    title: '磁盘授权',
+                    area: ['420px', '460px'],
+                    resize: false,
+                    content: 'disk/auth?id=' + data.id,
+                    zIndex: layer.zIndex,
+                    success: function (layero) {
+                        layer.setTop(layero);
+                    }
+                });
             } else if (obj.event === 'delete') {
                 layer.confirm('真的删除磁盘: ' + data.name + ' 吗？', {title: "删除确认"}, function (index) {
                     $.ajax({
@@ -269,20 +284,20 @@
                             success: function (layerInput) {
                                 layerInput.find('input').on('keydown', function () {
                                     if (event.keyCode === 13) {
-                                        prompt_service(event.target.value,row);
+                                        prompt_service(event.target.value, row);
                                     }
                                 })
                             }
                         },
                         function (value) {
-                            prompt_service(value,row);
+                            prompt_service(value, row);
                         }
                     );
 
-                    function prompt_service(_newName,_row) {
+                    function prompt_service(_newName, _row) {
                         $.ajax({
                             type: "POST",
-                            url: "/api/folder/rename?id="+_row.id+"&newName="+_newName,
+                            url: "/api/folder/rename?id=" + _row.id + "&newName=" + _newName,
                             contentType: 'application/json; charset=utf-8',
                             dataType: "json",
                             success: function (value) {
@@ -295,8 +310,19 @@
                     break;
                 case 'auth-folder': {
                     var row = folderTreeGrid.getRow();
-                    row.text += 'auth-folder';
-                    folderTreeGrid.updateNode(row, row.id);
+                    layer.open({
+                        type: 2,
+                        title: '目录授权',
+                        area: ['420px', '460px'],
+                        resize: false,
+                        content: 'disk/authFolder?id=' + row.id,
+                        zIndex: layer.zIndex,
+                        success: function (layero) {
+                            layer.setTop(layero);
+                        }
+                    });
+                    //row.text += 'auth-folder';
+                    //folderTreeGrid.updateNode(row, row.id);
                 }
                     break;
                 case 'delete': {

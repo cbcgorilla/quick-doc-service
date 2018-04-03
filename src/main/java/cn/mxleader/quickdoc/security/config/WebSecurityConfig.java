@@ -159,6 +159,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     //.authenticationDetailsSource(authenticationDetailsSource)
                     .permitAll()
                     .and()
+                    .headers().frameOptions().sameOrigin()
+                    .and()
                     .sessionManagement()
                     .invalidSessionUrl("/login")
                     .maximumSessions(1).sessionRegistry(sessionRegistry())

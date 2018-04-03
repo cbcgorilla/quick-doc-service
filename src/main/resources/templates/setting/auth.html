@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="keyword" content="Quick Doc Service">
+    <title th:text="${title}"></title>
+
+    <!-- Icons -->
+    <link rel="stylesheet" type="text/css" href="../css/fontawesome-all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/simple-line-icons.css"/>
+    <!--layui and necessary plugins-->
+    <link rel="stylesheet" type="text/css" href="../lib/layui/css/layui.css" media="all"/>
+    <!-- Main styles for this application -->
+    <link rel="stylesheet" type="text/css" href="../css/style.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/mxleader-style.css"/>
+</head>
+
+<body>
+
+<table class="layui-table" id="auth">
+</table>
+
+<!-- Bootstrap and necessary plugins -->
+<script src="../js/jquery.min.js"></script>
+<script src="../js/popper.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<script src="../js/pace.min.js"></script>
+<script src="../lib/layui/layui.js" charset="utf-8"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    layui.use('table', function () {
+        var table = layui.table;
+        //方法级渲染
+        table.render({
+            elem: '#auth',
+            cols: [
+                [
+                    {field: 'name', title: '授权对象'},
+                    {field: 'type', title: '对象类别'},
+                    {field: 'actions', title: '授权行为'}
+                ]
+            ],
+            data: [[${authorizations}]],
+            even: true
+        });
+
+    });
+
+    /*]]>*/
+</script>
+</body>
+</html>

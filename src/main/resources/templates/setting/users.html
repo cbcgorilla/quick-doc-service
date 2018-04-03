@@ -46,7 +46,7 @@
                                 elem: '#LAY_table_user',
                                 id: 'user-data',
                                 url: '/api/user/list',
-                                height: '510',
+                                height: '520',
                                 cellMinWidth: 120,
                                 page: true, //开启分页,
                                 limit: 10,
@@ -326,20 +326,6 @@
     </div>
 </div>
 
-<script th:inline="javascript">
-    //<![CDATA[
-    $(document).on("click", ".addMemberDialogModal", function () {
-        $(".template-input-icon-container #username").val("");
-        $(".template-input-icon-container #userGroup").val("");
-    });
-    $(document).on("click", ".editMemberDialogModal", function () {
-        var $td = $(this).parents('tr').children('td');
-        $(".template-input-icon-container #username").val($td.eq(0).text());
-        $(".template-input-icon-container #userGroup").val($td.eq(1).find("ul.custom-list > li").text().trim());
-        $(".template-input-icon-container #userType").val($td.eq(2).find("select").get(0).val());
-    });
-    //]]>
-</script>
 <script type="text/html" id="avatarTpl">
     <div style="align:center;">
         <img src="file/view-jpeg/{{ d.avatarId}}"
