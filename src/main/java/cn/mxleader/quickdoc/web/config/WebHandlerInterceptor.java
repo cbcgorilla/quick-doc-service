@@ -9,11 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static cn.mxleader.quickdoc.common.CommonCode.HOME_TITLE;
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
 public class WebHandlerInterceptor extends HandlerInterceptorAdapter {
 
+    public static final String HOME_TITLE = "快捷文档共享";
     public static final String FILES_ATTRIBUTE = "files";
 
     /**
