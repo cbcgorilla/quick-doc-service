@@ -1,9 +1,8 @@
 package cn.mxleader.quickdoc.web.rest;
 
-import cn.mxleader.quickdoc.entities.AuthTarget;
-import cn.mxleader.quickdoc.entities.ParentLink;
-import cn.mxleader.quickdoc.entities.SysFolder;
+import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.FolderService;
+import cn.mxleader.quickdoc.web.domain.LayuiData;
 import cn.mxleader.quickdoc.web.domain.TreeNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -11,9 +10,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -45,6 +42,26 @@ public class FolderRestController {
                         sysFolder.getParent().getId().toString(), Collections.emptyList())
                 )
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取目录授权清单
+     *
+     * @param page  当前页面编号（起始编号为1）
+     * @param limit 每页显示数量限制
+     * @return 返回LayUI标准Table数据格式
+     */
+    @GetMapping("/auth")
+    @ApiOperation(value = "根据上级目录ID获取文件列表")
+    public LayuiData<Set<Authorization>> authList(@RequestParam ObjectId id,
+                                                  @RequestParam Integer page,
+                                                  @RequestParam Integer limit) {
+        Optional<SysFolder> folder = folderService.get(id);
+        if (folder.isPresent()) {
+            Set<Authorization> auth = folder.get().getAuthorizations();
+            return new LayuiData<>(0,"",auth.size(),auth);
+        }
+        return null;
     }
 
     @PostMapping("/save")

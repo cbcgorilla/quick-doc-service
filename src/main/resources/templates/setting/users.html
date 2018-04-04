@@ -39,185 +39,6 @@
                         </div>
                     </script>
 
-                    <script th:inline="javascript">
-                        layui.use('table', function () {
-                            var table = layui.table;
-                            var opt = {
-                                elem: '#LAY_table_user',
-                                id: 'user-data',
-                                url: '/api/user/list',
-                                height: '520',
-                                cellMinWidth: 120,
-                                page: true, //开启分页,
-                                limit: 10,
-                                limits: [10, 50, 100, 200],
-                                cols: [
-                                    [
-                                        {type: 'checkbox'},
-                                        {field: 'id', title: 'ID'},
-                                        {field: 'username', title: '用户名', edit: 'text', width: 160},
-                                        {field: 'title', title: '显示名', edit: 'text', width: 160},
-                                        {
-                                            field: 'avatarId',
-                                            title: '头像',
-                                            align: 'center',
-                                            width: 80,
-                                            templet: '#avatarTpl'
-                                        },
-                                        {field: 'email', title: '邮箱', edit: 'text'},
-                                        {field: 'groups', title: '用户组'},
-                                        {
-                                            title: '操作',
-                                            width: 160,
-                                            align: 'center',
-                                            toolbar: '#userOpsBar'
-                                        }
-                                    ]
-                                ],
-                                done: function (res, curr, count) {
-                                    $("[data-field='id']").css('display', 'none');
-                                }
-                            };
-                            //方法级渲染
-                            table.render(opt);
-
-                            //监听表格复选框选择
-                            table.on('checkbox(userTable)', function (obj) {
-                                console.log(obj)
-                            });
-
-                            table.on('edit(userTable)', function (obj) {
-                                var value = obj.value, //得到修改后的值
-                                    data = obj.data, //得到所在行所有键值
-                                    field = obj.field; //得到字段
-                                $.ajax({
-                                    type: "POST",
-                                    url: "/api/user/update/" + field,
-                                    contentType: 'application/json; charset=utf-8',
-                                    data: JSON.stringify(data), //可选参数
-                                    dataType: "json",
-                                    success: function (resp) {
-                                        console.log(resp);
-                                        layer.msg('用户信息更新成功！');
-                                        //reloadUserTable('/api/user/list');
-                                    }
-                                });
-                            });
-
-                            //监听工具条
-                            table.on('tool(userTable)', function (obj) {
-                                var data = obj.data;
-                                if (obj.event === 'detail') {
-                                    layer.msg('用户ID号：' + data.id + '\n 显示名称：' + data.title);
-                                } else if (obj.event === 'del') {
-                                    layer.confirm('真的删除用户: ' + data.username + ' 吗？', {title: "删除确认"}, function (index) {
-                                        $.ajax({
-                                            type: "POST",
-                                            url: "/api/user/delete",
-                                            contentType: 'application/json; charset=utf-8',
-                                            data: data.id, //可选参数
-                                            dataType: "json",
-                                            success: function (value) {
-                                                console.log(value);
-                                                var result = JSON.parse(value);
-                                                if (result == true) {
-                                                    layer.alert('用户' + data.username + '删除成功!', {
-                                                        icon: 6, btn: ['确认'], yes: function (index) {
-                                                            obj.del();
-                                                            layer.close(index);
-                                                            var tableIns = table.render(opt);
-                                                            tableIns.reload();
-                                                        }
-                                                    });
-                                                } else {
-                                                    layer.alert("用户删除失败!", {icon: 2});
-                                                }
-                                                layer.close(index);
-                                            }
-                                        });
-                                    });
-
-                                } else if (obj.event === 'edit') {
-                                    layer.alert('编辑行：<br>' + JSON.stringify(data))
-                                }
-                            });
-
-                            var $ = layui.$, active = {
-                                batchAddGroup: function () {
-                                    var checkStatus = table.checkStatus('user-data')
-                                        , data = checkStatus.data;
-                                    //layer.alert(JSON.stringify(data));
-                                    console.log(data);
-                                    if (data.length == 0) {
-                                        layer.msg('请选择待加入组的用户！');
-                                    } else {
-                                        postGroupService('/api/user/addGroup', data);
-                                    }
-                                },
-                                batchRemoveGroup: function () {
-                                    var checkStatus = table.checkStatus('user-data')
-                                        , data = checkStatus.data;
-                                    //layer.alert(JSON.stringify(data));
-                                    console.log(data);
-                                    if (data.length == 0) {
-                                        layer.msg('请选择待移除组的用户！');
-                                    } else {
-                                        postGroupService('/api/user/removeGroup', data);
-                                    }
-                                }
-
-                            };
-
-                            $('.userTable .layui-btn').on('click', function () {
-                                var type = $(this).data('type');
-                                active[type] ? active[type].call(this) : '';
-                            });
-
-                            function postGroupService(url, postData) {
-                                layer.prompt(
-                                    {
-                                        title: '请输入组名',
-                                        success: function (layerInput) {
-                                            layerInput.find('input').on('keydown', function () {
-                                                if (event.keyCode === 13) {
-                                                    prompt_service(event.target.value);
-                                                }
-                                            })
-                                        }
-                                    },
-                                    function (value) {
-                                        prompt_service(value);
-                                    }
-                                );
-
-                                function prompt_service(inputParam) {
-                                    $.ajax({
-                                        type: "POST",
-                                        url: url + "?group=" + inputParam,
-                                        contentType: 'application/json; charset=utf-8',
-                                        data: JSON.stringify(postData), //可选参数
-                                        dataType: "json",
-                                        success: function (value) {
-                                            console.log(value);
-                                            reloadUserTable('/api/user/list');
-                                        }
-                                    });
-                                    layer.closeAll();
-                                }
-                            }
-
-                            function reloadUserTable(restUrl) {
-                                table.reload('user-data', {
-                                    url: restUrl,
-                                    page: {
-                                        curr: 1 //重新从第 1 页开始
-                                    }
-                                });
-                            }
-
-                        });
-                    </script>
-
                     <!-- 模态框 -->
                     <div class="modal fade" id="addMemberDialogModal">
                         <div class="modal-dialog modal-lg">
@@ -325,6 +146,185 @@
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    layui.use('table', function () {
+        var table = layui.table;
+        var opt = {
+            elem: '#LAY_table_user',
+            id: 'user-data',
+            url: '/api/user/list',
+            height: '520',
+            cellMinWidth: 120,
+            page: true, //开启分页,
+            limit: 10,
+            limits: [10, 50, 100, 200],
+            cols: [
+                [
+                    {type: 'checkbox'},
+                    {field: 'id', title: 'ID'},
+                    {field: 'username', title: '用户名', edit: 'text', width: 160},
+                    {field: 'title', title: '显示名', edit: 'text', width: 160},
+                    {
+                        field: 'avatarId',
+                        title: '头像',
+                        align: 'center',
+                        width: 80,
+                        templet: '#avatarTpl'
+                    },
+                    {field: 'email', title: '邮箱', edit: 'text'},
+                    {field: 'groups', title: '用户组'},
+                    {
+                        title: '操作',
+                        width: 160,
+                        align: 'center',
+                        toolbar: '#userOpsBar'
+                    }
+                ]
+            ],
+            done: function (res, curr, count) {
+                $("[data-field='id']").css('display', 'none');
+            }
+        };
+        //方法级渲染
+        table.render(opt);
+
+        //监听表格复选框选择
+        table.on('checkbox(userTable)', function (obj) {
+            console.log(obj)
+        });
+
+        table.on('edit(userTable)', function (obj) {
+            var value = obj.value, //得到修改后的值
+                data = obj.data, //得到所在行所有键值
+                field = obj.field; //得到字段
+            $.ajax({
+                type: "POST",
+                url: "/api/user/update/" + field,
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data), //可选参数
+                dataType: "json",
+                success: function (resp) {
+                    console.log(resp);
+                    layer.msg('用户信息更新成功！');
+                    //reloadUserTable('/api/user/list');
+                }
+            });
+        });
+
+        //监听工具条
+        table.on('tool(userTable)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+                layer.msg('用户ID号：' + data.id + '\n 显示名称：' + data.title);
+            } else if (obj.event === 'del') {
+                layer.confirm('真的删除用户: ' + data.username + ' 吗？', {title: "删除确认"}, function (index) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/user/delete",
+                        contentType: 'application/json; charset=utf-8',
+                        data: data.id, //可选参数
+                        dataType: "json",
+                        success: function (value) {
+                            console.log(value);
+                            var result = JSON.parse(value);
+                            if (result == true) {
+                                layer.alert('用户' + data.username + '删除成功!', {
+                                    icon: 6, btn: ['确认'], yes: function (index) {
+                                        obj.del();
+                                        layer.close(index);
+                                        var tableIns = table.render(opt);
+                                        tableIns.reload();
+                                    }
+                                });
+                            } else {
+                                layer.alert("用户删除失败!", {icon: 2});
+                            }
+                            layer.close(index);
+                        }
+                    });
+                });
+
+            } else if (obj.event === 'edit') {
+                layer.alert('编辑行：<br>' + JSON.stringify(data))
+            }
+        });
+
+        var $ = layui.$, active = {
+            batchAddGroup: function () {
+                var checkStatus = table.checkStatus('user-data')
+                    , data = checkStatus.data;
+                //layer.alert(JSON.stringify(data));
+                console.log(data);
+                if (data.length == 0) {
+                    layer.msg('请选择待加入组的用户！');
+                } else {
+                    postGroupService('/api/user/addGroup', data);
+                }
+            },
+            batchRemoveGroup: function () {
+                var checkStatus = table.checkStatus('user-data')
+                    , data = checkStatus.data;
+                //layer.alert(JSON.stringify(data));
+                console.log(data);
+                if (data.length == 0) {
+                    layer.msg('请选择待移除组的用户！');
+                } else {
+                    postGroupService('/api/user/removeGroup', data);
+                }
+            }
+
+        };
+
+        $('.userTable .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        function postGroupService(url, postData) {
+            layer.prompt(
+                {
+                    title: '请输入组名',
+                    success: function (layerInput) {
+                        layerInput.find('input').on('keydown', function () {
+                            if (event.keyCode === 13) {
+                                prompt_service(event.target.value);
+                            }
+                        })
+                    }
+                },
+                function (value) {
+                    prompt_service(value);
+                }
+            );
+
+            function prompt_service(inputParam) {
+                $.ajax({
+                    type: "POST",
+                    url: url + "?group=" + inputParam,
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(postData), //可选参数
+                    dataType: "json",
+                    success: function (value) {
+                        console.log(value);
+                        reloadUserTable('/api/user/list');
+                    }
+                });
+                layer.closeAll();
+            }
+        }
+
+        function reloadUserTable(restUrl) {
+            table.reload('user-data', {
+                url: restUrl,
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+        }
+
+    });
+</script>
 
 <script type="text/html" id="avatarTpl">
     <div style="align:center;">

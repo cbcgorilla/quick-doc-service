@@ -27,6 +27,17 @@ public class DiskController {
     private final DiskService diskService;
     private final FolderService folderService;
 
+    private static final Map<AuthType, String> authTypeMap = new HashMap<AuthType, String>() {{
+        put(AuthType.GROUP, "用户组");
+        put(AuthType.PRIVATE, "个人用户");
+    }};
+
+    private static final Map<AuthAction, String> authActionMap = new HashMap<AuthAction, String>() {{
+        put(AuthAction.READ, "读");
+        put(AuthAction.WRITE, "写");
+        put(AuthAction.DELETE, "删");
+    }};
+
     @Autowired
     public DiskController(DiskService diskService,
                           FolderService folderService) {
@@ -50,29 +61,18 @@ public class DiskController {
 
     @RequestMapping("/space")
     public String space(Model model) {
-        Map<AuthType, String> authTypeMap = new HashMap<AuthType, String>() {{
-            put(AuthType.GROUP, "共享组");
-            put(AuthType.PRIVATE, "个人用户");
-        }};
         model.addAttribute("authTypeMap", authTypeMap);
         return "setting/space";
     }
 
     @RequestMapping("/auth")
-    public String auth(@RequestParam ObjectId id, Model model) {
-        Optional<SysDisk> disk = diskService.get(id);
-        if (disk.isPresent()) {
-            model.addAttribute("authorizations", disk.get().getAuthorizations());
-        }
-        return "setting/auth";
-    }
-
-    @RequestMapping("/authFolder")
-    public String authFolder(@RequestParam ObjectId id, Model model) {
-        Optional<SysFolder> folder = folderService.get(id);
-        if (folder.isPresent()) {
-            model.addAttribute("authorizations", folder.get().getAuthorizations());
-        }
+    public String auth(@RequestParam ObjectId id,
+                       @RequestParam AuthTarget target,
+                       Model model) {
+        model.addAttribute("authTypeMap", authTypeMap);
+        model.addAttribute("authActionMap", authActionMap);
+        model.addAttribute("parentId", id.toString());
+        model.addAttribute("type", target);
         return "setting/auth";
     }
 

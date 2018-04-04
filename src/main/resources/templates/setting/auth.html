@@ -17,7 +17,51 @@
 
 <body>
 
-<table class="layui-table" id="auth">
+<div class="card">
+    <form method="POST" th:action="@{'./disk/addauth'}">
+        <table class="table table-hover">
+            <tr>
+                <td align="right">对象类型:</td>
+                <td>
+                    <select id="authType" name="authType"
+                            class="select custom-select">
+                        <option th:each="entry : ${authTypeMap}"
+                                th:value="${entry.key}"
+                                th:text="${entry.value}">对象类型
+                        </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">名称:</td>
+                <td>
+                    <div class="template-input-icon-container">
+                        <i class="fas fa-hdd"></i>
+                        <input type="text" class="form-control"
+                               placeholder="名称"
+                               required="required"
+                               id="name" name="name"/>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">授权行为:</td>
+                <td>
+                    <select id="authAction" name="authAction"
+                            class="select custom-select">
+                        <option th:each="entry : ${authActionMap}"
+                                th:value="${entry.key}"
+                                th:text="${entry.value}">授权行为
+                        </option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" value="增加" class="btn btn-success"/>
+    </form>
+</div>
+
+<table class="layui-table" id="auth" lay-filter="authTable">
 </table>
 
 <!-- Bootstrap and necessary plugins -->
@@ -27,23 +71,52 @@
 <script src="../js/pace.min.js"></script>
 <script src="../lib/layui/layui.js" charset="utf-8"></script>
 
+<script type="text/html" id="opsBar">
+    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del-auth">
+        <i class="fas fa-trash-alt" title="删除"></i>
+    </button>
+</script>
 <script th:inline="javascript">
     /*<![CDATA[*/
 
     layui.use('table', function () {
         var table = layui.table;
-        //方法级渲染
-        table.render({
-            elem: '#auth',
+        var type = [[${type}]]
+        var dataUrl = null;
+
+        switch (type) {
+            case 'DISK': {
+                dataUrl = '/api/disk/auth';
+            }
+                break;
+            case 'FOLDER': {
+                dataUrl = '/api/folder/auth';
+            }
+                break;
+        }
+        var ops = {
+            elem: "#auth",
+            url: dataUrl,
+            id: 'auth-data',
+            where: {id: [[${parentId}]]},
             cols: [
                 [
-                    {field: 'name', title: '授权对象'},
-                    {field: 'type', title: '对象类别'},
-                    {field: 'actions', title: '授权行为'}
+                    {field: 'type', width: 100, title: '对象类型', sort: true},
+                    {field: 'name', align: 'center', title: '名称'},
+                    {field: 'actions', align: 'center', width: 160, title: '授权行为'},
+                    {align: 'center', width: 80, title: '操作', toolbar: '#opsBar'}
                 ]
-            ],
-            data: [[${authorizations}]],
-            even: true
+            ]
+        };
+
+        table.render(ops);
+
+        //监听工具条
+        table.on('tool(authTable)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'del-auth') {
+                layer.msg('ID号：' + data.type + '\n 名称：' + data.name);
+            }
         });
 
     });

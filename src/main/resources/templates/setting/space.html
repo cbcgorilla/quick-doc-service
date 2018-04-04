@@ -214,9 +214,9 @@
                 layer.open({
                     type: 2,
                     title: '磁盘授权',
-                    area: ['420px', '460px'],
+                    area: ['560px', '680px'],
                     resize: false,
-                    content: 'disk/auth?id=' + data.id,
+                    content: 'disk/auth?id=' + data.id+'&target=DISK',
                     zIndex: layer.zIndex,
                     success: function (layero) {
                         layer.setTop(layero);
@@ -313,9 +313,9 @@
                     layer.open({
                         type: 2,
                         title: '目录授权',
-                        area: ['420px', '460px'],
+                        area: ['560px', '680px'],
                         resize: false,
-                        content: 'disk/authFolder?id=' + row.id,
+                        content: 'disk/auth?id=' + row.id+'&target=FOLDER',
                         zIndex: layer.zIndex,
                         success: function (layero) {
                             layer.setTop(layero);

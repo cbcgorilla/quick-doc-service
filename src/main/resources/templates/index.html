@@ -37,6 +37,15 @@
         <li class="nav-item px-3" th:if="${session.ActiveUser.isAdmin()}">
             <a class="nav-link" href="users">系统用户</a>
         </li>
+        <li class="dropdown nav-item px-3"  th:if="${session.ActiveUser.isAdmin()}">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                REST API 接口 <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu"  aria-labelledby="dropdownMenu">
+                <a class="dropdown-item"  href="swagger-ui.html">SWAGGER-UI</a>
+                <a class="dropdown-item"  href="doc.html">swagger-bootstrap-ui</a>
+            </ul>
+        </li>
     </ul>
     <ul class="nav navbar-nav ml-auto">
         <li class="nav-item dropdown">
