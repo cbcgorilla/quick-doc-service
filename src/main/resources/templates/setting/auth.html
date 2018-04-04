@@ -18,46 +18,46 @@
 <body>
 
 <div class="card">
-    <form method="POST" th:action="@{'./disk/addauth'}">
+    <form id="auth-form">
         <table class="table table-hover">
             <tr>
-                <td align="right">对象类型:</td>
+                <td align="right">类型:</td>
                 <td>
                     <select id="authType" name="authType"
                             class="select custom-select">
                         <option th:each="entry : ${authTypeMap}"
                                 th:value="${entry.key}"
-                                th:text="${entry.value}">对象类型
+                                th:text="${entry.value}">类型
                         </option>
                     </select>
                 </td>
-            </tr>
-            <tr>
                 <td align="right">名称:</td>
                 <td>
                     <div class="template-input-icon-container">
-                        <i class="fas fa-hdd"></i>
+                        <i class="fas fa-address-card"></i>
                         <input type="text" class="form-control"
                                placeholder="名称"
                                required="required"
                                id="name" name="name"/>
                     </div>
                 </td>
-            </tr>
-            <tr>
-                <td align="right">授权行为:</td>
+                <td align="right">权限:</td>
                 <td>
                     <select id="authAction" name="authAction"
                             class="select custom-select">
                         <option th:each="entry : ${authActionMap}"
                                 th:value="${entry.key}"
-                                th:text="${entry.value}">授权行为
+                                th:text="${entry.value}">权限
                         </option>
                     </select>
                 </td>
+                <td>
+                    <button type="button" id="addBtn" class="btn btn-success">
+                        <i class="fas fa-plus-square"></i>
+                    </button>
+                </td>
             </tr>
         </table>
-        <input type="submit" value="增加" class="btn btn-success"/>
     </form>
 </div>
 
@@ -119,6 +119,22 @@
             }
         });
 
+    });
+
+    $("#addBtn").click(function () {
+        $.ajax({
+            type: "POST",   //提交的方法
+            url:"/api/disk/addAuth", //提交的地址
+            data:$('#auth-form').serialize(),// 序列化表单值
+            async: false,
+            error: function(request) {  //失败的话
+                alert("Connection error");
+            },
+            success: function(data) {  //成功
+                alert(data);  //就将返回的数据显示出来
+                window.location.href="跳转页面"
+            }
+        });
     });
 
     /*]]>*/

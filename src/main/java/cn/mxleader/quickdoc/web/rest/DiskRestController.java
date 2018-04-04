@@ -69,6 +69,13 @@ public class DiskRestController {
         return null;
     }
 
+    @PostMapping("/addAuth")
+    @ApiOperation(value = "根据上级目录ID获取文件列表")
+    public Boolean addAuth(@RequestBody String data) {
+        System.out.println(data);
+        return null;
+    }
+
     @PostMapping(value = "/rename")
     @ApiOperation(value = "修改磁盘显示名称")
     public Boolean rename(@RequestParam ObjectId diskId, @RequestParam String newName) {

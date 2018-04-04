@@ -157,7 +157,7 @@
             cols: [
                 [
                     {field: 'id', title: 'ID'},
-                    {field: 'name', title: '磁盘名称', event: 'diskName'},
+                    {field: 'name', title: '磁盘名称', width: 320, event: 'diskName'},
                     {
                         title: '操作',
                         align: 'center',
@@ -214,9 +214,9 @@
                 layer.open({
                     type: 2,
                     title: '磁盘授权',
-                    area: ['560px', '680px'],
+                    area: ['720px', '460px'],
                     resize: false,
-                    content: 'disk/auth?id=' + data.id+'&target=DISK',
+                    content: 'disk/auth?id=' + data.id + '&target=DISK',
                     zIndex: layer.zIndex,
                     success: function (layero) {
                         layer.setTop(layero);
@@ -313,9 +313,9 @@
                     layer.open({
                         type: 2,
                         title: '目录授权',
-                        area: ['560px', '680px'],
+                        area: ['720px', '460px'],
                         resize: false,
-                        content: 'disk/auth?id=' + row.id+'&target=FOLDER',
+                        content: 'disk/auth?id=' + row.id + '&target=FOLDER',
                         zIndex: layer.zIndex,
                         success: function (layero) {
                             layer.setTop(layero);
