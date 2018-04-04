@@ -69,5 +69,23 @@ public interface FolderService {
      */
     void delete(ObjectId folderId);
 
+    /**
+     * 增加磁盘授权信息
+     *
+     * @param id            文件夹ID
+     * @param authorization 新增授权
+     * @return
+     */
+    SysFolder addAuthorization(ObjectId id, Authorization authorization);
+
+    /**
+     * 删除磁盘授权信息
+     *
+     * @param id            文件夹ID
+     * @param authorization 待删除授权
+     * @return
+     */
+    SysFolder removeAuthorization(ObjectId id, Authorization authorization);
+
 
 }

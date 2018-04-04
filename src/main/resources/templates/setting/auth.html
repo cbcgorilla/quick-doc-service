@@ -19,11 +19,11 @@
 
 <div class="card">
     <form id="auth-form">
-        <table class="table table-hover">
+        <table class="table">
             <tr>
                 <td align="right">类型:</td>
                 <td>
-                    <select id="authType" name="authType"
+                    <select id="type" name="type"
                             class="select custom-select">
                         <option th:each="entry : ${authTypeMap}"
                                 th:value="${entry.key}"
@@ -31,6 +31,30 @@
                         </option>
                     </select>
                 </td>
+
+                <td align="right" rowspan="2">权限:</td>
+                <td rowspan="2">
+                    <select id="actions" name="actions" multiple="multiple" size="3"
+                            class="select custom-select">
+                        <option th:each="entry : ${authActionMap}"
+                                th:value="${entry.key}"
+                                th:text="${entry.value}">权限
+                        </option>
+                    </select>
+                </td>
+                <td rowspan="2">
+                    <div class="layui-btn-group">
+                        <button type="button" id="addBtn" class="layui-btn layui-btn-sm">
+                            <i class="fas fa-plus-square" title="增加"></i>
+                        </button>
+                        <button type="button" id="removeBtn"
+                                class="layui-btn layui-btn-danger layui-btn-sm">
+                            <i class="fas fa-minus-square" title="删除"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
                 <td align="right">名称:</td>
                 <td>
                     <div class="template-input-icon-container">
@@ -40,21 +64,6 @@
                                required="required"
                                id="name" name="name"/>
                     </div>
-                </td>
-                <td align="right">权限:</td>
-                <td>
-                    <select id="authAction" name="authAction"
-                            class="select custom-select">
-                        <option th:each="entry : ${authActionMap}"
-                                th:value="${entry.key}"
-                                th:text="${entry.value}">权限
-                        </option>
-                    </select>
-                </td>
-                <td>
-                    <button type="button" id="addBtn" class="btn btn-success">
-                        <i class="fas fa-plus-square"></i>
-                    </button>
                 </td>
             </tr>
         </table>
@@ -78,32 +87,58 @@
 </script>
 <script th:inline="javascript">
     /*<![CDATA[*/
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                if (this.name === 'actions') {
+                    o[this.name] = [this.value];
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            }
+        });
+        return o;
+    };
 
     layui.use('table', function () {
         var table = layui.table;
-        var type = [[${type}]]
+        var type = [[${type}]];
         var dataUrl = null;
+        var authUrl = null;
+        var removeAuthUrl = null;
 
         switch (type) {
             case 'DISK': {
                 dataUrl = '/api/disk/auth';
+                authUrl = '/api/disk/addAuth?';
+                removeAuthUrl = '/api/disk/removeAuth?';
             }
                 break;
             case 'FOLDER': {
                 dataUrl = '/api/folder/auth';
+                authUrl = '/api/folder/addAuth?';
+                removeAuthUrl = '/api/folder/removeAuth?';
             }
                 break;
         }
+
         var ops = {
-            elem: "#auth",
+            elem: '#auth',
             url: dataUrl,
             id: 'auth-data',
             where: {id: [[${parentId}]]},
             cols: [
                 [
-                    {field: 'type', width: 100, title: '对象类型', sort: true},
+                    {field: 'type', width: 100, title: '类型', sort: true},
                     {field: 'name', align: 'center', title: '名称'},
-                    {field: 'actions', align: 'center', width: 160, title: '授权行为'},
+                    {field: 'actions', align: 'center', width: 160, title: '权限'},
                     {align: 'center', width: 80, title: '操作', toolbar: '#opsBar'}
                 ]
             ]
@@ -115,26 +150,38 @@
         table.on('tool(authTable)', function (obj) {
             var data = obj.data;
             if (obj.event === 'del-auth') {
-                layer.msg('ID号：' + data.type + '\n 名称：' + data.name);
+                authService(removeAuthUrl, data);
             }
         });
 
-    });
-
-    $("#addBtn").click(function () {
-        $.ajax({
-            type: "POST",   //提交的方法
-            url:"/api/disk/addAuth", //提交的地址
-            data:$('#auth-form').serialize(),// 序列化表单值
-            async: false,
-            error: function(request) {  //失败的话
-                alert("Connection error");
-            },
-            success: function(data) {  //成功
-                alert(data);  //就将返回的数据显示出来
-                window.location.href="跳转页面"
-            }
+        $("#addBtn").click(function () {
+            authService(authUrl, $('#auth-form').serializeObject());
         });
+
+        $("#removeBtn").click(function () {
+            authService(removeAuthUrl, $('#auth-form').serializeObject());
+        });
+
+        function authService(_authUrl, _postData) {
+            $.ajax({
+                type: 'POST',
+                url: _authUrl + 'parentId=' + [[${parentId}]],
+                contentType: 'application/json; charset=utf-8',
+                async: false,
+                data: JSON.stringify(_postData),
+                dataType: 'json',
+                error: function (request) {
+                    alert('Connection error');
+                },
+                success: function (data) {
+                    table.reload('auth-data', {
+                        url: dataUrl,
+                        where: {id: [[${parentId}]]}
+                    });
+                }
+            });
+        }
+
     });
 
     /*]]>*/

@@ -110,4 +110,49 @@ public class FolderServiceImpl implements FolderService {
         }
     }
 
+    @Override
+    public SysFolder addAuthorization(ObjectId id, Authorization authorization) {
+        Optional<SysFolder> sysFolder = sysFolderRepository.findById(id);
+        if (sysFolder.isPresent()) {
+            SysFolder folder = sysFolder.get();
+            Set<Authorization> authorizations = folder.getAuthorizations();
+            for (Authorization item : authorizations) {
+                if (item.getName().equalsIgnoreCase(authorization.getName())
+                        && item.getType().equals(authorization.getType())) {
+                    for (AuthAction action : authorization.getActions()) {
+                        item.add(action);
+                    }
+                    return sysFolderRepository.save(folder);
+                }
+            }
+            folder.addAuthorization(authorization);
+            return sysFolderRepository.save(folder);
+        }
+        return null;
+    }
+
+    @Override
+    public SysFolder removeAuthorization(ObjectId id, Authorization authorization) {
+        Optional<SysFolder> sysFolder = sysFolderRepository.findById(id);
+        if (sysFolder.isPresent()) {
+            SysFolder folder = sysFolder.get();
+            Set<Authorization> authorizations = folder.getAuthorizations();
+            for (Authorization item : authorizations) {
+                if (item.getName().equalsIgnoreCase(authorization.getName())
+                        && item.getType().equals(authorization.getType())) {
+                    for (AuthAction action : authorization.getActions()) {
+                        item.remove(action);
+                    }
+                    if(item.getActions().size()==0){
+                        folder.removeAuthorization(item);
+                    }
+                    return sysFolderRepository.save(folder);
+                }
+            }
+            folder.removeAuthorization(authorization);
+            return sysFolderRepository.save(folder);
+        }
+        return null;
+    }
+
 }

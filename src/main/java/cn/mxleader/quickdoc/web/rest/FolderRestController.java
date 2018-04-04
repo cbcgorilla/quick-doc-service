@@ -59,9 +59,25 @@ public class FolderRestController {
         Optional<SysFolder> folder = folderService.get(id);
         if (folder.isPresent()) {
             Set<Authorization> auth = folder.get().getAuthorizations();
-            return new LayuiData<>(0,"",auth.size(),auth);
+            return new LayuiData<>(0, "", auth.size(), auth);
         }
         return null;
+    }
+
+    @PostMapping("/addAuth")
+    @ApiOperation(value = "增加授权")
+    public Boolean addAuth(@RequestParam ObjectId parentId,
+                           @RequestBody Authorization authorization) {
+        folderService.addAuthorization(parentId, authorization);
+        return true;
+    }
+
+    @PostMapping("/removeAuth")
+    @ApiOperation(value = "移除授权")
+    public Boolean removeAuth(@RequestParam ObjectId parentId,
+                              @RequestBody Authorization authorization) {
+        folderService.removeAuthorization(parentId, authorization);
+        return true;
     }
 
     @PostMapping("/save")

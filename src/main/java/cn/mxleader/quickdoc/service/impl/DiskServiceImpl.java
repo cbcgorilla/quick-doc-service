@@ -95,6 +95,9 @@ public class DiskServiceImpl implements DiskService {
                     for (AuthAction action : authorization.getActions()) {
                         item.remove(action);
                     }
+                    if(item.getActions().size()==0){
+                        disk.removeAuthorization(item);
+                    }
                     return sysDiskRepository.save(disk);
                 }
             }

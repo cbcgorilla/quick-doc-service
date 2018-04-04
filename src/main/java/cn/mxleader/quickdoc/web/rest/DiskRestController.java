@@ -1,9 +1,6 @@
 package cn.mxleader.quickdoc.web.rest;
 
-import cn.mxleader.quickdoc.entities.AuthTarget;
-import cn.mxleader.quickdoc.entities.Authorization;
-import cn.mxleader.quickdoc.entities.ParentLink;
-import cn.mxleader.quickdoc.entities.SysDisk;
+import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.DiskService;
 import cn.mxleader.quickdoc.web.domain.LayuiData;
 import cn.mxleader.quickdoc.web.domain.WebDisk;
@@ -59,21 +56,30 @@ public class DiskRestController {
     @GetMapping("/auth")
     @ApiOperation(value = "根据上级目录ID获取文件列表")
     public LayuiData<Set<Authorization>> authList(@RequestParam ObjectId id,
-                                            @RequestParam Integer page,
-                                            @RequestParam Integer limit) {
+                                                  @RequestParam Integer page,
+                                                  @RequestParam Integer limit) {
         Optional<SysDisk> disk = diskService.get(id);
         if (disk.isPresent()) {
             Set<Authorization> auth = disk.get().getAuthorizations();
-            return new LayuiData<>(0,"",auth.size(),auth);
+            return new LayuiData<>(0, "", auth.size(), auth);
         }
         return null;
     }
 
     @PostMapping("/addAuth")
-    @ApiOperation(value = "根据上级目录ID获取文件列表")
-    public Boolean addAuth(@RequestBody String data) {
-        System.out.println(data);
-        return null;
+    @ApiOperation(value = "增加授权")
+    public Boolean addAuth(@RequestParam ObjectId parentId,
+                           @RequestBody Authorization authorization) {
+        diskService.addAuthorization(parentId, authorization);
+        return true;
+    }
+
+    @PostMapping("/removeAuth")
+    @ApiOperation(value = "移除授权")
+    public Boolean removeAuth(@RequestParam ObjectId parentId,
+                              @RequestBody Authorization authorization) {
+        diskService.removeAuthorization(parentId, authorization);
+        return true;
     }
 
     @PostMapping(value = "/rename")
