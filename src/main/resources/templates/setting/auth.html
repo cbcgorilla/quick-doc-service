@@ -136,9 +136,9 @@
             where: {id: [[${parentId}]]},
             cols: [
                 [
-                    {field: 'type', width: 100, title: '类型', sort: true},
-                    {field: 'name', align: 'center', title: '名称'},
-                    {field: 'actions', align: 'center', width: 160, title: '权限'},
+                    {field: 'type', width: 100, title: '类型', sort: true, event: 'chosen-auth', templet: '#typeTpl'},
+                    {field: 'name', align: 'center', title: '名称', event: 'chosen-auth'},
+                    {field: 'actions', align: 'center', width: 160, title: '权限', event: 'chosen-auth'},
                     {align: 'center', width: 80, title: '操作', toolbar: '#opsBar'}
                 ]
             ]
@@ -149,9 +149,18 @@
         //监听工具条
         table.on('tool(authTable)', function (obj) {
             var data = obj.data;
-            if (obj.event === 'del-auth') {
-                authService(removeAuthUrl, data);
+            switch (obj.event) {
+                case 'del-auth': {
+                    authService(removeAuthUrl, data);
+                }
+                    break;
+                case 'chosen-auth': {
+                    $('#name').val(data.name);
+                    $('#type').val(data.type);
+                }
+                    break;
             }
+
         });
 
         $("#addBtn").click(function () {
@@ -181,10 +190,16 @@
                 }
             });
         }
-
     });
 
     /*]]>*/
+</script>
+<script type="text/html" id="typeTpl">
+    {{#  if(d.type === 'GROUP'){ }}
+    <span style="color: #2f5ef5;">用户组</span>
+    {{#  } else { }}
+    <span style="color: #00ff00;">用户</span>
+    {{#  } }}
 </script>
 </body>
 </html>

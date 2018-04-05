@@ -149,8 +149,6 @@ public class FolderServiceImpl implements FolderService {
                     return sysFolderRepository.save(folder);
                 }
             }
-            folder.removeAuthorization(authorization);
-            return sysFolderRepository.save(folder);
         }
         return null;
     }

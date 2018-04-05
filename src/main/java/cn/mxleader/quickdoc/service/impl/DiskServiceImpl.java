@@ -35,7 +35,10 @@ public class DiskServiceImpl implements DiskService {
 
     @Override
     public List<SysDisk> list(Authorization authorization) {
-        return sysDiskRepository.findAllByAuthorizationsContaining(authorization);
+        return sysDiskRepository.findAllByAuthorizations(
+                authorization.getName(),
+                authorization.getType(),
+                authorization.getActions());
     }
 
     @Override
@@ -95,14 +98,12 @@ public class DiskServiceImpl implements DiskService {
                     for (AuthAction action : authorization.getActions()) {
                         item.remove(action);
                     }
-                    if(item.getActions().size()==0){
+                    if (item.getActions().size() == 0) {
                         disk.removeAuthorization(item);
                     }
                     return sysDiskRepository.save(disk);
                 }
             }
-            disk.removeAuthorization(authorization);
-            return sysDiskRepository.save(disk);
         }
         return null;
     }

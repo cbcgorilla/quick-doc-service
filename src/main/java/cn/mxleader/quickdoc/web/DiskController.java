@@ -29,7 +29,7 @@ public class DiskController {
 
     private static final Map<AuthType, String> authTypeMap = new HashMap<AuthType, String>() {{
         put(AuthType.GROUP, "用户组");
-        put(AuthType.PRIVATE, "个人用户");
+        put(AuthType.PRIVATE, "用户");
     }};
 
     private static final Map<AuthAction, String> authActionMap = new HashMap<AuthAction, String>() {{

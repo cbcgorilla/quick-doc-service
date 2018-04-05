@@ -12,7 +12,7 @@
 
                             <div class="container">
                                 <div class="layui-btn-group">
-                                    <button type="button" class="layui-btn uploadDialog" data-toggle="modal"
+                                    <button type="button" class="layui-btn layui-btn-sm uploadDialog" data-toggle="modal"
                                             data-target="#addDisk">
                                         <i class="fas fa-plus-square"></i> 新建磁盘
                                     </button>
@@ -40,14 +40,14 @@
 
                             <div class="container">
                                 <div class="layui-btn-group">
-                                    <a class="layui-btn" lay-filter="add"><i class="fas fa-plus-square"></i> 新建目录</a>
-                                    <a id="addSubBtn" class="layui-btn-disabled layui-btn" lay-filter="addChild"><i
+                                    <a class="layui-btn layui-btn-sm" lay-filter="add"><i class="fas fa-plus-square"></i> 新建目录</a>
+                                    <a id="addSubBtn" class="layui-btn-disabled layui-btn layui-btn-sm" lay-filter="addChild"><i
                                             class="far fa-plus-square"></i> 新建子目录</a>
-                                    <a id="renameFolderBtn" class="layui-btn-disabled layui-btn layui-btn-normal"
+                                    <a id="renameFolderBtn" class="layui-btn-disabled layui-btn layui-btn-sm layui-btn-normal"
                                        lay-filter="update"><i class="fas fa-edit"></i> 修改</a>
-                                    <a id="authFolderBtn" class="layui-btn-disabled layui-btn layui-btn-warm"
+                                    <a id="authFolderBtn" class="layui-btn-disabled layui-btn layui-btn-sm layui-btn-warm"
                                        lay-filter="auth-folder"><i class="fas fa-user-secret"></i> 授权</a>
-                                    <a id="deleteFolderBtn" class="layui-btn-disabled layui-btn layui-btn-danger"
+                                    <a id="deleteFolderBtn" class="layui-btn-disabled layui-btn layui-btn-sm layui-btn-danger"
                                        lay-filter="delete"><i class="fas fa-trash-alt"></i> 删除</a>
                                 </div>
                                 <table class="layui-table" id="LAY_table_folders" lay-filter="folder">
