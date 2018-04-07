@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.service;
 
-import cn.mxleader.quickdoc.common.annotation.PreAuth;
+import cn.mxleader.quickdoc.security.authorization.PreAuth;
 import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;

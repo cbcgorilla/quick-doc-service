@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.common.annotation;
+package cn.mxleader.quickdoc.security.authorization;
 
 import cn.mxleader.quickdoc.entities.AuthAction;
 import cn.mxleader.quickdoc.entities.AuthTarget;

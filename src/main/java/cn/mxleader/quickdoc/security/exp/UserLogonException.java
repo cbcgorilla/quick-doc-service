@@ -1,4 +1,4 @@
-package cn.mxleader.quickdoc.common;
+package cn.mxleader.quickdoc.security.exp;
 
 import org.springframework.security.core.AuthenticationException;
 

@@ -70,12 +70,7 @@ public class FileRestController {
     @PostMapping(value = "/delete")
     @ApiOperation(value = "根据文件ID删除库内文件信息")
     public Boolean delete(@RequestBody String fileId) {
-        try {
-            fileService.delete(new ObjectId(fileId));
-        } catch (Exception exp) {
-            //System.out.println(exp.getMessage());
-            return false;
-        }
+        fileService.delete(new ObjectId(fileId));
         return true;
     }
 

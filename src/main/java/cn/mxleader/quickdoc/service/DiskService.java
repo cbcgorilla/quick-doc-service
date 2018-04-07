@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.service;
 
-import cn.mxleader.quickdoc.common.annotation.PreAuth;
+import cn.mxleader.quickdoc.security.authorization.PreAuth;
 import cn.mxleader.quickdoc.entities.AuthAction;
 import cn.mxleader.quickdoc.entities.AuthTarget;
 import cn.mxleader.quickdoc.entities.Authorization;

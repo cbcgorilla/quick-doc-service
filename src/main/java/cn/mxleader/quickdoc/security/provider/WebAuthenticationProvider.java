@@ -1,6 +1,6 @@
 package cn.mxleader.quickdoc.security.provider;
 
-import cn.mxleader.quickdoc.common.UserLogonException;
+import cn.mxleader.quickdoc.security.exp.UserLogonException;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Component

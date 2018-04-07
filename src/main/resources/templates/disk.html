@@ -22,7 +22,8 @@
                                         <i class="fas fa-cloud-download-alt"></i>下载
                                     </button>
 
-                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" id="upload-file">
+                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal"
+                                            id="upload-file">
                                         <i class="fas fa-cloud-upload-alt"></i>上传文件
                                     </button>
 
@@ -79,11 +80,27 @@
                 //this.data.params = JSON.stringify(this.data.params);
             },
             done: function (res) {
-                //上传完毕回调
-                reloadFileTable('/api/file/list', parentId, parentType);
+                console.log(res.code);
+                console.log(res.data);
+                switch (res.code) {
+                    case 0: {
+                        reloadFileTable('/api/file/list', parentId, parentType);
+                    }
+                        break;
+                    case -1: {
+                        //var respData = JSON.parse(res.data);
+                        console.log(res.msg);
+                        layer.alert(res.msg, {icon: 2});
+                    }
+                        break;
+                }
             },
-            error: function () {
-                //请求异常回调
+            allDone: function (obj) { //当文件全部被提交后，才触发
+                console.log(obj.total); //得到总文件数
+                console.log(obj.successful); //请求成功的文件数
+                console.log(obj.aborted); //请求失败的文件数
+            },
+            error: function (res) {
                 layer.alert("文件上传失败!", {icon: 2});
             }
         });
@@ -168,13 +185,13 @@
                 }
             }
         };
-/*
+        /*
 
-        $('.file-table .layui-btn').on('click', function () {
-            var type = $(this).data('type');
-            active[type] ? active[type].call(this) : '';
-        });
-*/
+                $('.file-table .layui-btn').on('click', function () {
+                    var type = $(this).data('type');
+                    active[type] ? active[type].call(this) : '';
+                });
+        */
 
         $('#diskTree').treeview({
             data: [[${folderTree}]],

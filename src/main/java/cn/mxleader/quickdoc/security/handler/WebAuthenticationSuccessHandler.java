@@ -43,6 +43,8 @@ public class WebAuthenticationSuccessHandler implements
         if (session != null) {
             session.setMaxInactiveInterval(30 * 60);
             SysUser user = userService.get(authentication.getName());
+            // 加入Session属性前置空密码位：
+            user.setPassword("_");
             session.setAttribute(SESSION_USER, user);
             // 发送用户登录消息到平台MQ
             Date d = new Date();

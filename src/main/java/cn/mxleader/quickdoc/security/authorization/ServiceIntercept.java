@@ -1,10 +1,10 @@
-package cn.mxleader.quickdoc.common.intercepter;
+package cn.mxleader.quickdoc.security.authorization;
 
-import cn.mxleader.quickdoc.common.annotation.PreAuth;
 import cn.mxleader.quickdoc.dao.SysDiskRepository;
 import cn.mxleader.quickdoc.dao.SysFolderRepository;
 import cn.mxleader.quickdoc.dao.ext.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.*;
+import cn.mxleader.quickdoc.security.exp.PreAuthException;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -66,6 +66,7 @@ public class ServiceIntercept {
             HttpServletRequest request = ((ServletRequestAttributes)
                     RequestContextHolder.getRequestAttributes()).getRequest();
             SysUser sysUser = (SysUser) request.getSession().getAttribute("ActiveUser");
+
             for (Object arg : joinPoint.getArgs()) {
                 if (arg.getClass().equals(preAuth.field())) {
                     AuthTarget authTarget = null;
@@ -77,6 +78,7 @@ public class ServiceIntercept {
                         authTarget = preAuth.target();
                         id = (ObjectId) arg;
                     }
+
                     Boolean auth = false;
                     switch (authTarget) {
                         case DISK:
@@ -98,19 +100,13 @@ public class ServiceIntercept {
                     } else {
                         // System.out.println("目标类名称：" + joinPoint.getTarget().getClass().getName());
                         // System.out.println("方法名称：" + joinPoint.getSignature().getName());
-                        String msg = "用户：" + sysUser.getUsername() + " 未获得："
-                                + m.toString() + "的 {" + preAuth.action() + "} 访问授权";
-                        log.warn(msg);
-                        throw new Exception(msg);
+                        throw new PreAuthException("鉴权失败！", preAuth.action(),
+                                preAuth.target(), id, m.toString(), sysUser.getUsername());
                     }
                 }
             }
-
             Object object = joinPoint.proceed();// 执行该方法
-
             // 后续动作
-            // System.out.println("退出方法");
-
             return object;
         } else {
             return joinPoint.proceed();
