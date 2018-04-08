@@ -52,6 +52,7 @@ public interface FileService {
 
     GridFSFile addParent(ObjectId fileId, ParentLink parent);
 
+    GridFSFile addAuthorization(ObjectId fileId, Authorization authorization);
     /**
      * 删除Mongo库内文件
      *

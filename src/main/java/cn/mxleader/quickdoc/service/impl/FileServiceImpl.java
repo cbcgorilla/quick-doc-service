@@ -27,10 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -141,7 +138,7 @@ public class FileServiceImpl implements FileService {
                 new HashSet<ParentLink>() {{
                     add(parent);
                 }},
-                getParentAuthorizations(parent), null);
+                getParentAuthorizations(parent), Collections.emptySet());
         return gridFsAssistant.store(file, filename, metadata);
     }
 
@@ -165,11 +162,11 @@ public class FileServiceImpl implements FileService {
     public ObjectId storeServerFile(String resourceLocation) throws IOException {
         Resource resource = new ClassPathResource(resourceLocation);
         String fileType = FileUtils.getContentType(resource.getFilename());
-        Metadata metadata = new Metadata(fileType, null,
+        Metadata metadata = new Metadata(fileType, Collections.emptySet(),
                 new HashSet<Authorization>() {{
                     add(new Authorization("users", AuthType.GROUP));
                 }},
-                null);
+                Collections.emptySet());
         return gridFsAssistant.store(resource.getInputStream(), resource.getFilename(), metadata);
     }
 
@@ -188,6 +185,23 @@ public class FileServiceImpl implements FileService {
         GridFSFile file = gridFsAssistant.findOne(Query.query(Criteria.where("_id").is(fileId)));
         Metadata metadata = converter.read(Metadata.class, file.getMetadata());
         metadata.getParents().add(parent);
+        return gridFsAssistant.updateMetadata(fileId, metadata);
+    }
+
+    @Override
+    public GridFSFile addAuthorization(ObjectId fileId, Authorization authorization) {
+        GridFSFile file = gridFsAssistant.findOne(Query.query(Criteria.where("_id").is(fileId)));
+        Metadata metadata = converter.read(Metadata.class, file.getMetadata());
+        for (Authorization item : metadata.getAuthorizations()) {
+            if (item.getName().equalsIgnoreCase(authorization.getName())
+                    && item.getType().equals(authorization.getType())) {
+                for (AuthAction action : authorization.getActions()) {
+                    item.add(action);
+                }
+                return gridFsAssistant.updateMetadata(fileId, metadata);
+            }
+        }
+        metadata.addAuthorization(authorization);
         return gridFsAssistant.updateMetadata(fileId, metadata);
     }
 
@@ -312,7 +326,6 @@ public class FileServiceImpl implements FileService {
                 gridFSFile.getLength(),
                 gridFSFile.getUploadDate(),
                 metadata.get_contentType(),
-                FileUtils.getLinkPrefix(metadata.get_contentType()),
                 FileUtils.getIconClass(metadata.get_contentType()),
                 false,
                 false

@@ -2,10 +2,10 @@ package cn.mxleader.quickdoc.common.utils;
 
 import org.springframework.lang.Nullable;
 
-import java.io.*;
-import java.net.FileNameMap;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,25 +17,12 @@ import java.util.stream.Collectors;
 public class FileUtils {
 
     /**
-     * 不同格式文件对应的预览资源路径前缀
-     */
-    private static final Map<String, String> typeLinkPrefix = new HashMap<String, String>() {{
-        put("application/pdf", "file/view-pdf/");
-        put("image/png", "file/view-png/");
-        put("image/gif", "file/view-gif/");
-        put("image/jpeg", "file/view-jpeg/");
-        put("text/plain", "file/view-text/");
-        put("text/html", "file/view-text/");
-        put("application/xml", "file/view-text/");
-    }};
-
-    /**
      * 以下ICON CLASS信息匹配 Font Awesome 5.0.6版本
      */
     private static final Map<String, String> typeIconMap = new HashMap<String, String>() {{
         put("application/pdf", "far fa-file-pdf");
-        put("application/xml", "far fa-file-code");
-        put("application/zip", "far fa-file-archive");
+        put("text/xml", "far fa-file-code");
+        put("application/x-zip-compressed", "far fa-file-archive");
         put("image/png", "far fa-file-image");
         put("image/gif", "far fa-file-image");
         put("image/jpeg", "far fa-file-image");
@@ -43,16 +30,6 @@ public class FileUtils {
         put("text/plain", "far fa-file-alt");
         put("text/html", "fab fa-html5");
     }};
-
-    /**
-     * 根据文件类型获取预览链接前缀
-     *
-     * @param contentType
-     * @return
-     */
-    public static String getLinkPrefix(String contentType) {
-        return typeLinkPrefix.get(contentType) == null ? "file/download/" : typeLinkPrefix.get(contentType);
-    }
 
     /**
      * 根据文件类型获取显示图标

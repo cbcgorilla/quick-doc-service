@@ -22,7 +22,7 @@
                         <tr th:each="file : ${files}">
                             <form th:action="@{/deleteFile}" th:method="DELETE">
                                 <td>
-                                    <a th:href="@{${file.linkPrefix}+${file.id}}">
+                                    <a th:href="@{'file/preview/'+${file.id}}">
                                         <i th:class="${file.iconClass}"></i>
                                         <span th:text="${file.filename}"></span>
                                     </a>
@@ -36,7 +36,7 @@
                                                th:value="${file.id}"/>
                                         <input th:if="${file.deleteAuthorization}" type="submit"
                                                value="&#xf2ed" class="btn btn-danger far fa-trash-alt"/>
-                                        <a th:href="@{'files/download/'+${file.id}}" class="btn btn-dark">
+                                        <a th:href="@{'file/download/'+${file.id}}" class="btn btn-dark">
                                             <i class="fas fa-cloud-download-alt"></i>
                                         </a>
                                     </div>

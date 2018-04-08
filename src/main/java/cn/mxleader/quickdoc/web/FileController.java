@@ -101,73 +101,22 @@ public class FileController {
     /**
      * 预览文件共用方法
      *
-     * @param returnType
      * @param fileId
      * @return
      * @throws IOException
      */
-    private HttpEntity<byte[]> openDocumentEntity(MediaType returnType, ObjectId fileId) throws IOException {
+    @GetMapping(value = "/preview/{fileId}")
+    public @ResponseBody
+    HttpEntity<byte[]> previewDocument(@PathVariable ObjectId fileId) throws IOException {
         GridFsResource fs = fileService.getResource(fileId);
         byte[] document = FileCopyUtils.copyToByteArray(fs.getInputStream());
 
         HttpHeaders header = new HttpHeaders();
-        header.setContentType(returnType);
+        header.setContentType(MediaType.valueOf(fs.getContentType()));
         header.set("Content-Disposition", "inline; filename=" + fs.getFilename());
         header.setContentLength(document.length);
 
         return new HttpEntity<>(document, header);
-    }
-
-    /**
-     * PDF格式文件预览功能
-     *
-     * @param fileId
-     * @return
-     * @throws IOException
-     */
-    @GetMapping(value = "/view-pdf/{fileId}", produces = MediaType.APPLICATION_PDF_VALUE)
-    public @ResponseBody
-    HttpEntity<byte[]> openPdfEntity(@PathVariable ObjectId fileId) throws IOException {
-        return openDocumentEntity(MediaType.APPLICATION_PDF, fileId);
-    }
-
-    /**
-     * GIF预览功能
-     *
-     * @param fileId
-     * @return
-     * @throws IOException
-     */
-    @GetMapping(value = "/view-gif/{fileId}", produces = MediaType.IMAGE_GIF_VALUE)
-    public @ResponseBody
-    HttpEntity<byte[]> openImageGifEntity(@PathVariable ObjectId fileId) throws IOException {
-        return openDocumentEntity(MediaType.IMAGE_GIF, fileId);
-    }
-
-    /**
-     * JPEG预览功能
-     *
-     * @param fileId
-     * @return
-     * @throws IOException
-     */
-    @GetMapping(value = "/view-jpeg/{fileId}", produces = MediaType.IMAGE_JPEG_VALUE)
-    public @ResponseBody
-    HttpEntity<byte[]> openImageJpegEntity(@PathVariable ObjectId fileId) throws IOException {
-        return openDocumentEntity(MediaType.IMAGE_JPEG, fileId);
-    }
-
-    /**
-     * PNG预览功能
-     *
-     * @param fileId
-     * @return
-     * @throws IOException
-     */
-    @GetMapping(value = "/view-png/{fileId}", produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody
-    HttpEntity<byte[]> openImageEntity(@PathVariable ObjectId fileId) throws IOException {
-        return openDocumentEntity(MediaType.IMAGE_PNG, fileId);
     }
 
     /**

@@ -1,8 +1,7 @@
 package cn.mxleader.quickdoc.web.rest;
 
 import cn.mxleader.quickdoc.common.utils.FileUtils;
-import cn.mxleader.quickdoc.entities.AuthTarget;
-import cn.mxleader.quickdoc.entities.ParentLink;
+import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.LayuiData;
@@ -17,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+
+import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
 @RestController
 @RequestMapping("/api/file")
@@ -55,8 +56,8 @@ public class FileRestController {
     @PostMapping(value = "/upload")
     public LayuiData<Boolean> upload(@RequestParam("file") MultipartFile file,
                                      @RequestParam ObjectId parentId,
-                                     @RequestParam AuthTarget parentType) throws IOException {
-        //SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
+                                     @RequestParam AuthTarget parentType,
+                                     @SessionAttribute(SESSION_USER) SysUser user) throws IOException {
         String filename = FileUtils.getFilename(file.getOriginalFilename());
         ParentLink parent = getParentLink(parentId, parentType);
         if (fileService.getStoredFile(filename, parent) != null) {
@@ -64,14 +65,15 @@ public class FileRestController {
         }
 
         ObjectId fileId = fileService.store(file.getInputStream(), filename, parent);
+        fileService.addAuthorization(fileId, new Authorization(user.getUsername(), AuthType.PRIVATE, AuthAction.DELETE));
         return new LayuiData<>(0, "", 0, true);
     }
 
     @PostMapping(value = "/delete")
     @ApiOperation(value = "根据文件ID删除库内文件信息")
-    public Boolean delete(@RequestBody String fileId) {
+    public LayuiData<Boolean> delete(@RequestBody String fileId) {
         fileService.delete(new ObjectId(fileId));
-        return true;
+        return new LayuiData<>(0, "", 0, true);
     }
 
     private ParentLink getParentLink(ObjectId parentId, AuthTarget parentType) {
