@@ -251,6 +251,14 @@ public class FileServiceImpl implements FileService {
         zos.close();
     }
 
+    public void createZipFromList(String[] ids, OutputStream fos, String parent) throws IOException {
+        ZipOutputStream zos = new ZipOutputStream(fos);
+        for (String id : ids) {
+            compressFile(getResource(new ObjectId(id)), zos, parent);
+        }
+        zos.close();
+    }
+
     /**
      * 压缩文件夹
      *
@@ -266,10 +274,10 @@ public class FileServiceImpl implements FileService {
         // 递归压缩目录
         List<SysFolder> folders = mongoTemplate.find(
                 Query.query(Criteria.where("parentId").is(folder.getId())),
-                SysFolder.class).stream()
-/*                .filter(quickDocFolder -> checkAuthentication(quickDocFolder.getAuthorizations(),
-                        activeUser, AuthAction.READ))*/
-                .collect(Collectors.toList());
+                SysFolder.class)/*.stream()
+                .filter(quickDocFolder -> checkAuthentication(quickDocFolder.getAuthorizations(),
+                        activeUser, AuthAction.READ))
+                .collect(Collectors.toList())*/;
         if (folders != null && folders.size() > 0) {
             for (SysFolder subFolder : folders) {
                 compressFolder(subFolder, out, basedir + "/" + subFolder.getName(),

@@ -81,5 +81,6 @@ public interface FileService {
      */
     @PreAuth
     void createZip(ObjectId folderId, OutputStream fos, SysUser activeUser) throws IOException;
-
+    //@PreAuth
+    void createZipFromList(String[] ids, OutputStream fos, String parent) throws IOException ;
 }

@@ -18,13 +18,13 @@
                             <div class="col-md-9" style="float: right">
 
                                 <div class="layui-btn-group file-table">
-                                    <button class="layui-btn layui-btn-sm" data-type="downloadSelectedFiles">
+                                    <button class="layui-btn layui-btn-sm" data-type="downloadFiles">
                                         <i class="fas fa-cloud-download-alt"></i>下载
                                     </button>
 
                                     <button type="button" class="layui-btn layui-btn-sm layui-btn-normal"
                                             id="upload-file">
-                                        <i class="fas fa-cloud-upload-alt"></i>上传文件
+                                        <i class="fas fa-cloud-upload-alt"></i>上传
                                     </button>
 
                                 </div>
@@ -38,7 +38,7 @@
                                             <i class="fas fa-cloud-download-alt" title="下载该文件"></i>
                                         </button>
                                         <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
-                                            <i class="fas fa-trash-alt" title="删除文件"></i>
+                                            <i class="fas fa-trash-alt" title="删除该文件"></i>
                                         </button>
                                     </div>
                                 </script>
@@ -67,6 +67,7 @@
             upload = layui.upload;
 
         var parentId = [[${disk.id.toString()}]],
+            parent = [[${disk.name}]],
             parentType = 'DISK';
 
         var uploadInst = upload.render({
@@ -134,9 +135,10 @@
         table.render(opt);
 
         //监听表格复选框选择
-        /*table.on('checkbox(file-table)', function (obj) {
+        table.on('checkbox(file-table)', function (obj) {
             console.log(obj)
-        });*/
+        });
+
         //监听工具条
         table.on('tool(file-table)', function (obj) {
             var data = obj.data;
@@ -181,14 +183,22 @@
         });
 
         var $ = layui.$, active = {
-            downloadSelectedFiles: function () { //下载选中的文件
+            downloadFiles: function () { //下载选中的文件
                 var checkStatus = table.checkStatus('file-data'),
                     data = checkStatus.data;
                 if (data.length > 0) {
-                    layer.alert(JSON.stringify(data));
+                    data1 = data.map(function(value,index,arr){
+                        return value.id;
+                    });
+                    window.open('/file/zip-package?parent='+parent+'&ids='+data1);
                 }
             }
         };
+
+        $('.file-table .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
 
         $('#diskTree').treeview({
             data: [[${folderTree}]],
@@ -198,11 +208,13 @@
             nodeIcon: "fas fa-film",
             onNodeSelected: function (event, data) {
                 parentId = data.id;
+                parent = data.text;
                 parentType = 'FOLDER';
                 reloadFileTable('/api/file/list', parentId, parentType);
             },
             onNodeUnselected: function (event, data) {
                 parentId = [[${disk.id.toString()}]];
+                parent = [[${disk.name}]];
                 parentType = 'DISK';
                 reloadFileTable('/api/file/list', parentId, parentType);
             }

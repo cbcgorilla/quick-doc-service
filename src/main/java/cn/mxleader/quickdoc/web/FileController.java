@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
@@ -66,15 +68,26 @@ public class FileController {
     public @ResponseBody
     void downloadDocument(HttpServletResponse response,
                           @PathVariable ObjectId folderId,
-                          HttpSession session) throws IOException {
-        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+                          @SessionAttribute(SESSION_USER) SysUser activeUser) throws IOException {
         response.setHeader("Content-Disposition",
                 "attachment; filename=" + folderId + ".zip");
         // @TODO 压缩包文件大小在文件下载完毕前无法获取
         // response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
 
         fileService.createZip(folderId, response.getOutputStream(), activeUser);
+    }
+
+    @GetMapping(value = "/zip-package", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public @ResponseBody
+    void downloadZipPackage(HttpServletResponse response,
+                            @RequestParam String parent,
+                            @RequestParam String[] ids) throws IOException {
+        response.setHeader("Content-Disposition", "attachment; filename="
+                + java.net.URLEncoder.encode(parent, "UTF-8") + ".zip");
+        // @TODO 压缩包文件大小在文件下载完毕前无法获取
+        // response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
+
+        fileService.createZipFromList(ids, response.getOutputStream(), parent);
     }
 
     /**
