@@ -95,28 +95,4 @@ public class UserController {
         return "redirect:/#users";
     }
 
-    /**
-     * 删除系统用户信息
-     *
-     * @param userId
-     * @param session
-     * @param redirectAttributes
-     * @return
-     */
-    @DeleteMapping("/delete")
-    public String delete(@RequestParam("userId") ObjectId userId,
-                         HttpSession session,
-                         RedirectAttributes redirectAttributes) {
-        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        if (activeUser.isAdmin()) {
-            userService.delete(userId);
-            redirectAttributes.addFlashAttribute("message",
-                    "成功删除用户： " + userId);
-        } else {
-            redirectAttributes.addFlashAttribute("message",
-                    "您无删除用户的权限，请联系管理员获取！");
-        }
-        return "redirect:/#users";
-    }
-
 }

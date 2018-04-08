@@ -77,10 +77,9 @@ public interface FileService {
      *
      * @param folderId   文件或文件夹路径
      * @param fos        生成的zip文件存在路径（包括文件名）
-     * @param activeUser 用户信息
      */
     @PreAuth
-    void createZip(ObjectId folderId, OutputStream fos, SysUser activeUser) throws IOException;
-    //@PreAuth
-    void createZipFromList(String[] ids, OutputStream fos, String parent) throws IOException ;
+    void createZip(ObjectId folderId, OutputStream fos) throws IOException;
+    @PreAuth(target = AuthTarget.FILE)
+    void createZipFromList(ObjectId[] ids, OutputStream fos, String parent) throws IOException ;
 }

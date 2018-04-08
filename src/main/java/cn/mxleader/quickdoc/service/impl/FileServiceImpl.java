@@ -6,7 +6,6 @@ import cn.mxleader.quickdoc.dao.SysFolderRepository;
 import cn.mxleader.quickdoc.dao.ext.GridFsAssistant;
 import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.FileService;
-import cn.mxleader.quickdoc.web.domain.LayuiData;
 import cn.mxleader.quickdoc.web.domain.WebFile;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.GridFSFindIterable;
@@ -17,14 +16,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsCriteria;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import java.io.*;
 import java.util.*;
@@ -43,18 +40,15 @@ public class FileServiceImpl implements FileService {
     private final GridFsAssistant gridFsAssistant;
     private final SysDiskRepository sysDiskRepository;
     private final SysFolderRepository sysFolderRepository;
-    private final MongoTemplate mongoTemplate;
     private final MongoConverter converter;
 
     FileServiceImpl(GridFsAssistant gridFsAssistant,
                     SysDiskRepository sysDiskRepository,
                     SysFolderRepository sysFolderRepository,
-                    MongoTemplate mongoTemplate,
                     MongoConverter converter) {
         this.gridFsAssistant = gridFsAssistant;
         this.sysDiskRepository = sysDiskRepository;
         this.sysFolderRepository = sysFolderRepository;
-        this.mongoTemplate = mongoTemplate;
         this.converter = converter;
     }
 
@@ -158,7 +152,6 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    //@Async
     public ObjectId storeServerFile(String resourceLocation) throws IOException {
         Resource resource = new ClassPathResource(resourceLocation);
         String fileType = FileUtils.getContentType(resource.getFilename());
@@ -234,27 +227,24 @@ public class FileServiceImpl implements FileService {
     /**
      * 创建ZIP文件
      *
-     * @param folderId   文件或文件夹路径
-     * @param fos        生成的zip文件存在路径（包括文件名）
-     * @param activeUser 当前操作用户信息（用于判断是否有操作权限）
+     * @param folderId 文件或文件夹路径
+     * @param fos      生成的zip文件存在路径（包括文件名）
      */
-    public void createZip(ObjectId folderId,
-                          OutputStream fos,
-                          SysUser activeUser) throws IOException {
+    public void createZip(ObjectId folderId, OutputStream fos) throws IOException {
         ZipOutputStream zos = new ZipOutputStream(fos);
-        SysFolder folder = mongoTemplate.findById(folderId, SysFolder.class);
-        if (folder != null) {
-            compressFolder(folder, zos, folder.getName(), activeUser);
+        Optional<SysFolder> folder = sysFolderRepository.findById(folderId);
+        if (folder.isPresent()) {
+            compressFolder(folder.get(), zos, folder.get().getName());
         } else {
             throw new FileNotFoundException("文件夹ID：" + folderId);
         }
         zos.close();
     }
 
-    public void createZipFromList(String[] ids, OutputStream fos, String parent) throws IOException {
+    public void createZipFromList(ObjectId[] ids, OutputStream fos, String parent) throws IOException {
         ZipOutputStream zos = new ZipOutputStream(fos);
-        for (String id : ids) {
-            compressFile(getResource(new ObjectId(id)), zos, parent);
+        for (ObjectId id : ids) {
+            compressFile(getResource(id), zos, parent);
         }
         zos.close();
     }
@@ -262,35 +252,25 @@ public class FileServiceImpl implements FileService {
     /**
      * 压缩文件夹
      *
-     * @param folder     文件夹实体（含路径ID）
-     * @param out        ZIP输出流
-     * @param basedir    当前目录
-     * @param activeUser 当前操作用户信息（用于判断是否有操作权限）
+     * @param folder  文件夹实体（含路径ID）
+     * @param out     ZIP输出流
+     * @param basedir 当前目录
      */
     private void compressFolder(SysFolder folder,
                                 ZipOutputStream out,
-                                String basedir,
-                                SysUser activeUser) {
+                                String basedir) {
         // 递归压缩目录
-        List<SysFolder> folders = mongoTemplate.find(
-                Query.query(Criteria.where("parentId").is(folder.getId())),
-                SysFolder.class)/*.stream()
-                .filter(quickDocFolder -> checkAuthentication(quickDocFolder.getAuthorizations(),
-                        activeUser, AuthAction.READ))
-                .collect(Collectors.toList())*/;
+        ParentLink parent = new ParentLink(folder.getId(), AuthTarget.FOLDER, folder.getParent().getDiskId());
+        List<SysFolder> folders = sysFolderRepository.findAllByParent(parent);
         if (folders != null && folders.size() > 0) {
             for (SysFolder subFolder : folders) {
-                compressFolder(subFolder, out, basedir + "/" + subFolder.getName(),
-                        activeUser);
+                compressFolder(subFolder, out, basedir + "/" + subFolder.getName());
             }
         }
         // 压缩目录内的文件
         switchWebFiles(getStoredFiles(folder.getId()))
                 .forEach(file -> {
                     compressFile(getResource(new ObjectId(file.getId())), out, basedir);
-                    /*if (checkAuthentication(file.getAuthorizations(),
-                            activeUser, READ_PRIVILEGE)) {
-                    }*/
                 });
 
     }
@@ -302,9 +282,7 @@ public class FileServiceImpl implements FileService {
      * @param out            输出ZIP流
      * @param basedir        当前文件所在目录
      */
-    private void compressFile(GridFsResource gridFsResource,
-                              ZipOutputStream out,
-                              String basedir) {
+    private void compressFile(GridFsResource gridFsResource, ZipOutputStream out, String basedir) {
         try {
             BufferedInputStream bis = new BufferedInputStream(gridFsResource.getInputStream());
             ZipEntry entry = new ZipEntry(basedir + "/" + gridFsResource.getFilename());

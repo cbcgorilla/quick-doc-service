@@ -74,14 +74,14 @@ public class FileController {
         // @TODO 压缩包文件大小在文件下载完毕前无法获取
         // response.setHeader("Content-Length", String.valueOf(fsResource.contentLength()));
 
-        fileService.createZip(folderId, response.getOutputStream(), activeUser);
+        fileService.createZip(folderId, response.getOutputStream());
     }
 
     @GetMapping(value = "/zip-package", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public @ResponseBody
     void downloadZipPackage(HttpServletResponse response,
                             @RequestParam String parent,
-                            @RequestParam String[] ids) throws IOException {
+                            @RequestParam ObjectId[] ids) throws IOException {
         response.setHeader("Content-Disposition", "attachment; filename="
                 + java.net.URLEncoder.encode(parent, "UTF-8") + ".zip");
         // @TODO 压缩包文件大小在文件下载完毕前无法获取
@@ -155,83 +155,6 @@ public class FileController {
             String document = FileUtils.read(fs.getInputStream(), Charset.forName("GBK"));
             return new HttpEntity<>(document, header);
         }
-    }
-
-    /**
-     * 上传文件到指定目录和文件分类
-     *
-     * @param file
-     * @param containerId
-     * @param containerType
-     * @param redirectAttributes
-     * @param model
-     * @param session
-     * @return
-     * @throws IOException
-     */
-    @PostMapping("/upload")
-    public String upload(@RequestParam("file") MultipartFile file,
-                         @RequestParam("containerId") ObjectId containerId,
-                         @RequestParam("containerType") AuthTarget containerType,
-                         @RequestParam(value = "shareSetting", required = false) String[] shareSetting,
-                         @RequestParam(value = "shareGroups", required = false) String[] shareGroups,
-                         RedirectAttributes redirectAttributes,
-                         Model model,
-                         HttpSession session) throws IOException {
-        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        String filename = FileUtils.getFilename(file.getOriginalFilename());
-        String fileType = FileUtils.getContentType(filename);
-/*
-        MimetypesFileTypeMap m = new MimetypesFileTypeMap();
-        String fileType = m.getContentType(filename);*/
-
-        // 鉴权检查
-        /*if (checkAuthentication(sysFolder.getAuthorizations(), activeUser, WRITE_PRIVILEGE)) {
-            Metadata metadata = new Metadata(fileType, folderId,
-                    translateShareSetting(activeUser, shareSetting, shareGroups), null);
-
-            ObjectId fileId = fileService.store(file.getInputStream(), filename, metadata);
-            // 启动TensorFlow 线程分析图片内容
-            if (fileType.startsWith("image/")) {
-                tensorFlowService.updateImageMetadata(fileId, metadata);
-            }
-
-            refreshDirList(model, folderId);
-            // 发送MQ消息
-            streamService.sendMessage("用户" + activeUser.getUsername() +
-                    "成功上传文件： " + filename + "到目录：" + folderId);
-            redirectAttributes.addFlashAttribute("message",
-                    "成功上传文件： " + filename);
-        } else {
-            redirectAttributes.addFlashAttribute("message",
-                    "您无此目录的上传权限： " + sysFolder.getName() + "，请联系管理员获取！");
-        }*/
-        return "redirect:/#files/folder@" + containerId;
-    }
-
-    /**
-     * 删除文件
-     *
-     * @param folderId
-     * @param fileId
-     * @return
-     */
-    @DeleteMapping("/deleteFile")
-    public String deleteFile(@RequestParam("folderId") ObjectId folderId,
-                             @RequestParam("fileId") ObjectId fileId,
-                             HttpSession session,
-                             RedirectAttributes redirectAttributes) {
-        SysUser activeUser = (SysUser) session.getAttribute(SESSION_USER);
-        WebFile file = fileService.getStoredFile(fileId);
-        /*if (checkAuthentication(file.getAuthorizations(), activeUser, DELETE_PRIVILEGE)) {
-            fileService.delete(fileId);
-            redirectAttributes.addFlashAttribute("message",
-                    "成功删除文件： " + file.getFilename());
-        } else {
-            redirectAttributes.addFlashAttribute("message",
-                    "您无删除此文件的权限： " + file.getFilename() + "，请联系管理员获取！");
-        }*/
-        return "redirect:/#files/folder@" + folderId;
     }
 
 }
