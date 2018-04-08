@@ -78,10 +78,10 @@ public class QuickDocConfiguration {
 
                 // 初始化默认图标文件
                 sysProfile.getIconMap().put("SYS_LOGO", fileService.
-                        storeServerFile("classpath:static/images/favicon.png"));
+                        storeServerFile("static/images/favicon.png"));
 
                 sysProfile.getIconMap().put("AWARD", fileService.
-                        storeServerFile("classpath:static/images/Goldbull.jpg"));
+                        storeServerFile("static/images/Goldbull.jpg"));
 
                 // 初始化Admin管理账号
                 userService.saveUser(new SysUser(ObjectId.get(), "admin",

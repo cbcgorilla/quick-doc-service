@@ -12,6 +12,7 @@ import java.util.Set;
 
 public interface SysDiskRepository extends MongoRepository<SysDisk, ObjectId> {
 
-    @Query("{ 'authorizations.name' : ?0, 'authorizations.type' : ?1, 'authorizations.actions' : {$all: ?2 }}")
+    @Query("{'authorizations':{'$elemMatch':{'name' : ?0, 'type' : ?1, 'actions' : {'$all': ?2 }}}}")
+        //@Query("{ 'authorizations.name' : ?0, 'authorizations.type' : ?1, 'authorizations.actions' : {$all: ?2 }}")
     List<SysDisk> findAllByAuthorizations(String name, AuthType type, Set<AuthAction> actions);
 }

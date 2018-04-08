@@ -12,6 +12,8 @@ import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -160,15 +162,15 @@ public class FileServiceImpl implements FileService {
 
     @Override
     //@Async
-    public ObjectId storeServerFile(String resourceLocation) throws FileNotFoundException {
-        File file = ResourceUtils.getFile(resourceLocation);
-        String fileType = FileUtils.getContentType(file.getName());
+    public ObjectId storeServerFile(String resourceLocation) throws IOException {
+        Resource resource = new ClassPathResource(resourceLocation);
+        String fileType = FileUtils.getContentType(resource.getFilename());
         Metadata metadata = new Metadata(fileType, null,
                 new HashSet<Authorization>() {{
                     add(new Authorization("users", AuthType.GROUP));
                 }},
                 null);
-        return gridFsAssistant.store(new FileInputStream(file), file.getName(), metadata);
+        return gridFsAssistant.store(resource.getInputStream(), resource.getFilename(), metadata);
     }
 
 

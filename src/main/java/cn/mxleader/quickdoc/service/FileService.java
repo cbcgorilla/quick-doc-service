@@ -43,7 +43,7 @@ public interface FileService {
     @PreAuth(field = ParentLink.class, action = AuthAction.WRITE)
     ObjectId store(InputStream file, String filename, ParentLink parent);
 
-    ObjectId storeServerFile(String resourceLocation) throws FileNotFoundException;
+    ObjectId storeServerFile(String resourceLocation) throws IOException;
 
     void rename(ObjectId fileId, String newFilename);
 

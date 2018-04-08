@@ -1,6 +1,9 @@
 package cn.mxleader.quickdoc.web;
 
-import cn.mxleader.quickdoc.entities.*;
+import cn.mxleader.quickdoc.entities.AuthType;
+import cn.mxleader.quickdoc.entities.Authorization;
+import cn.mxleader.quickdoc.entities.SysDisk;
+import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.DiskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
@@ -33,7 +36,7 @@ public class IndexController {
         model.addAttribute("private_disk_menu", diskService.list(privateAuthorization));
 
         //组共享空间菜单（包含该用户的所有权限组磁盘）
-        List<SysDisk> groupSysDiskList = new ArrayList<>();
+        Set<SysDisk> groupSysDiskList = new HashSet<>();
         for (String group : activeUser.getGroups()) {
             Authorization groupAuthorization = new Authorization(group, AuthType.GROUP);
             groupSysDiskList.addAll(diskService.list(groupAuthorization));

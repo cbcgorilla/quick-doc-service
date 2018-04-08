@@ -6,7 +6,7 @@
 $.ajaxLoad = true;
 
 //required when $.ajaxLoad = true
-$.defaultPage = 'users';
+$.defaultPage = 'file/search?filename=txt';
 $.subPagesDirectory = '/';
 $.page404 = '404';
 $.mainContent = $('#ui-view');
