@@ -109,7 +109,7 @@
             id: 'file-data',
             url: '/api/file/list?parentId=' + [[${disk.id.toString()}]] + '&parentType=DISK',
             height: '510',
-            cellMinWidth: 120,
+            cellMinWidth: 100,
             page: true, //开启分页,
             limit: 10,
             limits: [10, 50, 100, 200],
@@ -118,8 +118,7 @@
                     {type: 'checkbox'},
                     {field: 'id', title: 'ID'},
                     {field: 'filename', title: '文件名', width: 560, templet: '#previewLink'},
-                    {field: 'length', title: '大小', width: 100},
-                    {field: 'uploadDate', title: '上传日期', width: 240},
+                    {field: 'length', title: '大小'},
                     {
                         title: '操作',
                         align: 'center',
@@ -187,10 +186,10 @@
                 var checkStatus = table.checkStatus('file-data'),
                     data = checkStatus.data;
                 if (data.length > 0) {
-                    data1 = data.map(function(value,index,arr){
+                    data1 = data.map(function (value, index, arr) {
                         return value.id;
                     });
-                    window.open('/file/zip-package?parent='+parent+'&ids='+data1);
+                    window.open('/file/zip-package?parent=' + parent + '&ids=' + data1);
                 }
             }
         };
