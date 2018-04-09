@@ -15,6 +15,7 @@ public interface UserService {
     Page<SysUser> list(Pageable pageable);
     SysUser get(String username);
     SysUser update(WebUser user);
+    SysUser changePassword(ObjectId id, String newPassword);
     Boolean validateUser(String username, String password);
     void delete(ObjectId userId);
     SysUser addGroup(ObjectId id, String group);

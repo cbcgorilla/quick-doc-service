@@ -56,6 +56,17 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
+    public SysUser changePassword(ObjectId id, String newPassword){
+        Optional<SysUser> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            SysUser user = userOptional.get();
+            user.setPassword(PasswordUtil.getEncryptedPwd(newPassword));
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
     /**
      * 检查用户名密码是否有效
      *

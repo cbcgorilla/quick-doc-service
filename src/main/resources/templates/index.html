@@ -37,13 +37,13 @@
         <li class="nav-item px-3" th:if="${session.ActiveUser.isAdmin()}">
             <a class="nav-link" href="users">系统用户</a>
         </li>
-        <li class="dropdown nav-item px-3"  th:if="${session.ActiveUser.isAdmin()}">
+        <li class="dropdown nav-item px-3" th:if="${session.ActiveUser.isAdmin()}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 REST API 接口 <b class="caret"></b>
             </a>
-            <ul class="dropdown-menu"  aria-labelledby="dropdownMenu">
-                <a class="dropdown-item"  href="swagger-ui.html">SWAGGER-UI</a>
-                <a class="dropdown-item"  href="doc.html">swagger-bootstrap-ui</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+                <a class="dropdown-item" href="swagger-ui.html">SWAGGER-UI</a>
+                <a class="dropdown-item" href="doc.html">swagger-bootstrap-ui</a>
             </ul>
         </li>
     </ul>
@@ -58,7 +58,7 @@
                 <div class="dropdown-header text-center">
                     <strong th:text="@{'当前用户：'+${session.ActiveUser.title}}"></strong>
                 </div>
-                <a class="dropdown-item" data-toggle="modal" title="修改密码" href="#changePassword">
+                <a id="changePsMenu" class="dropdown-item" href="#" title="修改密码" lay-filter="change-password">
                     <i class="fas fa-wrench"></i> 修改密码</a>
                 <div class="divider"></div>
                 <a class="dropdown-item" href="#"><i class="fas fa-heart"></i> 我的收藏</a>
@@ -219,55 +219,6 @@
     <span class="ml-auto">Powered by <a href="http://www.mxleader.cn">MXLEADER</a></span>
 </footer>
 
-<!-- 模态框 -->
-<div class="modal fade" id="changePassword">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <!-- 模态框头部 -->
-            <div class="modal-header">
-                <h4 class="modal-title">修改密码</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-
-            <!-- 模态框主体 -->
-            <div class="modal-body">
-                <div class="table-responsive" style="text-align: center">
-                    <form method="POST" enctype="multipart/form-data"
-                          th:action="@{'./files/upload'}">
-                        <table class="table table-hover">
-                            <tr>
-                                <td align="right">原密码:</td>
-                                <td><input type="password" name="oldPassword" class="form-control"
-                                           placeholder="原密码" required="required"/></td>
-                            </tr>
-                            <tr>
-                                <td align="right">新密码:</td>
-                                <td><input type="password" name="newPassword" class="form-control"
-                                           placeholder="新密码" required="required"/></td>
-                            </tr>
-                            <tr>
-                                <td align="right">新密码确认:</td>
-                                <td><input type="password" name="verifyPassword" class="form-control"
-                                           placeholder="新密码确认" required="required"/></td>
-                            </tr>
-                        </table>
-                        <input type="hidden" id="changePasswordUsername" name="username"
-                               th:value="${username}"/>
-                        <input type="submit" value="修改" class="btn btn-success"/>
-                    </form>
-                </div>
-            </div>
-            <!-- 模态框底部 -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭
-                </button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
 <!-- Bootstrap and necessary plugins -->
 <script src="js/jquery.min.js"></script>
 <script src="js/popper.min.js"></script>
@@ -290,6 +241,26 @@
             var filename = $("#filename").val();
             setUpUrl("file/search?filename=" + filename);
         });
+
+        $('.dropdown-item').on('click', function () {
+            switch ($(this).attr('lay-filter')) {
+                case 'change-password': {
+                    layer.open({
+                        type: 2,
+                        title: '修改密码',
+                        area: ['360px', '280px'],
+                        resize: false,
+                        content: 'users/password',
+                        zIndex: layer.zIndex,
+                        success: function (layero) {
+                            layer.setTop(layero);
+                        }
+                    });
+                }
+                    break;
+            }
+        });
+
     });
 </script>
 

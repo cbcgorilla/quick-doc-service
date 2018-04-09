@@ -61,6 +61,11 @@ public class UserController {
         return "setting/users";
     }
 
+    @GetMapping("/password")
+    public String password(Model model) {
+        return "setting/password";
+    }
+
     @PostMapping("/save")
     public String save(@RequestParam("username") String username,
                        @RequestParam("title") String title,

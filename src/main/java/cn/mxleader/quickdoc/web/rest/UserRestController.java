@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
+
 @RestController
 @RequestMapping("/api/user")
 @Api(value = "User API", description = "用户信息变更接口")
@@ -60,6 +62,21 @@ public class UserRestController {
             return true;
         }
         return false;
+    }
+
+    @PostMapping("/changePassword")
+    @ApiOperation("修改密码")
+    public LayuiData<Boolean> changePassword(@RequestParam String password,
+                                  @RequestParam String newPassword,
+                                  @RequestParam String verifyPassword,
+                                  @SessionAttribute(SESSION_USER) SysUser user) {
+        if (userService.validateUser(user.getUsername(), password) && newPassword.equals(verifyPassword)) {
+            SysUser sysUser = userService.get(user.getUsername());
+            userService.changePassword(sysUser.getId(), newPassword);
+            return new LayuiData<>(0, "", 0, true);
+        } else {
+            return new LayuiData<>(0, "", 0, false);
+        }
     }
 
     @PostMapping("/delete")
