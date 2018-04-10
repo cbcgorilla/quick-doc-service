@@ -5,8 +5,6 @@ import cn.mxleader.quickdoc.entities.SysDisk;
 import cn.mxleader.quickdoc.service.DiskService;
 import cn.mxleader.quickdoc.web.domain.LayuiData;
 import cn.mxleader.quickdoc.web.domain.WebDisk;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/disk")
-@Api(value = "Disk Rest API", description = "磁盘操作接口")
+//@Api(value = "Disk Rest API", description = "磁盘操作接口")
 public class DiskRestController {
     private final DiskService diskService;
 
@@ -35,7 +33,7 @@ public class DiskRestController {
      * @return 返回LayUI标准Table数据格式
      */
     @GetMapping("/list")
-    @ApiOperation(value = "根据上级目录ID获取文件列表")
+    //@ApiOperation(value = "根据上级目录ID获取文件列表")
     public LayuiData<List<WebDisk>> list(@RequestParam Integer page,
                                          @RequestParam Integer limit) {
         Page<SysDisk> diskPage = diskService.list(PageRequest.of(page - 1, limit));
@@ -54,7 +52,7 @@ public class DiskRestController {
      * @return 返回LayUI标准Table数据格式
      */
     @GetMapping("/auth")
-    @ApiOperation(value = "根据上级目录ID获取文件列表")
+    //@ApiOperation(value = "根据上级目录ID获取文件列表")
     public LayuiData<Set<Authorization>> authList(@RequestParam ObjectId id,
                                                   @RequestParam Integer page,
                                                   @RequestParam Integer limit) {
@@ -67,7 +65,7 @@ public class DiskRestController {
     }
 
     @PostMapping("/addAuth")
-    @ApiOperation(value = "增加授权")
+    //@ApiOperation(value = "增加授权")
     public Boolean addAuth(@RequestParam ObjectId parentId,
                            @RequestBody Authorization authorization) {
         diskService.addAuthorization(parentId, authorization);
@@ -75,7 +73,7 @@ public class DiskRestController {
     }
 
     @PostMapping("/removeAuth")
-    @ApiOperation(value = "移除授权")
+    //@ApiOperation(value = "移除授权")
     public Boolean removeAuth(@RequestParam ObjectId parentId,
                               @RequestBody Authorization authorization) {
         diskService.removeAuthorization(parentId, authorization);
@@ -83,7 +81,7 @@ public class DiskRestController {
     }
 
     @PostMapping(value = "/rename")
-    @ApiOperation(value = "修改磁盘显示名称")
+    //@ApiOperation(value = "修改磁盘显示名称")
     public Boolean rename(@RequestParam ObjectId diskId, @RequestParam String newName) {
         try {
             diskService.rename(diskId, newName);
@@ -95,7 +93,7 @@ public class DiskRestController {
     }
 
     @PostMapping(value = "/delete")
-    @ApiOperation(value = "根据磁盘ID删除库内磁盘信息")
+    //@ApiOperation(value = "根据磁盘ID删除库内磁盘信息")
     public Boolean delete(@RequestBody String diskId) {
         try {
             diskService.delete(new ObjectId(diskId));

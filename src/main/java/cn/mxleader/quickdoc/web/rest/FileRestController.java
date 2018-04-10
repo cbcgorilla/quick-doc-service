@@ -6,8 +6,6 @@ import cn.mxleader.quickdoc.service.FileService;
 import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.LayuiData;
 import cn.mxleader.quickdoc.web.domain.WebFile;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +19,7 @@ import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 
 @RestController
 @RequestMapping("/api/file")
-@Api(value = "File Rest API", description = "文件操作接口")
+//@Api(value = "File Rest API", description = "文件操作接口")
 public class FileRestController {
 
     private final FileService fileService;
@@ -43,7 +41,7 @@ public class FileRestController {
      * @return 返回LayUI标准Table数据格式
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ApiOperation(value = "根据上级目录ID获取文件列表")
+    //@ApiOperation(value = "根据上级目录ID获取文件列表")
     public LayuiData<List<WebFile>> list(@RequestParam ObjectId parentId,
                                          @RequestParam AuthTarget parentType,
                                          @RequestParam Integer page,
@@ -70,7 +68,7 @@ public class FileRestController {
     }
 
     @PostMapping(value = "/delete")
-    @ApiOperation(value = "根据文件ID删除库内文件信息")
+    //@ApiOperation(value = "根据文件ID删除库内文件信息")
     public LayuiData<Boolean> delete(@RequestBody String fileId) {
         fileService.delete(new ObjectId(fileId));
         return new LayuiData<>(0, "", 0, true);

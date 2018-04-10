@@ -4,8 +4,6 @@ import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.FolderService;
 import cn.mxleader.quickdoc.web.domain.LayuiData;
 import cn.mxleader.quickdoc.web.domain.TreeNode;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/folder")
-@Api(value = "Folder Configuration API", description = "目录配置修改接口")
+//@Api(value = "Folder Configuration API", description = "目录配置修改接口")
 public class FolderRestController {
 
     private final FolderService folderService;
@@ -27,14 +25,14 @@ public class FolderRestController {
     }
 
     @GetMapping("/tree")
-    @ApiOperation(value = "根据磁盘ID号获取目录树信息")
+    //@ApiOperation(value = "根据磁盘ID号获取目录树信息")
     public List<TreeNode> getFolderTree(@RequestParam String parentId) {
         return folderService.getFolderTree(new ParentLink(new ObjectId(parentId),
                 AuthTarget.DISK, new ObjectId(parentId)));
     }
 
     @GetMapping("/list")
-    @ApiOperation(value = "根据磁盘ID号获取目录列表")
+    //@ApiOperation(value = "根据磁盘ID号获取目录列表")
     public List<TreeNode> getFoldersOfDisk(@RequestParam String diskId) {
         return folderService.listFoldersInDisk(new ObjectId(diskId))
                 .stream()
@@ -52,7 +50,7 @@ public class FolderRestController {
      * @return 返回LayUI标准Table数据格式
      */
     @GetMapping("/auth")
-    @ApiOperation(value = "根据上级目录ID获取文件列表")
+    //@ApiOperation(value = "根据上级目录ID获取文件列表")
     public LayuiData<Set<Authorization>> authList(@RequestParam ObjectId id,
                                                   @RequestParam Integer page,
                                                   @RequestParam Integer limit) {
@@ -65,7 +63,7 @@ public class FolderRestController {
     }
 
     @PostMapping("/addAuth")
-    @ApiOperation(value = "增加授权")
+    //@ApiOperation(value = "增加授权")
     public Boolean addAuth(@RequestParam ObjectId parentId,
                            @RequestBody Authorization authorization) {
         folderService.addAuthorization(parentId, authorization);
@@ -73,7 +71,7 @@ public class FolderRestController {
     }
 
     @PostMapping("/removeAuth")
-    @ApiOperation(value = "移除授权")
+    //@ApiOperation(value = "移除授权")
     public Boolean removeAuth(@RequestParam ObjectId parentId,
                               @RequestBody Authorization authorization) {
         folderService.removeAuthorization(parentId, authorization);
@@ -81,7 +79,7 @@ public class FolderRestController {
     }
 
     @PostMapping("/save")
-    @ApiOperation("根据上级目录ID增加子目录")
+    //@ApiOperation("根据上级目录ID增加子目录")
     public List<TreeNode> save(@RequestParam String name,
                                @RequestParam ObjectId parentId,
                                @RequestParam AuthTarget parentType,
@@ -97,7 +95,7 @@ public class FolderRestController {
     }
 
     @PostMapping("/rename")
-    @ApiOperation("修改目录名称")
+    //@ApiOperation("修改目录名称")
     public TreeNode rename(@RequestParam ObjectId id, @RequestParam String newName) {
         try {
             SysFolder sysFolder = folderService.rename(id, newName);
