@@ -1,8 +1,8 @@
 package cn.mxleader.quickdoc.web;
 
-import cn.mxleader.quickdoc.entities.Authorization;
 import cn.mxleader.quickdoc.entities.AuthAction;
 import cn.mxleader.quickdoc.entities.AuthType;
+import cn.mxleader.quickdoc.entities.Authorization;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.DiskService;
@@ -14,10 +14,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpSession;
-import java.util.*;
-
-import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/users")
@@ -73,9 +72,7 @@ public class UserController {
                        @RequestParam("password") String password,
                        @RequestParam("userGroup") String userGroup,
                        @RequestParam("userType") SysUser.Authority userType,
-                       RedirectAttributes redirectAttributes,
-                       Model model,
-                       HttpSession session) {
+                       RedirectAttributes redirectAttributes) {
         SysUser sysUser = new SysUser(ObjectId.get(), username, title, password,
                 configService.getSysProfile().getIconMap().get("SYS_LOGO"),
                 new HashSet<SysUser.Authority>() {{

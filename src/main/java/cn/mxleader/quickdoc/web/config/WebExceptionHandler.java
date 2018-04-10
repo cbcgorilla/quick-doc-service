@@ -17,12 +17,6 @@ public class WebExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(PreAuthException.class)
     public final ResponseEntity<LayuiData>
     handleAllExceptions(PreAuthException exp, WebRequest request) {
-        /*ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(),
-                exp.getMessage(), user,
-                request.getDescription(false));
-        System.out.println(request.getRemoteUser());
-        System.out.println(exceptionResponse);*/
-        //exp.g
         LayuiData<String> resp = new LayuiData<>(-1,
                 exp.getPreAuthMessage(),
                 0, request.getRemoteUser());

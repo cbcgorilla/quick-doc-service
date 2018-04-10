@@ -27,10 +27,10 @@
 | 安全框架 | Spring Security 5.0.4.RELEASE  |
 | 实体Bean | Kotlin 1.2  |
 | 页面模板 | Thymeleaf  |
-| WEB UI | Bootstrap 4.0  |
-| WEB UI | Core UI  | 
+| WEB UI | Bootstrap 4.1  |
+| WEB UI | Core UI 1.0.10 | 
 | WEB UI | font-awesome 5.0.6  |
-| WEB UI | LayUI  |
+| WEB UI | LayUI 2.2.6 |
 | 消息流 |  Kafka | 
 | REST API |  Springfox Swagger 2.8.0 | 
 | REST API |  swagger-bootstrap-ui 1.7.2 | 
