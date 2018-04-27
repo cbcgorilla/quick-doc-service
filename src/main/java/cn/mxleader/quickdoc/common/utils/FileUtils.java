@@ -59,7 +59,7 @@ public class FileUtils {
 
     public static String getContentType(String filename) {
         try {
-            Path path = Paths.get(filename);
+            Path path = Paths.get(filename.toLowerCase());
             String type = Files.probeContentType(path);
             return type == null ? "application/octet-stream" : type;
         } catch (IOException exp) {
