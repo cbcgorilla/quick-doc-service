@@ -6,20 +6,20 @@ buildscript {
         swagger_bootstrap_version = '1.7.2'
         spring_kafka_version = '2.1.5.RELEASE'
         junit_version = '4.12'
-        junit_jupiter_version = '5.1.0'
-        junit_vintage_version = '5.1.0'
-        junit_platform_version = '1.1.0'
+        junit_jupiter_version = '5.2.0'
+        junit_vintage_version = '5.2.0'
+        junit_platform_version = '1.2.0'
     }
     repositories {
         mavenCentral()
-        maven { url "https://repo.spring.io/snapshot" }
-        maven { url "https://repo.spring.io/milestone" }
+        maven { url 'https://repo.spring.io/snapshot' }
+        maven { url 'https://repo.spring.io/milestone' }
         maven { url 'http://repo.spring.io/plugins-release' }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'io.spring.gradle:propdeps-plugin:0.0.9.RELEASE'
+        classpath 'io.spring.gradle:propdeps-plugin:0.0.10.RELEASE'
     }
 }
 
