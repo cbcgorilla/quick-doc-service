@@ -38,6 +38,18 @@
 
 ## 待办：
 
+人员配置和搜索
+
+管理有权修改各账号密码
+
+Word、excel预览
+
+模板复制
+
+定期备份问题
+
+删除功能失效/删除提醒功能
+
 1. 启用 Spring Security 功能会屏蔽Spring Boot Actuator默认的Endpoint注册, 需在application.properties文件显示配置.
 
 2. csrf() 在Spring Security 内默认启用CSRF，会屏蔽POST提交任务, 通过csrf().disable()关闭CSRF。
@@ -49,6 +61,9 @@
 5. Android客户端： 自动同步本地图片文件
 
 6. 剥离TensorFlow图像分析模块，内存消耗问题。
+
+
+
 
 Lombok 在 Java 9 环境导致编译异常
 
