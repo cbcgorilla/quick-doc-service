@@ -56,9 +56,11 @@
 </div>
 
 <link href="./css/bootstrap-treeview.min.css" rel="stylesheet">
+<link href="./css/lightbox.min.css" rel="stylesheet" type="text/css">
 <script src="./js/bootstrap-treeview.min.js"></script>
+<script src="./js/lightbox.min.js"></script>
 <script type="text/html" id="previewLink">
-    <i class="{{d.iconClass}}"></i> <a href="file/preview/{{ d.id}}" target="_top">{{d.filename}}</a>
+    <i class="{{d.iconClass}}"></i> <a href="file/preview/{{ d.id}}" data-lightbox="{{d.id}}" data-title="{{d.filename}}">{{d.filename}}</a>
 </script>
 <script th:inline="javascript">
     /*<![CDATA[*/
