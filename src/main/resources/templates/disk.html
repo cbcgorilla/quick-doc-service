@@ -60,7 +60,12 @@
 <script src="./js/bootstrap-treeview.min.js"></script>
 <script src="./js/lightbox.min.js"></script>
 <script type="text/html" id="previewLink">
+    {{#  if(d.iconClass === 'far fa-file-image'){ }}
     <i class="{{d.iconClass}}"></i> <a href="file/preview/{{ d.id}}" data-lightbox="image-set" data-title="{{d.filename}}">{{d.filename}}</a>
+    {{#  } }}
+    {{#  if(d.iconClass !== 'far fa-file-image'){ }}
+    <i class="{{d.iconClass}}"></i> <a href="file/preview/{{ d.id}}" target="_blank">{{d.filename}}</a>
+    {{#  } }}
 </script>
 <script th:inline="javascript">
     /*<![CDATA[*/
