@@ -2,9 +2,10 @@ package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.FileService;
-import cn.mxleader.quickdoc.service.FolderService;
-import cn.mxleader.quickdoc.service.StreamService;
 import org.bson.types.ObjectId;
+import org.jodconverter.DocumentConverter;
+import org.jodconverter.document.DefaultDocumentFormatRegistry;
+import org.jodconverter.office.OfficeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.http.HttpEntity;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
+import java.io.*;
 import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
@@ -28,17 +29,14 @@ import static cn.mxleader.quickdoc.web.config.WebHandlerInterceptor.FILES_ATTRIB
 @SessionAttributes("ActiveUser")
 public class FileController {
 
-    private final FolderService folderService;
     private final FileService fileService;
-    private final StreamService streamService;
+    private final DocumentConverter converter;
 
     @Autowired
-    public FileController(FolderService folderService,
-                          FileService fileService,
-                          StreamService streamService) {
-        this.folderService = folderService;
+    public FileController(FileService fileService,
+                          DocumentConverter converter) {
         this.fileService = fileService;
-        this.streamService = streamService;
+        this.converter = converter;
     }
 
     @RequestMapping("/search")
@@ -111,16 +109,25 @@ public class FileController {
      */
     @GetMapping(value = "/preview/{fileId}")
     public @ResponseBody
-    HttpEntity<byte[]> previewDocument(@PathVariable ObjectId fileId) throws IOException {
+    HttpEntity<byte[]> previewDocument(@PathVariable ObjectId fileId) throws IOException, OfficeException {
         GridFsResource fs = fileService.getResource(fileId);
-        byte[] document = FileCopyUtils.copyToByteArray(fs.getInputStream());
-
+        byte[] document = null;
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.valueOf(fs.getContentType()));
         header.set("Content-Disposition",
                 "inline; filename=" + java.net.URLEncoder.encode(fs.getFilename(), "UTF-8"));
+        String type = fs.getContentType();
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        if (type.startsWith("application/vnd.") || type.startsWith("application/ms")) {
+            converter.convert(fs.getInputStream()).as(DefaultDocumentFormatRegistry.getFormatByMediaType(type))
+                    .to(bout).as(DefaultDocumentFormatRegistry.PDF)
+                    .execute();
+            header.setContentType(MediaType.APPLICATION_PDF);
+            document = bout.toByteArray();
+        } else {
+            document = FileCopyUtils.copyToByteArray(fs.getInputStream());
+        }
         header.setContentLength(document.length);
-
         return new HttpEntity<>(document, header);
     }
 
