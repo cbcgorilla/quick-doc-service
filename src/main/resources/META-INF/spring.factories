@@ -1,1 +1,3 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.mxleader.quickdoc.config.QuickDocConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  cn.mxleader.quickdoc.config.QuickDocConfiguration,\
+  cn.mxleader.quickdoc.config.JodConverterAutoConfiguration
