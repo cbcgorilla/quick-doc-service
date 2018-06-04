@@ -1,5 +1,8 @@
 package cn.mxleader.quickdoc.config;
 
+import cn.mxleader.quickdoc.common.condition.LinuxCondition;
+import cn.mxleader.quickdoc.service.PreviewService;
+import cn.mxleader.quickdoc.service.impl.PreviewServiceOnLinuxImpl;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -13,6 +16,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.stream.Stream;
@@ -25,6 +29,7 @@ import java.util.stream.Stream;
         havingValue = "true",
         matchIfMissing = false
 )
+@Conditional(LinuxCondition.class)
 @EnableConfigurationProperties(JodConverterAutoProperties.class)
 public class JodConverterAutoConfiguration {
 
@@ -64,7 +69,6 @@ public class JodConverterAutoConfiguration {
     @Bean(name = "autoOfficeManager", initMethod = "start", destroyMethod = "stop")
     @ConditionalOnMissingBean(name = "autoOfficeManager")
     public OfficeManager autoOfficeManager() {
-
         return createOfficeManager();
     }
 
@@ -73,7 +77,11 @@ public class JodConverterAutoConfiguration {
     @ConditionalOnMissingBean(name = "autoDocumentConverter")
     @ConditionalOnBean(name = "autoOfficeManager")
     public DocumentConverter autoDocumentConverter(final OfficeManager autoOfficeManager) {
-
         return LocalConverter.make(autoOfficeManager);
+    }
+
+    @Bean
+    public PreviewService getLinuxPreviewService(DocumentConverter converter){
+        return new PreviewServiceOnLinuxImpl(converter);
     }
 }

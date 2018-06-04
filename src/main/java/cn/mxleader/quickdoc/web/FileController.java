@@ -2,14 +2,12 @@ package cn.mxleader.quickdoc.web;
 
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.FileService;
+import cn.mxleader.quickdoc.service.PreviewService;
 import org.bson.types.ObjectId;
-import org.jodconverter.DocumentConverter;
-import org.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.jodconverter.office.OfficeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.IOException;
 import java.util.stream.Collectors;
 
 import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
@@ -30,13 +28,12 @@ import static cn.mxleader.quickdoc.web.config.WebHandlerInterceptor.FILES_ATTRIB
 public class FileController {
 
     private final FileService fileService;
-    private final DocumentConverter converter;
+    private final PreviewService previewService;
 
     @Autowired
-    public FileController(FileService fileService,
-                          DocumentConverter converter) {
+    public FileController(FileService fileService,PreviewService previewService) {
         this.fileService = fileService;
-        this.converter = converter;
+        this.previewService = previewService;
     }
 
     @RequestMapping("/search")
@@ -109,26 +106,8 @@ public class FileController {
      */
     @GetMapping(value = "/preview/{fileId}")
     public @ResponseBody
-    HttpEntity<byte[]> previewDocument(@PathVariable ObjectId fileId) throws IOException, OfficeException {
-        GridFsResource fs = fileService.getResource(fileId);
-        byte[] document = null;
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(MediaType.valueOf(fs.getContentType()));
-        header.set("Content-Disposition",
-                "inline; filename=" + java.net.URLEncoder.encode(fs.getFilename(), "UTF-8"));
-        String type = fs.getContentType();
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        if (type.startsWith("application/vnd.") || type.startsWith("application/ms")) {
-            converter.convert(fs.getInputStream()).as(DefaultDocumentFormatRegistry.getFormatByMediaType(type))
-                    .to(bout).as(DefaultDocumentFormatRegistry.PDF)
-                    .execute();
-            header.setContentType(MediaType.APPLICATION_PDF);
-            document = bout.toByteArray();
-        } else {
-            document = FileCopyUtils.copyToByteArray(fs.getInputStream());
-        }
-        header.setContentLength(document.length);
-        return new HttpEntity<>(document, header);
+    HttpEntity<byte[]> previewDocument(@PathVariable ObjectId fileId) throws IOException {
+        return previewService.getEntity(fileService.getResource(fileId));
     }
 
 }
