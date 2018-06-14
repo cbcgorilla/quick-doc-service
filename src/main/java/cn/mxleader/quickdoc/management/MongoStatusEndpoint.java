@@ -24,6 +24,6 @@ public class MongoStatusEndpoint {
 
     @ReadOperation
     public Document getMongoDBStatus() {
-        return mongoClient.getDatabase(database).runCommand(new Document("serverStatus",1));
+        return mongoClient.getDatabase(database).runCommand(new Document("serverStatus", 1));
     }
 }
