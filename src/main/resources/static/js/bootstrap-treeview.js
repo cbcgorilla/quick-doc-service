@@ -497,6 +497,15 @@
 
 		this.$element.empty().append(this.$wrapper.empty());
 
+        this.$element.append(this.template.button.add);
+        this.$element.append(this.template.button.edit);
+        this.$element.append(this.template.button.remove);
+
+        this.$element.mouseenter(function(){
+            this.$element.children('button.btn').removeClass('node-hidden');
+        }).mouseleave(function(){
+            this.$element.children('button.btn').addClass('node-hidden');
+        });
 		// Build tree
 		this.buildTree(this.tree, 0);
 	};
@@ -692,6 +701,11 @@
 		indent: '<span class="indent"></span>',
 		icon: '<span class="icon"></span>',
 		link: '<a href="#" style="color:inherit;"></a>',
+        button: {
+            add: '<button class="btn icon-plus node-hidden"></button>',
+            edit: '<button class="btn icon-edit node-hidden"></button>',
+            remove: '<button class="btn icon-remove node-hidden"></button>'
+        },
 		badge: '<span class="badge"></span>'
 	};
 
