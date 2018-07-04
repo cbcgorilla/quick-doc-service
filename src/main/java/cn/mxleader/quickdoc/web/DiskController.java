@@ -3,8 +3,6 @@ package cn.mxleader.quickdoc.web;
 import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.DiskService;
 import cn.mxleader.quickdoc.service.FolderService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,15 +44,15 @@ public class DiskController {
     }
 
     @RequestMapping("/{diskId}")
-    public String diskFilesPage(@PathVariable ObjectId diskId, Model model)
-            throws JsonProcessingException {
+    public String diskFilesPage(@PathVariable ObjectId diskId, Model model){
         Optional<SysDisk> disk = diskService.get(diskId);
         if (disk.isPresent()) {
             model.addAttribute("disk", disk.get());
-            ObjectMapper mapper = new ObjectMapper();
+            /*ObjectMapper mapper = new ObjectMapper();*/
             model.addAttribute("folderTree",
-                    mapper.writeValueAsString(folderService.getFolderTree(
-                            new ParentLink(diskId, AuthTarget.DISK, diskId))));
+                    folderService.getFolderTree(new ParentLink(diskId, AuthTarget.DISK, diskId)));/*
+            model.addAttribute("folderList",
+                    mapper.writeValueAsString(folderService.listFoldersInDisk(diskId)));*/
         }
         return "disk";
     }
