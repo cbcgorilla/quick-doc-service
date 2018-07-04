@@ -59,13 +59,20 @@
 <link href="./css/zTreeStyle/zTreeStyle.css" rel="stylesheet" type="text/css">
 
 <style type="text/css">
-    .ztree li span.button.add {margin-left:2px; margin-right: -1px; background-position:-144px 0; vertical-align:top; *vertical-align:middle}
+    .ztree li span.button.add {
+        margin-left: 2px;
+        margin-right: -1px;
+        background-position: -144px 0;
+        vertical-align: top;
+        *vertical-align: middle
+    }
 </style>
 <script src="./js/jquery.ztree.all.js" type="text/javascript"></script>
 <script src="./js/lightbox.min.js"></script>
 <script type="text/html" id="previewLink">
     {{#  if(d.iconClass === 'far fa-file-image'){ }}
-    <i class="{{d.iconClass}}"></i> <a href="file/preview/{{ d.id}}" data-lightbox="image-set" data-title="{{d.filename}}">{{d.filename}}</a>
+    <i class="{{d.iconClass}}"></i> <a href="file/preview/{{ d.id}}" data-lightbox="image-set"
+                                       data-title="{{d.filename}}">{{d.filename}}</a>
     {{#  } }}
     {{#  if(d.iconClass !== 'far fa-file-image'){ }}
     <i class="{{d.iconClass}}"></i> <a href="file/preview/{{ d.id}}" target="_blank">{{d.filename}}</a>
@@ -211,28 +218,28 @@
             var type = $(this).data('type');
             active[type] ? active[type].call(this) : '';
         });
-/*
+        /*
 
-        $('#diskTree').treeview({
-            data: [[${folderTree}]],
-            levels: 10,
-            expandIcon: 'fas fa-folder',
-            collapseIcon: 'fas fa-folder-open',
-            nodeIcon: "fas fa-film",
-            onNodeSelected: function (event, data) {
-                parentId = data.id;
-                parent = data.text;
-                parentType = 'FOLDER';
-                reloadFileTable('/api/file/list', parentId, parentType);
-            },
-            onNodeUnselected: function (event, data) {
-                parentId = [[${disk.id.toString()}]];
-                parent = [[${disk.name}]];
-                parentType = 'DISK';
-                reloadFileTable('/api/file/list', parentId, parentType);
-            }
-        });
-*/
+                $('#diskTree').treeview({
+                    data: [[${folderTree}]],
+                    levels: 10,
+                    expandIcon: 'fas fa-folder',
+                    collapseIcon: 'fas fa-folder-open',
+                    nodeIcon: "fas fa-film",
+                    onNodeSelected: function (event, data) {
+                        parentId = data.id;
+                        parent = data.text;
+                        parentType = 'FOLDER';
+                        reloadFileTable('/api/file/list', parentId, parentType);
+                    },
+                    onNodeUnselected: function (event, data) {
+                        parentId = [[${disk.id.toString()}]];
+                        parent = [[${disk.name}]];
+                        parentType = 'DISK';
+                        reloadFileTable('/api/file/list', parentId, parentType);
+                    }
+                });
+        */
         var setting = {
             view: {
                 dblClickExpand: false,
@@ -240,11 +247,16 @@
                 removeHoverDom: removeHoverDom,
                 selectedMulti: false
             },
+            data: {
+                key: {
+                    isParent: "parent"
+                }
+            },
             edit: {
                 enable: true,
                 editNameSelectAll: true,
-                showRemoveBtn: true,
-                showRenameBtn: showRenameBtn
+                showRemoveBtn: showRemoveBtn,
+                showRenameBtn: true
             },
             callback: {
                 onClick: onClick,
@@ -257,8 +269,8 @@
 
         var folderNodes = [[${folderTree}]];
 
-        function showRenameBtn(treeId, treeNode) {
-            return !treeNode.isLastNode;
+        function showRemoveBtn(treeId, treeNode) {
+            return !treeNode.parent;
         }
 
         function onClick(event, treeId, treeNode, clickFlag) {
@@ -269,77 +281,70 @@
         }
 
         function beforeRemove(treeId, treeNode) {
-            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            var zTree = $.fn.zTree.getZTreeObj("diskFolderTree");
             zTree.selectNode(treeNode);
-            return confirm("确认删除 节点 -- " + treeNode.name + " 吗？");
-        }
-        function onRemove(e, treeId, treeNode) {
             layer.confirm('真的删除目录: ' + treeNode.name + ' 吗？', {title: "删除确认"}, function (index) {
                 $.ajax({
                     type: "POST",
-                    url: "/api/file/delete",
+                    url: "/api/folder/delete?id=" + treeNode.id,
                     contentType: 'application/json; charset=utf-8',
-                    data: data.id, //可选参数
+                    //data: data.id, //可选参数
                     dataType: "json",
                     success: function (res) {
-                        switch (res.code) {
-                            case 0: {
-                                if (res.data === true) {
-                                    layer.alert('文件【' + data.filename + '】删除成功!', {
-                                        icon: 6, btn: ['确认'], yes: function (index) {
-                                            obj.del();
-                                            layer.close(index);
-                                            var tableFiles = table.render(opt);
-                                            tableFiles.reload();
-                                        }
-                                    });
-                                } else {
-                                    layer.alert("文件删除失败!", {icon: 2});
-                                }
-                            }
-                                break;
-                            case -1: {
-                                layer.alert(res.msg, {icon: 2});
-                            }
-                                break;
-                        }
+                        zTree.removeNode(treeNode, false);
                         layer.close(index);
                     }
                 });
             });
+            return false;
         }
+
+        function onRemove(e, treeId, treeNode) {
+            // 留空
+        }
+
         function beforeRename(treeId, treeNode, newName, isCancel) {
             if (newName.length == 0) {
-                setTimeout(function() {
-                    var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                setTimeout(function () {
+                    var zTree = $.fn.zTree.getZTreeObj("diskFolderTree");
                     zTree.cancelEditName();
-                    alert("节点名称不能为空.");
+                    layer.alert("节点名称不能为空!", {icon: 2});
                 }, 0);
                 return false;
             }
             return true;
         }
+
         function onRename(e, treeId, treeNode, isCancel) {
-            //
+            $.ajax({
+                type: "POST",
+                url: "/api/folder/rename?id=" + treeNode.id + "&newName=" + treeNode.name,
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function (value) {
+                    // 界面反馈REST调用结果
+                }
+            });
         }
 
         function addHoverDom(treeId, treeNode) {
             var sObj = $("#" + treeNode.tId + "_span");
-            if (treeNode.editNameFlag || $("#addBtn_"+treeNode.tId).length>0) return;
+            if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) return;
             var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
                 + "' title='新建目录' onfocus='this.blur();'></span>";
             sObj.after(addStr);
-            var btn = $("#addBtn_"+treeNode.tId);
-            if (btn) btn.bind("click", function(){
+            var btn = $("#addBtn_" + treeNode.tId);
+            if (btn) btn.bind("click", function () {
                 promptAddFolder(treeNode, 'child');
                 return false;
             });
         };
+
         function removeHoverDom(treeId, treeNode) {
-            $("#addBtn_"+treeNode.tId).unbind().remove();
+            $("#addBtn_" + treeNode.tId).unbind().remove();
         };
 
-        $(document).ready(function(){
+        $(document).ready(function () {
             console.log(folderNodes);
             $.fn.zTree.init($("#diskFolderTree"), setting, folderNodes);
         });

@@ -90,7 +90,8 @@ public class FolderRestController {
             add(new TreeNode(sysFolder.getId().toString(),
                     sysFolder.getName(),
                     sysFolder.getParent().getId().toString(),
-                    Collections.emptyList()));
+                    Collections.emptyList(),
+                    false,false));
         }};
     }
 
@@ -101,6 +102,18 @@ public class FolderRestController {
             SysFolder sysFolder = folderService.rename(id, newName);
             return new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),
                     sysFolder.getParent().getId().toString(), Collections.emptyList());
+        } catch (Exception exp) {
+            //System.out.println(exp.getMessage());
+            return null;
+        }
+    }
+
+    @PostMapping("/delete")
+    //@ApiOperation("删除目录")
+    public Boolean delete(@RequestParam ObjectId id) {
+        try {
+            folderService.delete(id);
+            return true;
         } catch (Exception exp) {
             //System.out.println(exp.getMessage());
             return null;

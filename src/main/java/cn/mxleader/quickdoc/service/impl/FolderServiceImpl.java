@@ -37,10 +37,12 @@ public class FolderServiceImpl implements FolderService {
     public List<TreeNode> getFolderTree(ParentLink parent) {
         return sysFolderRepository.findAllByParent(parent)
                 .stream()
-                .map(sysFolder -> new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),
-                        parent.getId().toString(),
-                        getFolderTree(new ParentLink(sysFolder.getId(), AuthTarget.FOLDER, parent.getDiskId())))
-                )
+                .map(sysFolder -> {
+                    List<TreeNode> subNodes = getFolderTree(new ParentLink(sysFolder.getId(),
+                            AuthTarget.FOLDER, parent.getDiskId()));
+                    return new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),
+                            parent.getId().toString(), subNodes, (subNodes != null && subNodes.size() > 0));
+                })
                 .collect(Collectors.toList());
     }
 
@@ -143,7 +145,7 @@ public class FolderServiceImpl implements FolderService {
                     for (AuthAction action : authorization.getActions()) {
                         item.remove(action);
                     }
-                    if(item.getActions().size()==0){
+                    if (item.getActions().size() == 0) {
                         folder.removeAuthorization(item);
                     }
                     return sysFolderRepository.save(folder);
