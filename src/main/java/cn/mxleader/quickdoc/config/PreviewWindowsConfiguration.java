@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Conditional(WindowsCondition.class)
-public class WindowsPreviewConfiguration {
+public class PreviewWindowsConfiguration {
     @Bean
     public PreviewService getWindowsPreviewService(){
         return new PreviewServiceOnWindowsImpl();

@@ -14,6 +14,7 @@ buildscript {
         gson_version = '2.8.5'
         aspect_version = '1.9.1'
         cglib_version = '3.2.6'
+        pinyin4j_version = '2.5.0'
     }
     repositories {
         mavenCentral()
@@ -81,6 +82,8 @@ dependencies {
     compile("org.libreoffice:ridl:$libreOfficeVersion")
     compile("org.libreoffice:unoil:$libreOfficeVersion")
     compile("com.google.code.gson:gson:$gson_version")
+
+    compile("com.belerweb:pinyin4j:$pinyin4j_version")
 
     testCompile("io.projectreactor:reactor-test")
     testCompile("org.springframework.boot:spring-boot-starter-test")

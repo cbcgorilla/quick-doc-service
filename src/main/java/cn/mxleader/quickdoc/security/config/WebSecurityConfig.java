@@ -79,7 +79,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             return entryPoint;
         }
     }
-/*
 
     @Configuration
     @Order(2)
@@ -89,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //http.antMatcher("/guest/**").authorizeRequests().anyRequest().permitAll();
 
             http.antMatcher("/api/**").authorizeRequests()
-                    .anyRequest().hasAuthority(SysUser.Authorities.ADMIN.name())
+                    .anyRequest().hasAuthority(SysUser.Authority.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
@@ -109,7 +108,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             return entryPoint;
         }
     }
-*/
 
     @Configuration
     @Order(3)

@@ -1,6 +1,9 @@
 package cn.mxleader.quickdoc.web.rest;
 
+import cn.mxleader.quickdoc.common.utils.HanyuPinyinUtil;
+import cn.mxleader.quickdoc.entities.SysProfile;
 import cn.mxleader.quickdoc.entities.SysUser;
+import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.UserService;
 import cn.mxleader.quickdoc.web.domain.*;
 import org.bson.types.ObjectId;
@@ -9,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,10 +24,12 @@ import static cn.mxleader.quickdoc.common.CommonCode.SESSION_USER;
 public class UserRestController {
 
     private final UserService userService;
+    private final ConfigService configService;
 
     @Autowired
-    UserRestController(UserService userService) {
+    UserRestController(UserService userService, ConfigService configService) {
         this.userService = userService;
+        this.configService = configService;
     }
     // -------------------Retrieve All Users-------------------
 
@@ -47,6 +53,21 @@ public class UserRestController {
         return userService.get(username);
     }
 
+    @PostMapping("/save")
+    public Boolean saveUser(@RequestBody WebUser webUser) {
+
+        SysProfile sysProfile = configService.getSysProfile();
+        userService.saveUser(new SysUser(ObjectId.get(), webUser.getUsername(),
+                webUser.getTitle(), HanyuPinyinUtil.toHanyuPinyin(webUser.getTitle()),
+                sysProfile.getIconMap().get("AWARD"),
+                new HashSet<SysUser.Authority>() {{
+                    add(SysUser.Authority.USER);
+                }},
+                webUser.getGroups(),
+                webUser.getEmail()));
+        return true;
+    }
+
     @PostMapping("/update/{field}")
     //@ApiOperation("更新系统用户信息")
     public Boolean update(@PathVariable String field, @RequestBody WebUser webUser) {
@@ -65,9 +86,9 @@ public class UserRestController {
     @PostMapping("/changePassword")
     //@ApiOperation("修改密码")
     public LayuiData<Boolean> changePassword(@RequestParam String password,
-                                  @RequestParam String newPassword,
-                                  @RequestParam String verifyPassword,
-                                  @SessionAttribute(SESSION_USER) SysUser user) {
+                                             @RequestParam String newPassword,
+                                             @RequestParam String verifyPassword,
+                                             @SessionAttribute(SESSION_USER) SysUser user) {
         if (userService.validateUser(user.getUsername(), password) && newPassword.equals(verifyPassword)) {
             SysUser sysUser = userService.get(user.getUsername());
             userService.changePassword(sysUser.getId(), newPassword);

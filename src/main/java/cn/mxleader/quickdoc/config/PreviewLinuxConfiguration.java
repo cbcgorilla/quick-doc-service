@@ -30,12 +30,12 @@ import java.util.stream.Stream;
         matchIfMissing = false
 )
 @Conditional(LinuxCondition.class)
-@EnableConfigurationProperties(JodConverterAutoProperties.class)
-public class JodConverterAutoConfiguration {
+@EnableConfigurationProperties(PreviewLinuxProperties.class)
+public class PreviewLinuxConfiguration {
 
-    private final JodConverterAutoProperties properties;
+    private final PreviewLinuxProperties properties;
 
-    public JodConverterAutoConfiguration(final JodConverterAutoProperties properties) {
+    public PreviewLinuxConfiguration(final PreviewLinuxProperties properties) {
         this.properties = properties;
     }
 
