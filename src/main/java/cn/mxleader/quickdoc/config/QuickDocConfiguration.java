@@ -85,7 +85,7 @@ public class QuickDocConfiguration {
 
                 // 初始化Admin管理账号
                 userService.saveUser(new SysUser(ObjectId.get(), "admin",
-                        "系统管理员", "chenbichao",
+                        "管理员","系统管理员", "chenbichao",
                         sysProfile.getIconMap().get("AWARD"),
                         new HashSet<SysUser.Authority>() {{
                             add(SysUser.Authority.ADMIN);

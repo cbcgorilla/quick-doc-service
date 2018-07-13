@@ -67,13 +67,14 @@ public class UserController {
 
     @PostMapping("/save")
     public String save(@RequestParam("username") String username,
+                       @RequestParam("displayName") String displayName,
                        @RequestParam("title") String title,
                        @RequestParam("email") String email,
                        @RequestParam("password") String password,
                        @RequestParam("userGroup") String userGroup,
                        @RequestParam("userType") SysUser.Authority userType,
                        RedirectAttributes redirectAttributes) {
-        SysUser sysUser = new SysUser(ObjectId.get(), username, title, password,
+        SysUser sysUser = new SysUser(ObjectId.get(), username, displayName, title, password,
                 configService.getSysProfile().getIconMap().get("SYS_LOGO"),
                 new HashSet<SysUser.Authority>() {{
                     add(userType);

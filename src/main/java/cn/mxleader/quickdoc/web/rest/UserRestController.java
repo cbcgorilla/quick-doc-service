@@ -1,9 +1,9 @@
 package cn.mxleader.quickdoc.web.rest;
 
 import cn.mxleader.quickdoc.common.utils.HanyuPinyinUtil;
-import cn.mxleader.quickdoc.entities.SysProfile;
-import cn.mxleader.quickdoc.entities.SysUser;
+import cn.mxleader.quickdoc.entities.*;
 import cn.mxleader.quickdoc.service.ConfigService;
+import cn.mxleader.quickdoc.service.DiskService;
 import cn.mxleader.quickdoc.service.UserService;
 import cn.mxleader.quickdoc.web.domain.*;
 import org.bson.types.ObjectId;
@@ -25,11 +25,15 @@ public class UserRestController {
 
     private final UserService userService;
     private final ConfigService configService;
+    private final DiskService diskService;
 
     @Autowired
-    UserRestController(UserService userService, ConfigService configService) {
+    UserRestController(UserService userService,
+                       ConfigService configService,
+                       DiskService diskService) {
         this.userService = userService;
         this.configService = configService;
+        this.diskService = diskService;
     }
     // -------------------Retrieve All Users-------------------
 
@@ -57,14 +61,22 @@ public class UserRestController {
     public Boolean saveUser(@RequestBody WebUser webUser) {
 
         SysProfile sysProfile = configService.getSysProfile();
-        userService.saveUser(new SysUser(ObjectId.get(), webUser.getUsername(),
-                webUser.getTitle(), HanyuPinyinUtil.toHanyuPinyin(webUser.getTitle()),
+        userService.saveUser(new SysUser(ObjectId.get(), webUser.getUsername(),webUser.getDisplayName(),
+                webUser.getTitle(), HanyuPinyinUtil.toHanyuPinyin(webUser.getDisplayName()),
                 sysProfile.getIconMap().get("AWARD"),
                 new HashSet<SysUser.Authority>() {{
                     add(SysUser.Authority.USER);
                 }},
                 webUser.getGroups(),
                 webUser.getEmail()));
+
+        diskService.save("我的磁盘1",
+                new Authorization(webUser.getUsername(), AuthType.PRIVATE,
+                        new HashSet<AuthAction>() {{
+                            add(AuthAction.READ);
+                            add(AuthAction.WRITE);
+                            add(AuthAction.DELETE);
+                        }}));
         return true;
     }
 

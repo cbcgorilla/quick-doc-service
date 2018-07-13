@@ -75,6 +75,18 @@
                                                             <input type="text" class="form-control"
                                                                    placeholder="显示用户名"
                                                                    required="required"
+                                                                   id="displayName" name="displayName"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right">职称:</td>
+                                                    <td>
+                                                        <div class="template-input-icon-container">
+                                                            <i class="fas fa-id-card"></i>
+                                                            <input type="text" class="form-control"
+                                                                   placeholder="职称"
+                                                                   required="required"
                                                                    id="user-title" name="title"/>
                                                         </div>
                                                     </td>
@@ -164,7 +176,8 @@
                     {type: 'checkbox'},
                     {field: 'id', title: 'ID'},
                     {field: 'username', title: '用户名', edit: 'text', width: 160},
-                    {field: 'title', title: '显示名', edit: 'text', width: 160},
+                    {field: 'displayName', title: '显示名', edit: 'text', width: 160},
+                    {field: 'title', title: '职称', edit: 'text', width: 160},
                     {
                         field: 'avatarId',
                         title: '头像',

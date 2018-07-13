@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSessionBindingListener
 @Document
 class SysUser(@Id var id: ObjectId,
               var username: String,
+              var displayName:String,
               var title: String,
               var password: String,
               var avatarId: ObjectId,
