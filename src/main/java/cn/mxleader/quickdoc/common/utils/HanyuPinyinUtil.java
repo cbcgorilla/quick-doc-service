@@ -124,7 +124,4 @@ public class HanyuPinyinUtil {
         return hanyupinyin;
     }
 
-    public static void main(String[] args) {
-        System.out.println(HanyuPinyinUtil.toHanyuPinyin("多发的发独守空房阿道夫打发第三方"));
-    }
 }

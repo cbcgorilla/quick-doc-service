@@ -21,10 +21,10 @@
 | **系统组件** |  **开源产品**| 
 | ------   |:------:|
 | 数据存储 | MongoDB 3.6.2  |
-| 容器框架 | Spring Framework 5.0.5.RELEASE  |
-| 系统框架 | Spring Boot 2.0.1.RELEASE |
+| 容器框架 | Spring Framework 5.0.7.RELEASE  |
+| 系统框架 | Spring Boot 2.0.3.RELEASE |
 | 状态监控 | Spring Actuator  |
-| 安全框架 | Spring Security 5.0.4.RELEASE  |
+| 安全框架 | Spring Security 5.0.6.RELEASE  |
 | 实体Bean | Kotlin 1.2  |
 | 页面模板 | Thymeleaf  |
 | WEB UI | Bootstrap 4.1  |
@@ -34,7 +34,7 @@
 | 消息流 |  Kafka | 
 | REST API |  Springfox Swagger 2.8.0 | 
 | REST API |  swagger-bootstrap-ui 1.7.2 | 
-| 系统构建 |  Gradle 4.6  |
+| 系统构建 |  Gradle 4.9  |
 
 ## 待办：
 

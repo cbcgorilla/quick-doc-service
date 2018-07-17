@@ -48,6 +48,7 @@ public class UserServiceImpl implements UserService {
         Optional<SysUser> userOptional = userRepository.findById(new ObjectId(webUser.getId()));
         if (userOptional.isPresent()) {
             SysUser user = userOptional.get();
+            user.setDisplayName(webUser.getDisplayName());
             user.setUsername(webUser.getUsername());
             user.setTitle(webUser.getTitle());
             user.setEmail(webUser.getEmail());

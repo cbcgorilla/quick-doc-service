@@ -87,7 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
             //http.antMatcher("/guest/**").authorizeRequests().anyRequest().permitAll();
 
-            http.antMatcher("/api/user/save").authorizeRequests()
+            http.antMatcher("/api/user/**").authorizeRequests()
                     .anyRequest().hasAuthority(SysUser.Authority.ADMIN.name())
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
