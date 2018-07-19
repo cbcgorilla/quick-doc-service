@@ -1,4 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   cn.mxleader.quickdoc.config.QuickDocConfiguration,\
   cn.mxleader.quickdoc.config.PreviewLinuxConfiguration,\
-  cn.mxleader.quickdoc.config.PreviewWindowsConfiguration
+  cn.mxleader.quickdoc.config.PreviewWindowsConfiguration,\
+  cn.mxleader.quickdoc.config.LDAPConfiguration

@@ -75,7 +75,7 @@ public class UserController {
                        @RequestParam("userType") SysUser.Authority userType,
                        RedirectAttributes redirectAttributes) {
         SysUser sysUser = new SysUser(ObjectId.get(), username, displayName, title, password,
-                configService.getSysProfile().getIconMap().get("SYS_LOGO"),
+                configService.getSysProfile().getIconMap().get("SYS_LOGO"),false,"",
                 new HashSet<SysUser.Authority>() {{
                     add(userType);
                 }},

@@ -66,6 +66,7 @@ public class QuickDocConfiguration {
 
     @Bean
     CommandLineRunner initConfigurationData(UserService userService,
+                                            LDAPService ldapService,
                                             FileService fileService,
                                             ConfigService configService) {
         return args -> {
@@ -85,8 +86,8 @@ public class QuickDocConfiguration {
 
                 // 初始化Admin管理账号
                 userService.saveUser(new SysUser(ObjectId.get(), "admin",
-                        "管理员","系统管理员", "chenbichao",
-                        sysProfile.getIconMap().get("AWARD"),
+                        "管理员", "系统管理员", "chenbichao",
+                        sysProfile.getIconMap().get("AWARD"), false, "",
                         new HashSet<SysUser.Authority>() {{
                             add(SysUser.Authority.ADMIN);
                         }},
@@ -95,7 +96,6 @@ public class QuickDocConfiguration {
                             add("users");
                         }},
                         "admin@mxleader.cn"));
-
                 // 初始化成功标记
                 sysProfile.setInitialized(true);
             }

@@ -61,9 +61,9 @@ public class UserRestController {
     public Boolean saveUser(@RequestBody WebUser webUser) {
 
         SysProfile sysProfile = configService.getSysProfile();
-        userService.saveUser(new SysUser(ObjectId.get(), webUser.getUsername(),webUser.getDisplayName(),
+        userService.saveUser(new SysUser(ObjectId.get(), webUser.getUsername(), webUser.getDisplayName(),
                 webUser.getTitle(), HanyuPinyinUtil.toHanyuPinyin(webUser.getDisplayName()),
-                sysProfile.getIconMap().get("AWARD"),
+                sysProfile.getIconMap().get("AWARD"), webUser.getLdap(), webUser.getDepartment(),
                 new HashSet<SysUser.Authority>() {{
                     add(SysUser.Authority.USER);
                 }},

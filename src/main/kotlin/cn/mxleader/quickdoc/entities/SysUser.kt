@@ -14,6 +14,8 @@ class SysUser(@Id var id: ObjectId,
               var title: String,
               var password: String,
               var avatarId: ObjectId,
+              var ldap:Boolean,
+              var department:String,
               var authorities: Set<Authority>,
               var groups: Set<String>,
               var email: String? = null) : HttpSessionBindingListener {
