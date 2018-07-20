@@ -20,5 +20,7 @@ public interface UserService {
     void delete(ObjectId userId);
     SysUser addGroup(ObjectId id, String group);
     SysUser removeGroup(ObjectId id, String group);
+    SysUser addAuth(ObjectId userId, SysUser.Authority authority);
+    SysUser removeAuth(ObjectId userId, SysUser.Authority authority);
 
 }

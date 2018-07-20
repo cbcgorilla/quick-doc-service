@@ -23,6 +23,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Set;
 
 @Aspect
@@ -83,16 +84,16 @@ public class ServiceIntercept {
                     switch (authTarget) {
                         case DISK:
                             auth = checkAuthorization(sysDiskRepository.findById(id)
-                                    .get().getAuthorizations(), sysUser, preAuth.action());
+                                    .get().getAuthorizations(), sysUser, preAuth.actions());
                             break;
                         case FOLDER:
                             auth = checkAuthorization(sysFolderRepository.findById(id)
-                                    .get().getAuthorizations(), sysUser, preAuth.action());
+                                    .get().getAuthorizations(), sysUser, preAuth.actions());
                             break;
                         case FILE:
                             GridFSFile file = gridFsAssistant.findOne(Query.query(Criteria.where("_id").is(id)));
                             Metadata metadata = converter.read(Metadata.class, file.getMetadata());
-                            auth = checkAuthorization(metadata.getAuthorizations(), sysUser, preAuth.action());
+                            auth = checkAuthorization(metadata.getAuthorizations(), sysUser, preAuth.actions());
                             break;
                     }
                     if (auth) {
@@ -100,7 +101,7 @@ public class ServiceIntercept {
                     } else {
                         // System.out.println("目标类名称：" + joinPoint.getTarget().getClass().getName());
                         // System.out.println("方法名称：" + joinPoint.getSignature().getName());
-                        throw new PreAuthException("鉴权失败！", preAuth.action(),
+                        throw new PreAuthException("鉴权失败！", preAuth.actions(),
                                 preAuth.target(), id, m.toString(), sysUser.getUsername());
                     }
                 }
@@ -118,18 +119,18 @@ public class ServiceIntercept {
      *
      * @param authorizations 授权列表
      * @param sysUser        用户信息
-     * @param action         待校验权限级别（READ，WRITE，DELETE）
+     * @param actions        待校验权限级别（READ，WRITE，DELETE）
      * @return 鉴权通过返回True，否则返回False
      */
     private Boolean checkAuthorization(Set<Authorization> authorizations,
-                                       SysUser sysUser, AuthAction action) {
+                                       SysUser sysUser, AuthAction[] actions) {
         // 管理员默认可访问所有目录和文件
         if (sysUser.isAdmin()) {
             return true;
         }
         if (authorizations != null && authorizations.size() > 0) {
             for (Authorization authorization : authorizations) {
-                if (checkAuthorization(authorization, sysUser, action)) {
+                if (checkAuthorization(authorization, sysUser, actions)) {
                     return true;
                 }
             }
@@ -142,16 +143,16 @@ public class ServiceIntercept {
      *
      * @param authorization 授权参照
      * @param sysUser       用户信息
-     * @param action        待校验权限级别（READ，WRITE，DELETE）
+     * @param actions       待校验权限级别（READ，WRITE，DELETE）
      * @return 鉴权通过返回True，否则返回False
      */
     private Boolean checkAuthorization(Authorization authorization,
-                                       SysUser sysUser, AuthAction action) {
+                                       SysUser sysUser, AuthAction[] actions) {
         // 管理员默认可访问所有目录和文件
         if (sysUser.isAdmin()) {
             return true;
         }
-        if (authorization.getActions().contains(action)) {
+        if (Intersection(authorization.getActions(), actions).size() > 0) {
             switch (authorization.getType()) {
                 case GROUP:
                     for (String group : sysUser.getGroups()) {
@@ -170,5 +171,14 @@ public class ServiceIntercept {
             return false;
         }
         return false;
+    }
+
+    private static ArrayList<AuthAction> Intersection(Set<AuthAction> a1, AuthAction[] a2) {
+        ArrayList<AuthAction> list = new ArrayList<>();
+        for (AuthAction a1Item : a1)
+            for (int j = 0; j < a2.length; j++)
+                if (a1Item == a2[j])
+                    list.add(a2[j]);
+        return list;
     }
 }

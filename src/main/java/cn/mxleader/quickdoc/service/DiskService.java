@@ -20,12 +20,12 @@ public interface DiskService {
 
     List<SysDisk> list(Authorization authorization);
 
-    @PreAuth(target = AuthTarget.DISK)
+    @PreAuth(target = AuthTarget.DISK, actions = {AuthAction.ADMIN, AuthAction.READ})
     Optional<SysDisk> get(ObjectId id);
 
     SysDisk save(String name, Authorization authorization);
 
-    @PreAuth(target = AuthTarget.DISK, action = AuthAction.WRITE)
+    @PreAuth(target = AuthTarget.DISK, actions = AuthAction.WRITE)
     SysDisk rename(ObjectId id, String newName);
 
     /**

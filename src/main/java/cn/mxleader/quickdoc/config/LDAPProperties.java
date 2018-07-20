@@ -4,6 +4,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("quickdoc.ldap")
 public class LDAPProperties {
+    /**
+     * LDAP同步功能启动开关
+     */
+    private Boolean enabled;
 
     /**
      * LDAP连接AD域控服务的管理用户名
@@ -29,6 +33,14 @@ public class LDAPProperties {
      * 屏蔽部门黑名单
      */
     private String blacklist[];
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public String getUsername() {
         return username;

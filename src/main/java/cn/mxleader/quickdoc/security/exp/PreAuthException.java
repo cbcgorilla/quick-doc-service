@@ -5,7 +5,7 @@ import cn.mxleader.quickdoc.entities.AuthTarget;
 import org.bson.types.ObjectId;
 
 public class PreAuthException extends RuntimeException {
-    private AuthAction action;
+    private AuthAction[] actions;
     private AuthTarget target;
     private ObjectId targetId;
     private String method;
@@ -19,18 +19,18 @@ public class PreAuthException extends RuntimeException {
         super(msg);
     }
 
-    public PreAuthException(String msg, AuthAction action, AuthTarget target,
+    public PreAuthException(String msg, AuthAction[] actions, AuthTarget target,
                             ObjectId targetId, String method, String username) {
         super(msg);
-        this.action = action;
+        this.actions = actions;
         this.target = target;
         this.targetId = targetId;
         this.method = method;
         this.username = username;
     }
 
-    public AuthAction getAction() {
-        return action;
+    public AuthAction[] getActions() {
+        return actions;
     }
 
     public AuthTarget getTarget() {
@@ -50,7 +50,7 @@ public class PreAuthException extends RuntimeException {
     }
 
     public String getPreAuthMessage() {
-        return this.username + " :: " + this.action.toString() + "::" + this.target.toString() + "("
+        return this.username + " :: " + this.actions.toString() + "::" + this.target.toString() + "("
                 + this.targetId.toString() + ")" + this.getMessage();
     }
 }

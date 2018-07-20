@@ -85,7 +85,7 @@ public class UserController {
                 email);
         if (userService.get(username) == null) {
             userService.saveUser(sysUser);
-            diskService.save("我的磁盘1",
+            diskService.save("我的磁盘",
                     new Authorization(username, AuthType.PRIVATE,
                             new HashSet<AuthAction>() {{
                                 add(AuthAction.READ);

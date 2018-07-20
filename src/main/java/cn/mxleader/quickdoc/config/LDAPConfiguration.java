@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -50,6 +51,7 @@ public class LDAPConfiguration {
      * @return
      */
     @Bean
+    @ConditionalOnProperty(prefix = "quickdoc.ldap", value = "enabled")
     public CommandLineRunner initLdapUsers(LDAPService ldapService,
                                            UserService userService,
                                            DiskService diskService) {

@@ -10,27 +10,49 @@ import javax.servlet.http.HttpSessionBindingListener
 @Document
 class SysUser(@Id var id: ObjectId,
               var username: String,
-              var displayName:String,
+              var displayName: String,
               var title: String,
               var password: String,
               var avatarId: ObjectId,
-              var ldap:Boolean,
-              var department:String,
+              var ldap: Boolean,
+              var department: String,
               var authorities: Set<Authority>,
               var groups: Set<String>,
-              var email: String? = null) : HttpSessionBindingListener {
+              var email: String? = null,
+              var active: Boolean? = true) : HttpSessionBindingListener {
+    constructor(id: ObjectId,
+                username: String,
+                displayName: String,
+                title: String,
+                password: String,
+                avatarId: ObjectId,
+                ldap: Boolean,
+                department: String,
+                authorities: Set<Authority>,
+                groups: Set<String>,
+                email: String? = null)
+            : this(id, username, displayName, title, password, avatarId, ldap,
+            department, authorities, groups, email, true)
 
     enum class Authority {
-        ADMIN, USER
+        ADMIN, USER, MANAGER
     }
 
-    fun isAdmin(): Boolean {
+    private fun checkAuthority(authority: Authority): Boolean {
         for (it in authorities) {
-            if (it == SysUser.Authority.ADMIN) {
+            if (it == authority) {
                 return true
             }
         }
         return false
+    }
+
+    fun isAdmin(): Boolean {
+        return checkAuthority(SysUser.Authority.ADMIN)
+    }
+
+    fun isManager(): Boolean {
+        return checkAuthority(SysUser.Authority.MANAGER)
     }
 
     override fun valueBound(event: HttpSessionBindingEvent) {

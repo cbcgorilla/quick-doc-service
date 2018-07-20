@@ -30,7 +30,8 @@ public class LDAPServiceImpl implements LDAPService {
 
     private final ConfigService configService;
 
-    public LDAPServiceImpl(ConfigService configService, Properties env, String defaultSearchBase,String blacklist[]) {
+    public LDAPServiceImpl(ConfigService configService, Properties env,
+                           String defaultSearchBase,String blacklist[]) {
         this.configService = configService;
         this.env = env;
         this.defaultSearchBase = defaultSearchBase;

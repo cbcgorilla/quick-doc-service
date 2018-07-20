@@ -112,4 +112,26 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
+    public SysUser addAuth(ObjectId userId, SysUser.Authority authority) {
+        Optional<SysUser> optionalSysUser = userRepository.findById(userId);
+        if (optionalSysUser.isPresent()) {
+            SysUser user = optionalSysUser.get();
+            user.addAuthority(authority);
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
+    @Override
+    public SysUser removeAuth(ObjectId userId, SysUser.Authority authority) {
+        Optional<SysUser> optionalSysUser = userRepository.findById(userId);
+        if (optionalSysUser.isPresent()) {
+            SysUser user = optionalSysUser.get();
+            user.removeAuthority(authority);
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
 }

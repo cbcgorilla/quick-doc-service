@@ -40,14 +40,14 @@ public interface FileService {
      */
     Stream<WebFile> searchFilesContaining(String filename);
 
-    @PreAuth(field = ParentLink.class, action = AuthAction.WRITE)
+    @PreAuth(field = ParentLink.class, actions = AuthAction.WRITE)
     ObjectId store(InputStream file, String filename, ParentLink parent);
 
     ObjectId storeServerFile(String resourceLocation) throws IOException;
 
     void rename(ObjectId fileId, String newFilename);
 
-    @PreAuth(target = AuthTarget.FILE, action = AuthAction.WRITE)
+    @PreAuth(target = AuthTarget.FILE, actions = AuthAction.WRITE)
     GridFSFile saveMetadata(ObjectId fileId, Metadata metadata);
 
     GridFSFile addParent(ObjectId fileId, ParentLink parent);
@@ -59,7 +59,7 @@ public interface FileService {
      * @param fileId 文件ID
      * @return
      */
-    @PreAuth(target = AuthTarget.FILE, action = AuthAction.DELETE)
+    @PreAuth(target = AuthTarget.FILE, actions = AuthAction.DELETE)
     void delete(ObjectId fileId);
 
     /**

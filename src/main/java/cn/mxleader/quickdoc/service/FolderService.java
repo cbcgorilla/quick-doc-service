@@ -58,7 +58,7 @@ public interface FolderService {
      * @param newName
      * @return
      */
-    @PreAuth(action = AuthAction.WRITE)
+    @PreAuth(actions = AuthAction.WRITE)
     SysFolder rename(ObjectId id, String newName);
 
     /**

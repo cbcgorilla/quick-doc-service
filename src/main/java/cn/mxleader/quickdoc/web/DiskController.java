@@ -34,6 +34,8 @@ public class DiskController {
         put(AuthAction.READ, "读");
         put(AuthAction.WRITE, "写");
         put(AuthAction.DELETE, "删");
+        put(AuthAction.ADMIN, "管理");
+        put(AuthAction.DOWNLOAD, "下载");
     }};
 
     @Autowired
@@ -61,6 +63,12 @@ public class DiskController {
     public String space(Model model) {
         model.addAttribute("authTypeMap", authTypeMap);
         return "setting/space";
+    }
+
+    @RequestMapping("/space1")
+    public String space1(Model model) {
+        model.addAttribute("authTypeMap", authTypeMap);
+        return "setting/space1";
     }
 
     @RequestMapping("/auth")

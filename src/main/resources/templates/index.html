@@ -106,6 +106,12 @@
                         </li>
                     </ul>
                 </li>
+                <li class="nav-title" th:if="${session.ActiveUser.isManager()}">
+                    系统设置
+                </li>
+                <li class="nav-item" th:if="${session.ActiveUser.isManager()}">
+                    <a class="nav-link" href="disk/space1"><i class="fas fa-cogs"></i>空间管理</a>
+                </li>
                 <li class="nav-title" th:if="${session.ActiveUser.isAdmin()}">
                     系统设置
                 </li>

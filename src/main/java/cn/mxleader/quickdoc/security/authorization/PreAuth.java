@@ -13,6 +13,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface PreAuth {
     Class field() default ObjectId.class;
+
     AuthTarget target() default AuthTarget.FOLDER;
-    AuthAction action() default AuthAction.READ;
+
+    AuthAction[] actions() default AuthAction.READ;
 }

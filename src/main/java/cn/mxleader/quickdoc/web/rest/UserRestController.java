@@ -70,7 +70,7 @@ public class UserRestController {
                 webUser.getGroups(),
                 webUser.getEmail()));
 
-        diskService.save("我的磁盘1",
+        diskService.save("我的磁盘",
                 new Authorization(webUser.getUsername(), AuthType.PRIVATE,
                         new HashSet<AuthAction>() {{
                             add(AuthAction.READ);
@@ -134,6 +134,22 @@ public class UserRestController {
         for (WebUser user : webUserList) {
             userService.removeGroup(new ObjectId(user.getId()), group);
         }
+        return true;
+    }
+
+    @PostMapping("/addAuth")
+    //@ApiOperation(value = "增加授权")
+    public Boolean addAuth(@RequestParam ObjectId userId,
+                           @RequestParam SysUser.Authority authority) {
+        userService.addAuth(userId,authority);
+        return true;
+    }
+
+    @PostMapping("/removeAuth")
+    //@ApiOperation(value = "移除授权")
+    public Boolean removeAuth(@RequestParam ObjectId userId,
+                              @RequestParam SysUser.Authority authority) {
+        userService.removeAuth(userId,authority);
         return true;
     }
 
