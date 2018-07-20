@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -107,6 +108,17 @@ public class UserServiceImpl implements UserService {
         if (optionalSysUser.isPresent()) {
             SysUser user = optionalSysUser.get();
             user.removeGroup(group);
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
+    @Override
+    public SysUser updateGroups(ObjectId id, Set<String> groups){
+        Optional<SysUser> optionalSysUser = userRepository.findById(id);
+        if (optionalSysUser.isPresent()) {
+            SysUser user = optionalSysUser.get();
+            user.setGroups(groups);
             return userRepository.save(user);
         }
         return null;

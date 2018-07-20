@@ -137,11 +137,23 @@ public class UserRestController {
         return true;
     }
 
+    @PostMapping("/updateGroups")
+    //@ApiOperation("批量添加用户组")
+    public Boolean updateGroups(@RequestBody List<WebUser> webUserList) {
+        for (WebUser user : webUserList) {
+            SysUser sysUser = userService.get(user.getUsername());
+            if (sysUser != null) {
+                userService.updateGroups(sysUser.getId(), user.getGroups());
+            }
+        }
+        return true;
+    }
+
     @PostMapping("/addAuth")
     //@ApiOperation(value = "增加授权")
     public Boolean addAuth(@RequestParam ObjectId userId,
                            @RequestParam SysUser.Authority authority) {
-        userService.addAuth(userId,authority);
+        userService.addAuth(userId, authority);
         return true;
     }
 
@@ -149,7 +161,7 @@ public class UserRestController {
     //@ApiOperation(value = "移除授权")
     public Boolean removeAuth(@RequestParam ObjectId userId,
                               @RequestParam SysUser.Authority authority) {
-        userService.removeAuth(userId,authority);
+        userService.removeAuth(userId, authority);
         return true;
     }
 

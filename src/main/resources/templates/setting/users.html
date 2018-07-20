@@ -195,7 +195,7 @@
                     {field: 'groups', title: '用户组'},
                     {
                         title: '操作',
-                        width: 160,
+                        width: 200,
                         align: 'center',
                         toolbar: '#userOpsBar'
                     }
@@ -365,6 +365,7 @@
             );
 
             function prompt_service(inputParam) {
+                //console.log(JSON.stringify(postData));
                 $.ajax({
                     type: "POST",
                     url: url + "?group=" + inputParam,
