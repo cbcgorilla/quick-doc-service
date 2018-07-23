@@ -24,6 +24,8 @@ public class LDAPProperties {
      */
     private String url;
 
+    private String domain;
+
     /**
      * 搜索AD域控服务的根路径
      */
@@ -64,6 +66,14 @@ public class LDAPProperties {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public String getSearchBase() {
