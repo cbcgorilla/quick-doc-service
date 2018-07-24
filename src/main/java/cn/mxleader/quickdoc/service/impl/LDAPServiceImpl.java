@@ -67,6 +67,7 @@ public class LDAPServiceImpl implements LDAPService {
                                     add(SysUser.Authority.USER);
                                 }},
                                 new HashSet<String>() {{
+                                    add("users");
                                     add(department);
                                 }},
                                 email);

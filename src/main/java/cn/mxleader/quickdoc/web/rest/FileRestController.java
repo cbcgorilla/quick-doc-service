@@ -63,6 +63,19 @@ public class FileRestController {
         }
 
         ObjectId fileId = fileService.store(file.getInputStream(), filename, parent);
+
+        /*
+         *  鉴别文件类型
+         *  因CentOS 7 环境无法通过Files.probeContentType(path) 准确获取大部分文件的文件类型，需补充执行如下过程
+         *  通过文件字节码头部信息及文件后缀名综合识别文件类型
+         */
+        if("application/octet-stream".equalsIgnoreCase(fileService.getStoredFile(fileId).getType())){
+            fileService.updateMIMEType(fileId);
+        }
+        /*
+         *  End of 鉴别文件类型
+         */
+
         fileService.addAuthorization(fileId, new Authorization(user.getUsername(), AuthType.PRIVATE, AuthAction.DELETE));
         return new LayuiData<>(0, "", 0, true);
     }

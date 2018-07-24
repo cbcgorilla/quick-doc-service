@@ -50,6 +50,8 @@ public interface FileService {
     @PreAuth(target = AuthTarget.FILE, actions = AuthAction.WRITE)
     GridFSFile saveMetadata(ObjectId fileId, Metadata metadata);
 
+    void updateMIMEType(ObjectId fileId);
+
     GridFSFile addParent(ObjectId fileId, ParentLink parent);
 
     GridFSFile addAuthorization(ObjectId fileId, Authorization authorization);

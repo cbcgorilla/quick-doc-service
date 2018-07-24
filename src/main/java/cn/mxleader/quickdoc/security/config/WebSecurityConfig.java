@@ -79,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             return entryPoint;
         }
     }
-
+/*
     @Configuration
     @Order(2)
     public static class RestApiConfigurationAdapter extends WebSecurityConfigurerAdapter {
@@ -107,7 +107,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             entryPoint.setRealmName("Management Realm");
             return entryPoint;
         }
-    }
+    }*/
 
     @Configuration
     @Order(3)

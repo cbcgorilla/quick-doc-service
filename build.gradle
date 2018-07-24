@@ -56,8 +56,15 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     compile("org.springframework.boot:spring-boot-starter-security")
-    compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-webflux")
+    compile("org.springframework.boot:spring-boot-starter-web"){
+        exclude module: "spring-boot-starter-tomcat"
+    }
+    compile("org.springframework.boot:spring-boot-starter-jetty")
+    compile("org.springframework.boot:spring-boot-starter-webflux"){
+        exclude module: "spring-boot-starter-tomcat"
+    }
+    // https://mvnrepository.com/artifact/org.apache.tika/tika-core
+    compile ("org.apache.tika:tika-core:1.18") // APACHE TIKA 文件类型识别库
     //compile("io.springfox:springfox-swagger2:$swagger_version")
     //compile("io.springfox:springfox-swagger-ui:$swagger_version")
     //compile("com.github.xiaoymin:swagger-bootstrap-ui:$swagger_bootstrap_version")

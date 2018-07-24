@@ -1,6 +1,17 @@
 package cn.mxleader.quickdoc.common.utils;
 
+import org.apache.tika.Tika;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.HttpHeaders;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaMetadataKeys;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
 import org.springframework.lang.Nullable;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,11 +71,34 @@ public class FileUtils {
     public static String getContentType(String filename) {
         try {
             Path path = Paths.get(filename.toLowerCase());
+            // CentOS 7 JDK8 返回值为Null， UBUNTU和Windows环境返回值正常
             String type = Files.probeContentType(path);
             return type == null ? "application/octet-stream" : type;
         } catch (IOException exp) {
             return "application/octet-stream";
         }
+    }
+
+    public static String getMimeType(String filename) {
+        Tika tika = new Tika();
+        String mimeType = tika.detect(filename);
+        return mimeType;
+    }
+
+    public static String getMimeType(InputStream inputStream, String filename) {
+        AutoDetectParser parser = new AutoDetectParser();
+        parser.setParsers(new HashMap<MediaType, Parser>());
+
+        Metadata metadata = new Metadata();
+        metadata.add(TikaMetadataKeys.RESOURCE_NAME_KEY, filename);
+
+        try {
+            parser.parse(inputStream, new DefaultHandler(), metadata, new ParseContext());
+            inputStream.close();
+        } catch (TikaException | SAXException | IOException e) {
+            e.printStackTrace();
+        }
+        return metadata.get(HttpHeaders.CONTENT_TYPE);
     }
 
     public static String read(InputStream input) throws IOException {

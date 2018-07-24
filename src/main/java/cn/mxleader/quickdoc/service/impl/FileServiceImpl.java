@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsCriteria;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -132,7 +133,8 @@ public class FileServiceImpl implements FileService {
                 new HashSet<ParentLink>() {{
                     add(parent);
                 }},
-                getParentAuthorizations(parent), Collections.emptySet());
+                getParentAuthorizations(parent),
+                Collections.emptySet());
         return gridFsAssistant.store(file, filename, metadata);
     }
 
@@ -154,7 +156,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public ObjectId storeServerFile(String resourceLocation) throws IOException {
         Resource resource = new ClassPathResource(resourceLocation);
-        String fileType = FileUtils.getContentType(resource.getFilename());
+        String fileType = FileUtils.getMimeType(resource.getFilename());
         Metadata metadata = new Metadata(fileType, Collections.emptySet(),
                 new HashSet<Authorization>() {{
                     add(new Authorization("users", AuthType.GROUP));
@@ -171,6 +173,22 @@ public class FileServiceImpl implements FileService {
     @Override
     public GridFSFile saveMetadata(ObjectId fileId, Metadata metadata) {
         return gridFsAssistant.updateMetadata(fileId, metadata);
+    }
+
+    @Override
+    @Async
+    public void updateMIMEType(ObjectId fileId){
+        GridFSFile file = gridFsAssistant.findOne(Query.query(Criteria.where("_id").is(fileId)));
+        if(file != null) {
+            Metadata metadata = converter.read(Metadata.class, file.getMetadata());
+            try {
+                metadata.set_contentType(FileUtils.getMimeType(getResource(fileId).getInputStream(),
+                        file.getFilename()));
+                gridFsAssistant.updateMetadata(fileId, metadata);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

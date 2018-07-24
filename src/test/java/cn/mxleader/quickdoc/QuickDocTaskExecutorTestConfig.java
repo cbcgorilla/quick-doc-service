@@ -45,7 +45,7 @@ public class QuickDocTaskExecutorTestConfig {
     //@Bean
     CommandLineRunner uploadLocalFiles(FileService fileService) {
         return args -> {
-            File folder = new File("E:\\IT服务台管理\\报告材料\\排班");
+            File folder = new File("E:\\temp");
             if (folder.exists() && folder.isDirectory()) {
                 Flux.just(folder.listFiles())
                         .filter(file -> file.getName().toLowerCase().endsWith(".xlsx"))
