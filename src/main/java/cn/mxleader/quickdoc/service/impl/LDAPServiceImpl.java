@@ -103,19 +103,21 @@ public class LDAPServiceImpl implements LDAPService {
         List<TreeNode> nodeList = searchLdapItems(defaultOrgFilter, defaultOrgAtts, searchBase).map(sr -> {
             TreeNode node = null;
             try {
-                List<String> dir = Flux.fromArray(
+                byte[] guid = (byte[]) sr.getAttributes().get("objectGUID").get();
+                List<String> path = Flux.fromArray(
                         sr.getAttributes().get("distinguishedName").get().toString().split(","))
                         .filter(name -> name.startsWith("OU="))
                         .map(name -> name.replaceFirst("OU=", ""))
                         .collectList().block();
-                Collections.reverse(dir);
+                Collections.reverse(path);
                 StringBuffer sb = new StringBuffer();
-                for (int i = 0; i < dir.size() - 1; i++) {
-                    sb.append(dir.get(i) + "\\");
+                for (int i = 0; i < path.size() - 1; i++) {
+                    sb.append(path.get(i) + "-");
                 }
-                byte[] guid = (byte[]) sr.getAttributes().get("objectGUID").get();
+                int idxMinus = sb.toString().lastIndexOf("-");
+                String decPath = sb.toString().substring(0, idxMinus - 1);
                 node = new TreeNode(bytesToHexString(guid), sr.getAttributes().get("name").get().toString(),
-                        "", new ArrayList<>(), true, false, sb.toString(), dir.size());
+                        "", new ArrayList<>(), true, false, decPath, path.size());
             } catch (NamingException e) {
                 e.printStackTrace();
             }
@@ -124,19 +126,18 @@ public class LDAPServiceImpl implements LDAPService {
         //组织按层级排序
         Collections.sort(nodeList, Comparator.comparingInt(TreeNode::getLevel));
         //Collections.sort(nodeList, (TreeNode t1, TreeNode t2) -> Integer.compare(t1.getLevel(),t2.getLevel()));
-            /*
-            Collections.sort(nodeList, new Comparator<TreeNode>() {
-                @Override
-                public int compare (TreeNode o1, TreeNode o2){
-                    if (o1.getLevel() < o2.getLevel()) {
-                        return -1;
-                    } else if (o1.getLevel() > o2.getLevel()) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
+/*        Collections.sort(nodeList, new Comparator<TreeNode>() {
+            @Override
+            public int compare(TreeNode o1, TreeNode o2) {
+                if (o1.getLevel() < o2.getLevel()) {
+                    return -1;
+                } else if (o1.getLevel() > o2.getLevel()) {
+                    return 1;
+                } else {
+                    return 0;
                 }
-            });*/
+            }
+        });*/
         for (int i = 1; i < nodeList.size(); i++) {
             TreeNode node = nodeList.get(i);
             TreeNode parent = searchNodeList(nodeList, node.getPath(), node.getLevel() - 1);
@@ -151,7 +152,7 @@ public class LDAPServiceImpl implements LDAPService {
     }
 
     private static String bytesToHexString(byte[] src) {
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder();
         if (src == null || src.length <= 0) {
             return null;
         }
@@ -168,8 +169,7 @@ public class LDAPServiceImpl implements LDAPService {
 
     private static TreeNode searchNodeList(List<TreeNode> nodeList, String path, int level) {
         for (TreeNode item : nodeList) {
-            if (path.equalsIgnoreCase(item.getPath() + item.getName() + "\\")
-                    && item.getLevel() == level)
+            if (path.equalsIgnoreCase(item.getCompletePath()) && item.getLevel() == level)
                 return item;
         }
         return null;
