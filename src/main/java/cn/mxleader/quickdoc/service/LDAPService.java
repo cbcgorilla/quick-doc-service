@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.service;
 
 import cn.mxleader.quickdoc.entities.SysUser;
+import cn.mxleader.quickdoc.web.domain.TreeNode;
 import reactor.core.publisher.Flux;
 
 import javax.naming.NamingException;
@@ -17,5 +18,7 @@ public interface LDAPService {
 
     Flux<SearchResult> searchLdapOrg(String searchBase) throws NamingException;
 
-    Flux<SearchResult> searchLdapOrg() throws NamingException;
+    TreeNode getLdapOrgTree(String searchBase) throws NamingException;
+
+    TreeNode getLdapOrgTree() throws NamingException;
 }
