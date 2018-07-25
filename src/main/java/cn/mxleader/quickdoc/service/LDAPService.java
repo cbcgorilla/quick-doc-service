@@ -15,7 +15,7 @@ public interface LDAPService {
 
     Flux<SysUser> searchLdapUsers() throws NamingException;
 
-    Flux<SearchResult> searchLdapGroups(String searchBase) throws NamingException;
+    Flux<SearchResult> searchLdapOrg(String searchBase) throws NamingException;
 
-    Flux<SearchResult> searchLdapGroups() throws NamingException;
+    Flux<SearchResult> searchLdapOrg() throws NamingException;
 }

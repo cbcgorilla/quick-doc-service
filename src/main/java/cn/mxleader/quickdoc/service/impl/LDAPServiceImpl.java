@@ -22,9 +22,9 @@ public class LDAPServiceImpl implements LDAPService {
     private final Properties env;
     private final String defaultSearchBase;
     private final String blacklist[];
-    private static final String defaultGroupFilter = "(&(objectCategory=Group)(objectClass=group)(name=*))";
+    private static final String defaultOrgFilter = "(&(objectClass=organizationalUnit)(name=*))";
     private static final String defaultPersonFilter = "(&(objectCategory=Person)(objectClass=user)(name=*))";
-    private static final String defaultGroupAtts[] = {"distinguishedName", "name"};
+    private static final String defaultOrgAtts[] = {"distinguishedName", "name","objectGUID","ou"};
     private static final String defaultPersonAtts[] = {"distinguishedName", "memberOf", "name", "sAMAccountName",
             "displayName", "title", "mail", "department"};
 
@@ -94,12 +94,12 @@ public class LDAPServiceImpl implements LDAPService {
         return searchLdapUsers(defaultSearchBase);
     }
 
-    public Flux<SearchResult> searchLdapGroups(String searchBase) throws NamingException {
-        return searchLdapItems(defaultGroupFilter, defaultGroupAtts, searchBase);
+    public Flux<SearchResult> searchLdapOrg(String searchBase) throws NamingException {
+        return searchLdapItems(defaultOrgFilter, defaultOrgAtts, searchBase);
     }
 
-    public Flux<SearchResult> searchLdapGroups() throws NamingException {
-        return searchLdapGroups(defaultSearchBase);
+    public Flux<SearchResult> searchLdapOrg() throws NamingException {
+        return searchLdapOrg(defaultSearchBase);
     }
 
 }

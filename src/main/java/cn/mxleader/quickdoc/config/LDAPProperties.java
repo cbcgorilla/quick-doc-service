@@ -36,6 +36,8 @@ public class LDAPProperties {
      */
     private String blacklist[];
 
+    private Boolean addDisk;
+
     public Boolean getEnabled() {
         return enabled;
     }
@@ -90,5 +92,13 @@ public class LDAPProperties {
 
     public void setBlacklist(String[] blacklist) {
         this.blacklist = blacklist;
+    }
+
+    public Boolean getAddDisk() {
+        return addDisk;
+    }
+
+    public void setAddDisk(Boolean addDisk) {
+        this.addDisk = addDisk;
     }
 }

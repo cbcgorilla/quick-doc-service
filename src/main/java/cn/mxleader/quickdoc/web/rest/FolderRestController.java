@@ -91,7 +91,7 @@ public class FolderRestController {
                     sysFolder.getName(),
                     sysFolder.getParent().getId().toString(),
                     Collections.emptyList(),
-                    false,false));
+                    false,false,"",0));
         }};
     }
 
