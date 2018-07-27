@@ -36,8 +36,13 @@ public class FolderRestController {
     public List<TreeNode> getFoldersOfDisk(@RequestParam String diskId) {
         return folderService.listFoldersInDisk(new ObjectId(diskId))
                 .stream()
-                .map(sysFolder -> new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),
-                        sysFolder.getParent().getId().toString(), Collections.emptyList())
+                .map(sysFolder -> {
+                            List<TreeNode> subNodes = folderService.getFolderTree(new ParentLink(sysFolder.getId(),
+                                    AuthTarget.FOLDER, new ObjectId(diskId)));
+                            return new TreeNode(sysFolder.getId().toString(), sysFolder.getName(),
+                                    sysFolder.getParent().getId().toString(), Collections.emptyList(),
+                                    (subNodes != null && subNodes.size() > 0));
+                        }
                 )
                 .collect(Collectors.toList());
     }
@@ -91,7 +96,7 @@ public class FolderRestController {
                     sysFolder.getName(),
                     sysFolder.getParent().getId().toString(),
                     Collections.emptyList(),
-                    false,false,"",0));
+                    false, false, "", 0));
         }};
     }
 

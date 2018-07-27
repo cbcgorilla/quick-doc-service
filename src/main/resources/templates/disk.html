@@ -340,14 +340,13 @@
                 promptAddFolder(treeNode, 'child');
                 return false;
             });
-        };
+        }
 
         function removeHoverDom(treeId, treeNode) {
             $("#addBtn_" + treeNode.tId).unbind().remove();
-        };
+        }
 
         $(document).ready(function () {
-            console.log(folderNodes);
             $.fn.zTree.init($("#diskFolderTree"), setting, folderNodes);
         });
 
@@ -400,7 +399,6 @@
                 //data: JSON.stringify(postData), //可选参数
                 dataType: "json",
                 success: function (value) {
-                    console.log(value);
                     var zTree = $.fn.zTree.getZTreeObj("diskFolderTree");
                     zTree.addNodes(selectedRow, value);
                 }
