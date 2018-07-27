@@ -6,10 +6,14 @@ import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.UserService;
 import cn.mxleader.quickdoc.web.domain.WebUser;
 import org.bson.types.ObjectId;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -40,6 +44,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<SysUser> listDeptUsers(String department){
+        return userRepository.findAllByDepartment(department);
+    }
+
+    @Override
     public SysUser get(String username) {
         return userRepository.findByUsername(username);
     }
@@ -49,17 +58,14 @@ public class UserServiceImpl implements UserService {
         Optional<SysUser> userOptional = userRepository.findById(new ObjectId(webUser.getId()));
         if (userOptional.isPresent()) {
             SysUser user = userOptional.get();
-            user.setDisplayName(webUser.getDisplayName());
-            user.setUsername(webUser.getUsername());
-            user.setTitle(webUser.getTitle());
-            user.setEmail(webUser.getEmail());
+            BeanUtils.copyProperties(webUser, user, getEmptyPropertyNames(webUser));
             return userRepository.save(user);
         }
         return null;
     }
 
     @Override
-    public SysUser changePassword(ObjectId id, String newPassword){
+    public SysUser changePassword(ObjectId id, String newPassword) {
         Optional<SysUser> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             SysUser user = userOptional.get();
@@ -114,7 +120,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SysUser updateGroups(ObjectId id, Set<String> groups){
+    public SysUser updateGroups(ObjectId id, Set<String> groups) {
         Optional<SysUser> optionalSysUser = userRepository.findById(id);
         if (optionalSysUser.isPresent()) {
             SysUser user = optionalSysUser.get();
@@ -144,6 +150,47 @@ public class UserServiceImpl implements UserService {
             return userRepository.save(user);
         }
         return null;
+    }
+
+    @Override
+    public SysUser addManagePath(ObjectId id, String path) {
+        Optional<SysUser> optionalSysUser = userRepository.findById(id);
+        if (optionalSysUser.isPresent()) {
+            SysUser user = optionalSysUser.get();
+            user.addManagePath(path);
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
+    @Override
+    public SysUser removeManagePath(ObjectId id, String path) {
+        Optional<SysUser> optionalSysUser = userRepository.findById(id);
+        if (optionalSysUser.isPresent()) {
+            SysUser user = optionalSysUser.get();
+            user.removeManagePath(path);
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
+    /**
+     * 取非空属性名称列表
+     *
+     * @param source
+     * @return
+     */
+    private static String[] getEmptyPropertyNames(Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<>();
+        for (java.beans.PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null || srcValue.toString().length() == 0) emptyNames.add(pd.getName());
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
     }
 
 }

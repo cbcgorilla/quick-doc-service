@@ -20,7 +20,7 @@ data class TreeNode(val id: String, var name: String,
                 isParent: Boolean)
             : this(id, name, parentId, children, isParent, true, "", 0)
 
-    fun getCompletePath():String = "$path$name-"
+    fun getCompletePath():String = "$path-$name"
 
     fun addChildren(child: TreeNode) {
         child.parentId = this.id

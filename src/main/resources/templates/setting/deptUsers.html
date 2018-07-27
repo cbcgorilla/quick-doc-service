@@ -1,0 +1,263 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-align-justify"></i> 系统用户
+                </div>
+                <div class="card-body">
+
+                    <div class=" form-horizontal">
+                        <div class="row">
+
+                            <div class="col-md-3 table-bordered">
+                                <ul id="deptTree" class="ztree"></ul>
+                            </div>
+
+                            <div class="col-md-9" style="float: right">
+
+
+                                <div class="layui-btn-group userTable">
+                                    <button class="layui-btn layui-btn-sm" data-type="batchAddGroup">
+                                        <i class="fas fa-users"></i> <i class="fas fa-plus-circle"></i> 加入组
+                                    </button>
+                                    <button class="layui-btn layui-btn-sm layui-btn-danger" data-type="batchRemoveGroup">
+                                        <i class="fas fa-users"></i> <i class="fas fa-minus-circle"></i> 移除组
+                                    </button>
+                                </div>
+
+                                <table class="layui-table" id="LAY_table_user" lay-filter="userTable">
+                                </table>
+
+                                <script type="text/html" id="userOpsBar">
+                                    <div class="layui-btn-group">
+                                        <button class="layui-btn layui-btn-sm" lay-event="detail">
+                                            <i class="fas fa-info-circle" title="查看用户详细信息"></i>
+                                        </button>
+                                    </div>
+                                </script>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--/.row-->
+        </div>
+    </div>
+</div>
+
+<link href="./css/zTreeStyle/zTreeStyle.css" rel="stylesheet" type="text/css">
+
+<script src="./js/jquery.ztree.all.js" type="text/javascript"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    layui.use(['table', 'upload'], function () {
+        var table = layui.table,
+            curPath=[[${rootPath}]];
+
+        var opt = {
+            elem: '#LAY_table_user',
+            id: 'user-data',
+            url: '/api/user/deptUsers?department='+curPath,
+            cellMinWidth: 120,
+            page: false,
+            cols: [
+                [
+                    {type: 'checkbox'},
+                    {field: 'id', title: 'ID'},
+                    {field: 'username', title: '用户名',  width: 160},
+                    {field: 'displayName', title: '显示名', edit: 'text', width: 160},
+                    {field: 'title', title: '职称', edit: 'text', width: 200},
+                    {
+                        field: 'avatarId',
+                        title: '头像',
+                        align: 'center',
+                        width: 80,
+                        templet: '#avatarTpl'
+                    },
+                    {field: 'groups', title: '用户组'},
+                    {
+                        title: '操作',
+                        width: 240,
+                        align: 'center',
+                        toolbar: '#userOpsBar'
+                    }
+                ]
+            ],
+            done: function (res, curr, count) {
+                $("[data-field='id']").css('display', 'none');
+            }
+        };
+        //方法级渲染
+        table.render(opt);
+
+        //监听表格复选框选择
+        table.on('checkbox(userTable)', function (obj) {
+            console.log(obj)
+        });
+
+        table.on('edit(userTable)', function (obj) {
+            var value = obj.value, //得到修改后的值
+                data = obj.data, //得到所在行所有键值
+                field = obj.field; //得到字段
+            $.ajax({
+                type: "POST",
+                url: "/api/user/update/" + field,
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data), //可选参数
+                dataType: "json",
+                success: function (resp) {
+                    console.log(resp);
+                    layer.msg('用户信息更新成功！');
+                    //reloadUserTable('/api/user/list');
+                }
+            });
+        });
+
+        //监听工具条
+        table.on('tool(userTable)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+                layer.msg('用户详细信息：' + JSON.stringify(data));
+            }
+        });
+
+        var $ = layui.$, active = {
+            batchAddGroup: function () {
+                var checkStatus = table.checkStatus('user-data')
+                    , data = checkStatus.data;
+                //layer.alert(JSON.stringify(data));
+                console.log(data);
+                if (data.length == 0) {
+                    layer.msg('请选择待加入组的用户！');
+                } else {
+                    postGroupService('/api/user/addGroup', data);
+                }
+            },
+            batchRemoveGroup: function () {
+                var checkStatus = table.checkStatus('user-data')
+                    , data = checkStatus.data;
+                //layer.alert(JSON.stringify(data));
+                console.log(data);
+                if (data.length == 0) {
+                    layer.msg('请选择待移除组的用户！');
+                } else {
+                    postGroupService('/api/user/removeGroup', data);
+                }
+            }
+
+        };
+
+        $('.userTable .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        function authorityService(url,userId,authority) {
+            $.ajax({
+                type: "POST",
+                url: url+"?userId=" + userId+"&authority="+authority,
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function (value) {
+                    console.log(value);
+                    layer.msg('权限调整成功！');
+                    reloadUserTable('/api/user/deptUsers?department='+curPath);
+                }
+            });
+            layer.closeAll();
+        }
+
+        function postGroupService(url, postData) {
+            layer.prompt(
+                {
+                    title: '请输入组名',
+                    success: function (layerInput) {
+                        layerInput.find('input').on('keydown', function () {
+                            if (event.keyCode === 13) {
+                                prompt_service(event.target.value);
+                            }
+                        })
+                    }
+                },
+                function (value) {
+                    prompt_service(value);
+                }
+            );
+
+            function prompt_service(inputParam) {
+                //console.log(JSON.stringify(postData));
+                var encodeParam = encodeURI(inputParam);
+                $.ajax({
+                    type: "POST",
+                    url: url + "?group=" + encodeParam,
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(postData), //可选参数
+                    dataType: "json",
+                    success: function (value) {
+                        console.log(value);
+                        reloadUserTable('/api/user/deptUsers?department='+curPath);
+                    }
+                });
+                layer.closeAll();
+            }
+        }
+
+        function reloadUserTable(restUrl) {
+            var encodedUrl = encodeURI(restUrl);
+            table.reload('user-data', {
+                url: encodedUrl
+            });
+        }
+
+        var setting = {
+            view: {
+                dblClickExpand: false,
+                selectedMulti: false
+            },
+            data: {
+                key: {
+                    isParent: "parent"
+                },
+                simpleData: {
+                    enable: true,
+                    idKey: "id",
+                    pIdKey: "parentId",
+                    rootPId: null
+                }
+            },
+            callback: {
+                onClick: onClick
+            }
+        };
+
+        var deptNodes = [[${deptTree}]];
+
+        function onClick(event, treeId, treeNode, clickFlag) {
+            curPath = treeNode.completePath;
+            reloadUserTable('/api/user/deptUsers?department='+curPath);
+        }
+
+        $(document).ready(function () {
+            $.fn.zTree.init($("#deptTree"), setting, deptNodes);
+        });
+
+        /*]]>*/
+    });
+</script>
+
+<script type="text/html" id="avatarTpl">
+    <div style="align:center;">
+        <img src="file/preview/{{ d.avatarId}}"
+             style="width:32px; height:32px;border-radius:32px">
+    </div>
+</script>
+<style type="text/css">
+    .layui-table-cell {
+        height: 36px;
+        line-height: 36px;
+    }
+</style>

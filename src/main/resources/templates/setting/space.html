@@ -199,9 +199,10 @@
                 );
 
                 function prompt_service(inputParam) {
+                    var codeParam = encodeURI(inputParam);
                     $.ajax({
                         type: "POST",
-                        url: "/api/disk/rename?diskId=" + data.id + "&newName=" + inputParam,
+                        url: "/api/disk/rename?diskId=" + data.id + "&newName=" + codeParam,
                         contentType: 'application/json; charset=utf-8',
                         dataType: "json",
                         success: function (value) {

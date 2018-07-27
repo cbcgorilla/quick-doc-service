@@ -6,6 +6,7 @@ import reactor.core.publisher.Flux;
 
 import javax.naming.NamingException;
 import javax.naming.directory.SearchResult;
+import java.util.List;
 
 public interface LDAPService {
 
@@ -18,7 +19,7 @@ public interface LDAPService {
 
     Flux<SearchResult> searchLdapOrg(String searchBase) throws NamingException;
 
-    TreeNode getLdapOrgTree(String searchBase) throws NamingException;
+    List<TreeNode> getLdapOrgTree(String searchBase) throws NamingException;
 
-    TreeNode getLdapOrgTree() throws NamingException;
+    List<TreeNode> getLdapOrgTree() throws NamingException;
 }

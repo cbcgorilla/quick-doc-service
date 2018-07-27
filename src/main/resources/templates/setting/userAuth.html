@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="keyword" content="Quick Doc Service">
+    <title th:text="${title}"></title>
+
+    <!-- Icons -->
+    <link rel="stylesheet" type="text/css" href="../css/fontawesome-all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/simple-line-icons.css"/>
+    <!--layui and necessary plugins-->
+    <link rel="stylesheet" type="text/css" href="../lib/layui/css/layui.css" media="all"/>
+    <!-- Main styles for this application -->
+    <link rel="stylesheet" type="text/css" href="../css/style.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/mxleader-style.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/zTreeStyle/zTreeStyle.css">
+
+</head>
+
+<body>
+
+<div class="card">
+    <form id="auth-form">
+        <table class="table">
+            <tr>
+                <td align="right" >管理权限:</td>
+                <td>
+                    <input type="checkbox" id="manager_chk" name="管理员" value="MANAGER" checked="checked" /> 管理员
+                </td>
+            </tr>
+            <tr>
+                <td align="right">授权管理部门:</td>
+                <td>
+
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div class="table-bordered">
+    <ul id="deptTree" class="ztree"></ul>
+</div>
+
+<!-- Bootstrap and necessary plugins -->
+<script src="../js/jquery.min.js"></script>
+<script src="../js/popper.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<script src="../js/pace.min.js"></script>
+<script src="../lib/layui/layui.js" charset="utf-8"></script>
+
+<script src="../js/jquery.ztree.all.js" type="text/javascript"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    var uid = [[${id}]];
+
+    var setting = {
+        view: {
+            dblClickExpand: false,
+            selectedMulti: false
+        },
+        check: {
+            enable: true,
+            chkboxType : {"Y": "", "N": "p"},
+        },
+        data: {
+            key: {
+                isParent: "parent"
+            },
+            simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "parentId",
+                rootPId: null
+            }
+        },
+        callback: {
+            beforeCheck: beforeCheck,
+            onCheck: onCheck
+        }
+    };
+
+    function beforeCheck(treeId, treeNode) {
+        return (treeNode.doCheck !== false);
+    }
+    function onCheck(e, treeId, treeNode) {
+        if(treeNode.checked){
+            authorityService('/api/user/addPath',uid,null,treeNode);
+        }else{
+            authorityService('/api/user/removePath',uid,null,treeNode);
+        }
+    }
+
+    function authorityService(url,userId,authority,data) {
+        $.ajax({
+            type: "POST",
+            url: url+"?userId=" + userId+"&authority="+authority,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data), //可选参数
+            dataType: "json",
+            success: function (value) {
+                console.log(value);
+            }
+        });
+    }
+
+    function setManagerCheck() {
+        if($("#manager_chk").attr("checked")){
+            authorityService('/api/user/addAuth',uid,$("#manager_chk").attr("value"));
+        }else{
+            authorityService('/api/user/removeAuth',uid,$("#manager_chk").attr("value"));
+        }
+    }
+
+    var deptNodes = [[${deptTree}]];
+
+    $(document).ready(function () {
+        $.fn.zTree.init($("#deptTree"), setting, deptNodes);
+        $("#manager_chk").bind("change", setManagerCheck);
+    });
+
+    /*]]>*/
+</script>
+</body>
+</html>

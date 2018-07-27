@@ -5,6 +5,7 @@ import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.*;
 import cn.mxleader.quickdoc.service.impl.StreamServiceDefaultImpl;
 import cn.mxleader.quickdoc.service.impl.StreamServiceKafkaImpl;
+import cn.mxleader.quickdoc.web.domain.TreeNode;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -20,6 +21,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 @SpringBootConfiguration
 @ConditionalOnClass(StreamService.class)
@@ -72,8 +74,10 @@ public class QuickDocConfiguration {
         return args -> {
             SysProfile sysProfile = configService.getSysProfile();
             if (sysProfile == null) {
+                List<TreeNode> deptList = ldapService.getLdapOrgTree();
+                String companyName = deptList.get(0).getCompletePath();
                 sysProfile = new SysProfile(ObjectId.get(), serviceAddress(), new HashMap<>(),
-                        false, new Date(), null);
+                        false, new Date(), null, companyName, deptList);
             }
             if (!sysProfile.getInitialized()) {
 
@@ -91,6 +95,7 @@ public class QuickDocConfiguration {
                         new HashSet<SysUser.Authority>() {{
                             add(SysUser.Authority.ADMIN);
                         }},
+                        new HashSet<>(),
                         new HashSet<String>() {{
                             add("administrators");
                             add("users");

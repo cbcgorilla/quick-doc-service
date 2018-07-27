@@ -14,6 +14,7 @@ public interface UserService {
     SysUser saveUser(SysUser sysUser);
     List<SysUser> list();
     Page<SysUser> list(Pageable pageable);
+    List<SysUser> listDeptUsers(String department);
     SysUser get(String username);
     SysUser update(WebUser user);
     SysUser changePassword(ObjectId id, String newPassword);
@@ -24,5 +25,7 @@ public interface UserService {
     SysUser updateGroups(ObjectId id, Set<String> groups);
     SysUser addAuth(ObjectId userId, SysUser.Authority authority);
     SysUser removeAuth(ObjectId userId, SysUser.Authority authority);
+    SysUser addManagePath(ObjectId id, String path);
+    SysUser removeManagePath(ObjectId id, String path);
 
 }

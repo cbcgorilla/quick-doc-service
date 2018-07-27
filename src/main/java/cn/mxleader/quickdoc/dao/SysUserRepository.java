@@ -9,4 +9,5 @@ import java.util.List;
 public interface SysUserRepository extends MongoRepository<SysUser, ObjectId> {
     SysUser findByUsername(String username);
     List<SysUser> findByGroupsContaining(String group);
+    List<SysUser> findAllByDepartment(String department);
 }

@@ -43,11 +43,20 @@ public class UserRestController {
                                          @RequestParam Integer limit) {
         Page<SysUser> userPage = userService.list(PageRequest.of(page - 1, limit));
         List<WebUser> users = userPage.getContent()
-                .stream()
-                .map(WebUser::new)
+                .stream().map(WebUser::new)
                 .collect(Collectors.toList());
         return new LayuiData<>(0, "", userPage.getTotalElements(), users);
     }
+
+    @GetMapping(value = "/deptUsers")
+    //@ApiOperation("返回所有用户信息清单")
+    public LayuiData<List<WebUser>> listDeptUsers(@RequestParam String department) {
+        List<SysUser> userList = userService.listDeptUsers(department);
+        List<WebUser> users = userList.stream().map(WebUser::new)
+                .collect(Collectors.toList());
+        return new LayuiData<>(0, "", userList.size(), users);
+    }
+
 
     // -------------------Retrieve Single User------------------------------------------
 
@@ -67,6 +76,7 @@ public class UserRestController {
                 new HashSet<SysUser.Authority>() {{
                     add(SysUser.Authority.USER);
                 }},
+                new HashSet<>(),
                 webUser.getGroups(),
                 webUser.getEmail()));
 
@@ -162,6 +172,22 @@ public class UserRestController {
     public Boolean removeAuth(@RequestParam ObjectId userId,
                               @RequestParam SysUser.Authority authority) {
         userService.removeAuth(userId, authority);
+        return true;
+    }
+
+    @PostMapping("/addPath")
+    //@ApiOperation(value = "增加授权路径")
+    public Boolean addPath(@RequestParam ObjectId userId,
+                           @RequestBody TreeNode node) {
+        userService.addManagePath(userId, node.getCompletePath());
+        return true;
+    }
+
+    @PostMapping("/removePath")
+    //@ApiOperation(value = "移除授权路径")
+    public Boolean removePath(@RequestParam ObjectId userId,
+                              @RequestBody TreeNode node) {
+        userService.removeManagePath(userId, node.getCompletePath());
         return true;
     }
 

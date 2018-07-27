@@ -17,6 +17,7 @@ class SysUser(@Id var id: ObjectId,
               var ldap: Boolean,
               var department: String,
               var authorities: Set<Authority>,
+              var managePath: Set<String>,
               var groups: Set<String>,
               var email: String? = null,
               var active: Boolean? = true) : HttpSessionBindingListener {
@@ -29,10 +30,11 @@ class SysUser(@Id var id: ObjectId,
                 ldap: Boolean,
                 department: String,
                 authorities: Set<Authority>,
+                managePath: Set<String>,
                 groups: Set<String>,
                 email: String? = null)
             : this(id, username, displayName, title, password, avatarId, ldap,
-            department, authorities, groups, email, true)
+            department, authorities, managePath, groups, email, true)
 
     enum class Authority {
         ADMIN, USER, MANAGER
@@ -87,6 +89,14 @@ class SysUser(@Id var id: ObjectId,
 
     fun removeGroup(group: String) {
         this.groups -= group
+    }
+
+    fun addManagePath(path: String) {
+        this.managePath += path
+    }
+
+    fun removeManagePath(path: String) {
+        this.managePath -= path
     }
 
 }

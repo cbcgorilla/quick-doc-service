@@ -1,5 +1,6 @@
 package cn.mxleader.quickdoc.entities
 
+import cn.mxleader.quickdoc.web.domain.TreeNode
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -11,4 +12,6 @@ data class SysProfile(@Id val id: ObjectId,
                       var iconMap: Map<String, ObjectId>,
                       var initialized: Boolean,
                       var setupTime: Date,
-                      var startup: Date? = null)
+                      var startup: Date? = null,
+                      var companyName: String,
+                      var departments: List<TreeNode>)

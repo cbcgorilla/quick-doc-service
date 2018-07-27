@@ -33,11 +33,8 @@
                             <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="edit">
                                 <i class="fas fa-edit" title="修改用户信息"></i>
                             </button>
-                            <button class="layui-btn layui-btn-sm layui-btn-warm" lay-event="addAuth">
+                            <button class="layui-btn layui-btn-sm layui-btn-warm" lay-event="auth">
                                 <i class="fas fa-user-secret" title="授权角色"></i>
-                            </button>
-                            <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="removeAuth">
-                                <i class="fas fa-user-secret" title="删除角色"></i>
                             </button>
                             <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">
                                 <i class="fas fa-trash-alt" title="删除用户"></i>
@@ -266,38 +263,18 @@
 
             } else if (obj.event === 'edit') {
                 layer.alert('用户详细数据：<br>' + JSON.stringify(data))
-            } else if (obj.event === 'addAuth') {
-                layer.prompt(
-                    {
-                        title: '请输入授权角色名称',
-                        success: function (layerInput) {
-                            layerInput.find('input').on('keydown', function () {
-                                if (event.keyCode === 13) {
-                                    authorityService('/api/user/addAuth',data.id,event.target.value);
-                                }
-                            })
-                        }
-                    },
-                    function (value) {
-                        authorityService('/api/user/addAuth',data.id,value);
+            } else if (obj.event === 'auth') {
+                layer.open({
+                    type: 2,
+                    title: '管理授权',
+                    area: ['560px', '720px'],
+                    resize: false,
+                    content: 'users/auth?id=' + data.id,
+                    zIndex: layer.zIndex,
+                    success: function (layero) {
+                        layer.setTop(layero);
                     }
-                );
-            } else if (obj.event === 'removeAuth') {
-                layer.prompt(
-                    {
-                        title: '请输入待删除角色名称',
-                        success: function (layerInput) {
-                            layerInput.find('input').on('keydown', function () {
-                                if (event.keyCode === 13) {
-                                    authorityService('/api/user/removeAuth',data.id,event.target.value);
-                                }
-                            })
-                        }
-                    },
-                    function (value) {
-                        authorityService('/api/user/removeAuth',data.id,value);
-                    }
-                );
+                });
             }
         });
 
@@ -331,21 +308,6 @@
             var type = $(this).data('type');
             active[type] ? active[type].call(this) : '';
         });
-
-        function authorityService(url,userId,authority) {
-            $.ajax({
-                type: "POST",
-                url: url+"?userId=" + userId+"&authority="+authority,
-                contentType: 'application/json; charset=utf-8',
-                dataType: "json",
-                success: function (value) {
-                    console.log(value);
-                    layer.msg('权限调整成功！');
-                    reloadUserTable('/api/user/list');
-                }
-            });
-            layer.closeAll();
-        }
 
         function postGroupService(url, postData) {
             layer.prompt(

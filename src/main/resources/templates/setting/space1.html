@@ -193,9 +193,10 @@
                 );
 
                 function prompt_service(inputParam) {
+                    var codeParam = encodeURI(inputParam);
                     $.ajax({
                         type: "POST",
-                        url: "/api/disk/rename?diskId=" + data.id + "&newName=" + inputParam,
+                        url: "/api/disk/rename?diskId=" + data.id + "&newName=" + codeParam,
                         contentType: 'application/json; charset=utf-8',
                         dataType: "json",
                         success: function (value) {
@@ -290,9 +291,10 @@
                     );
 
                     function prompt_service(_newName, _row) {
+                        var code_newName = encodeURI(_newName);
                         $.ajax({
                             type: "POST",
-                            url: "/api/folder/rename?id=" + _row.id + "&newName=" + _newName,
+                            url: "/api/folder/rename?id=" + _row.id + "&newName=" + code_newName,
                             contentType: 'application/json; charset=utf-8',
                             dataType: "json",
                             success: function (value) {

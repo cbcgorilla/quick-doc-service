@@ -1,6 +1,7 @@
 package cn.mxleader.quickdoc.service.impl;
 
 import cn.mxleader.quickdoc.common.utils.HanyuPinyinUtil;
+import cn.mxleader.quickdoc.entities.SysProfile;
 import cn.mxleader.quickdoc.entities.SysUser;
 import cn.mxleader.quickdoc.service.ConfigService;
 import cn.mxleader.quickdoc.service.LDAPService;
@@ -52,6 +53,7 @@ public class LDAPServiceImpl implements LDAPService {
     }
 
     public Flux<SysUser> searchLdapUsers(String searchBase) throws NamingException {
+        SysProfile profile = configService.getSysProfile();
         Flux<SysUser> sysUserFlux = searchLdapItems(defaultPersonFilter, defaultPersonAtts, searchBase)
                 .map(sr -> {
                     try {
@@ -59,17 +61,18 @@ public class LDAPServiceImpl implements LDAPService {
                         String displayName = sr.getAttributes().get("displayName").get().toString();
                         String title = sr.getAttributes().get("title").get().toString();
                         String email = sr.getAttributes().get("mail").get().toString();
-                        String department = sr.getAttributes().get("department").get().toString();
+                        String department = profile.getCompanyName() + "-"
+                                + sr.getAttributes().get("department").get().toString();
                         return new SysUser(ObjectId.get(), sn, displayName, title,
                                 HanyuPinyinUtil.toHanyuPinyin(displayName),
-                                configService.getSysProfile().getIconMap().get("AWARD"),
+                                profile.getIconMap().get("AWARD"),
                                 true, department,
                                 new HashSet<SysUser.Authority>() {{
                                     add(SysUser.Authority.USER);
                                 }},
+                                new HashSet<>(),
                                 new HashSet<String>() {{
                                     add("users");
-                                    add(department);
                                 }},
                                 email);
                     } catch (NamingException exp) {
@@ -99,7 +102,7 @@ public class LDAPServiceImpl implements LDAPService {
         return searchLdapItems(defaultOrgFilter, defaultOrgAtts, searchBase);
     }
 
-    public TreeNode getLdapOrgTree(String searchBase) throws NamingException {
+    public List<TreeNode> getLdapOrgTree(String searchBase) throws NamingException {
         List<TreeNode> nodeList = searchLdapItems(defaultOrgFilter, defaultOrgAtts, searchBase).map(sr -> {
             TreeNode node = null;
             try {
@@ -114,8 +117,7 @@ public class LDAPServiceImpl implements LDAPService {
                 for (int i = 0; i < path.size() - 1; i++) {
                     sb.append(path.get(i) + "-");
                 }
-                int idxMinus = sb.toString().lastIndexOf("-");
-                String decPath = sb.toString().substring(0, idxMinus - 1);
+                String decPath = sb.toString().substring(0, sb.toString().lastIndexOf("-"));
                 node = new TreeNode(bytesToHexString(guid), sr.getAttributes().get("name").get().toString(),
                         "", new ArrayList<>(), true, false, decPath, path.size());
             } catch (NamingException e) {
@@ -142,12 +144,12 @@ public class LDAPServiceImpl implements LDAPService {
             TreeNode node = nodeList.get(i);
             TreeNode parent = searchNodeList(nodeList, node.getPath(), node.getLevel() - 1);
             if (parent != null)
-                parent.addChildren(node);
+                node.setParentId(parent.getId()); //parent.addChildren(node);
         }
-        return nodeList.get(0);
+        return nodeList;
     }
 
-    public TreeNode getLdapOrgTree() throws NamingException {
+    public List<TreeNode> getLdapOrgTree() throws NamingException {
         return getLdapOrgTree(defaultSearchBase);
     }
 
