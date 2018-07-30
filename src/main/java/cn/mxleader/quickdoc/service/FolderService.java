@@ -18,10 +18,10 @@ public interface FolderService {
      */
     List<SysFolder> list(ParentLink parent);
 
-    @PreAuth(target = AuthTarget.DISK)
+    @PreAuth(target = AuthTarget.DISK,actions={AuthAction.READ,AuthAction.ADMIN})
     List<SysFolder> listFoldersInDisk(ObjectId diskId);
 
-    @PreAuth(field = ParentLink.class)
+    @PreAuth(field = ParentLink.class,actions={AuthAction.READ,AuthAction.ADMIN})
     List<TreeNode> getFolderTree(ParentLink parent);
 
     /**
