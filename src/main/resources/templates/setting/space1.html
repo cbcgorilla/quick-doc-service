@@ -289,6 +289,7 @@
         function saveFolderService(folderName, selectedRow, addType) {
             var parentId = null;
             var parentType = null;
+            var folderNameCode = encodeURI(folderName);
             switch (addType) {
                 case 'sibling': {
                     if (selectedRow === null) {
@@ -311,7 +312,7 @@
             }
             $.ajax({
                 type: "POST",
-                url: "/api/folder/save?name=" + folderName + "&parentId=" + parentId + "&parentType=" + parentType + "&diskId=" + diskId,
+                url: "/api/folder/save?name=" + folderNameCode + "&parentId=" + parentId + "&parentType=" + parentType + "&diskId=" + diskId,
                 contentType: 'application/json; charset=utf-8',
                 //data: JSON.stringify(postData), //可选参数
                 dataType: "json",
