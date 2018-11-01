@@ -1,10 +1,9 @@
 buildscript {
-    ext.kotlin_version = '1.2.50'
+    ext.kotlin_version = '1.3.0'
     ext {
-        springBootVersion = '2.0.3.RELEASE'
+        springBootVersion = '2.1.0.RELEASE'
         swagger_version = '2.9.2'
-        swagger_bootstrap_version = '1.7.2'
-        spring_kafka_version = '2.1.7.RELEASE'
+        swagger_bootstrap_version = '1.8.6'
         junit_version = '4.12'
         junit_jupiter_version = '5.2.0'
         junit_vintage_version = '5.2.0'
@@ -12,8 +11,8 @@ buildscript {
         jodconverterVersion = '4.2.0'
         libreOfficeVersion = '5.4.2'
         gson_version = '2.8.5'
-        aspect_version = '1.9.1'
-        cglib_version = '3.2.6'
+        aspect_version = '1.9.2'
+        cglib_version = '3.2.9'
         pinyin4j_version = '2.5.0'
     }
     repositories {
@@ -68,7 +67,7 @@ dependencies {
     //compile("io.springfox:springfox-swagger2:$swagger_version")
     //compile("io.springfox:springfox-swagger-ui:$swagger_version")
     //compile("com.github.xiaoymin:swagger-bootstrap-ui:$swagger_bootstrap_version")
-    compile("org.springframework.kafka:spring-kafka:$spring_kafka_version")
+    compile("org.springframework.kafka:spring-kafka")
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
     compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")

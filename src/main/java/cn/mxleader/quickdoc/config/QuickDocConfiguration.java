@@ -54,6 +54,7 @@ public class QuickDocConfiguration {
         else
             return new StreamServiceDefaultImpl();
     }
+
 /*
     @Bean
     public MultipartResolver multipartResolver(){

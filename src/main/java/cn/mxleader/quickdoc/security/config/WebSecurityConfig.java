@@ -64,11 +64,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and().httpBasic()
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .and().exceptionHandling()
-                    .accessDeniedHandler(accessDeniedHandler());
+                    .accessDeniedHandler(accessDeniedHandler1());
         }
 
         @Bean
-        public AccessDeniedHandler accessDeniedHandler() {
+        public AccessDeniedHandler accessDeniedHandler1() {
             return new ApiAccessDeniedHandler();
         }
 
@@ -174,7 +174,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .logoutSuccessUrl("/login?logout=true")
                     .permitAll()
                     .and().exceptionHandling()
-                    .accessDeniedHandler(accessDeniedHandler());
+                    .accessDeniedHandler(accessDeniedHandler2());
             // @formatter:on
         }
 
@@ -194,7 +194,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         }
 
         @Bean
-        public AccessDeniedHandler accessDeniedHandler() {
+        public AccessDeniedHandler accessDeniedHandler2() {
             return new ApiAccessDeniedHandler();
         }
 

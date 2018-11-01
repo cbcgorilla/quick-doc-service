@@ -2,12 +2,23 @@ package cn.mxleader.quickdoc.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
+import org.springframework.web.context.support.RequestHandledEvent;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    /**
+     * WEB请求事件监听器
+     * @param event
+     */
+    @EventListener
+    public void requestHandledEventApplicationListener(RequestHandledEvent event){
+        System.out.println("请求处理监听事件："+event);
+    }
 
     /**
      * 配置拦截器的Bean

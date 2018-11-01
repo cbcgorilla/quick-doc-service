@@ -246,6 +246,17 @@ public class GridFsAssistant implements GridFsOperations, ResourcePatternResolve
 
     /*
      * (non-Javadoc)
+     * @see org.springframework.data.mongodb.gridfs.GridFsOperations#getResource(com.mongodb.client.gridfs.model.GridFSFile)
+     */
+    public GridFsResource getResource(GridFSFile file) {
+
+        Assert.notNull(file, "GridFSFile must not be null!");
+
+        return new GridFsResource(file, getGridFs().openDownloadStream(file.getObjectId()));
+    }
+
+    /*
+     * (non-Javadoc)
      * @see org.springframework.core.io.support.ResourcePatternResolver#getResources(java.lang.String)
      */
     public GridFsResource[] getResources(String locationPattern) {

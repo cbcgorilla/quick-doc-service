@@ -119,8 +119,8 @@ public class UserController {
             if (node.getParentId().equalsIgnoreCase(parent.getId())) {
                 removeChildren(tree, tempSet, node);
             }
-            tempSet.add(parent);
         }
+        tempSet.add(parent);
     }
 
     @GetMapping("/password")
