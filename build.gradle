@@ -3,10 +3,10 @@ buildscript {
     ext {
         springBootVersion = '2.1.0.RELEASE'
         swagger_version = '2.9.2'
-        swagger_bootstrap_version = '1.8.6'
+        swagger_bootstrap_version = '1.8.7'
         junit_version = '4.12'
-        junit_jupiter_version = '5.2.0'
-        junit_vintage_version = '5.2.0'
+        junit_jupiter_version = '5.3.2'
+        junit_vintage_version = '5.3.2'
         junit_platform_version = '1.2.0'
         jodconverterVersion = '4.2.0'
         libreOfficeVersion = '5.4.2'
