@@ -1,7 +1,7 @@
 buildscript {
-    ext.kotlin_version = '1.3.0'
+    ext.kotlin_version = '1.3.11'
     ext {
-        springBootVersion = '2.1.0.RELEASE'
+        springBootVersion = '2.1.1.RELEASE'
         swagger_version = '2.9.2'
         swagger_bootstrap_version = '1.8.7'
         junit_version = '4.12'
@@ -64,8 +64,8 @@ dependencies {
     }
     // https://mvnrepository.com/artifact/org.apache.tika/tika-core
     compile ("org.apache.tika:tika-core:1.18") // APACHE TIKA 文件类型识别库
-    //compile("io.springfox:springfox-swagger2:$swagger_version")
-    //compile("io.springfox:springfox-swagger-ui:$swagger_version")
+    compile("io.springfox:springfox-swagger2:$swagger_version")
+    compile("io.springfox:springfox-swagger-ui:$swagger_version")
     //compile("com.github.xiaoymin:swagger-bootstrap-ui:$swagger_bootstrap_version")
     compile("org.springframework.kafka:spring-kafka")
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
